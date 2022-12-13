@@ -9,7 +9,7 @@ const { setTimeout, setInterval, clearTimeout, clearInterval } = require("node:t
 const { ExptechAPI } = require("@kamiya4047/exptech-api-wrapper");
 const Exptech = new ExptechAPI();
 const axios = require("axios");
-const bytenode = require("bytenode");
+// const bytenode = require("bytenode");
 const maplibregl = require("maplibre-gl");
 TREM.Audios = {
 	pga1   : new Audio("../audio/PGA1.wav"),
@@ -28,16 +28,15 @@ TREM.EEW = new Map();
 TREM.Utils = require(path.resolve(__dirname, "../Utils/Utils.js"));
 localStorage.dirname = __dirname;
 
-// if (fs.existsSync(path.resolve(__dirname, "../../server.js"))) {
-// 	const vm = require("vm");
-// 	const v8 = require("v8");
-// 	v8.setFlagsFromString("--no-lazy");
-// 	const code = fs.readFileSync(path.resolve(__dirname, "../../server.js"), "utf-8");
-// 	const script = new vm.Script(code);
-// 	const bytecode = script.createCachedData();
-// 	fs.writeFileSync(path.resolve(__dirname, "../js/server.jar"), bytecode);
-// }
-// bytenode.runBytecodeFile(path.resolve(__dirname, "../js/server.jar"));
+if (fs.existsSync(path.resolve(__dirname, "../../server.js"))) {
+	const vm = require("vm");
+	const v8 = require("v8");
+	v8.setFlagsFromString("--no-lazy");
+	const code = fs.readFileSync(path.resolve(__dirname, "../../server.js"), "utf-8");
+	const script = new vm.Script(code);
+	const bytecode = script.createCachedData();
+	fs.writeFileSync(path.resolve(__dirname, "../js/server.jar"), bytecode);
+}
 
 // #region 變數
 const posturl = "https://exptech.com.tw/api/v1/trem/";
@@ -742,12 +741,7 @@ class EEW {
 }
 
 // #region 初始化
-const _unlock = fs.existsSync(path.join(app.getPath("userData"), "unlock.tmp"));
 bytenode.runBytecodeFile(path.resolve(__dirname, "../js/server.jar"));
-const folder = path.join(app.getPath("userData"), "data");
-
-if (!fs.existsSync(folder))
-	fs.mkdirSync(folder);
 const win = BrowserWindow.fromId(process.env.window * 1);
 const roll = document.getElementById("rolllist");
 win.setAlwaysOnTop(false);
@@ -3636,26 +3630,14 @@ ipcRenderer.on("config:maplayer", (event, mapName, state) => {
 // #endregion
 
 // #region EEW
-function FCMdata(data, Unit) {
-	const json = JSON.parse(data);
+async function FCMdata(json, Unit) {
 	console.log(json);
 
 	if (server_timestamp.includes(json.TimeStamp) || NOW.getTime() - json.TimeStamp > 180000) return;
 	server_timestamp.push(json.TimeStamp);
 
 	if (server_timestamp.length > 15) server_timestamp.splice(0, 1);
-	// eslint-disable-next-line no-empty-function
-	fs.writeFile(path.join(app.getPath("userData"), "server.json"), JSON.stringify(server_timestamp), () => {});
-	GetData = true;
-
-	if (json.response != "You have successfully subscribed to earthquake information") {
-		const filename = NOW.getTime();
-		json.data_unit = Unit;
-		json.delay = NOW.getTime() - json.TimeStamp;
-		fs.writeFile(path.join(folder, `${filename}.tmp`), JSON.stringify(json), (err) => {
-			fs.rename(path.join(folder, `${filename}.tmp`), path.join(folder, `${filename}.json`), () => void 0);
-		});
-	}
+	fs.writeFile(path.join(app.getPath("userData"), "server.json"), JSON.stringify(server_timestamp), () => void 0);
 
 	if (json.TimeStamp != undefined)
 		dump({ level: 0, message: `Latency: ${NOW.getTime() - json.TimeStamp}ms`, origin: "API" });
@@ -3721,7 +3703,7 @@ function FCMdata(data, Unit) {
 				Shot     : 1,
 			});
 		}, 5000);
-	} else if (json.Function != undefined && json.Function.includes("earthquake") || json.Replay || json.Test || (_unlock && json.Function == "TREM")) {
+	} else if (json.Function != undefined && json.Function.includes("earthquake") || json.Replay || json.Test) {
 		if (replay != 0 && !json.Replay) return;
 
 		if (replay == 0 && json.Replay) return;
