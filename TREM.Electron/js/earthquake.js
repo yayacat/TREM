@@ -1997,7 +1997,8 @@ function PGAMain() {
 						Response = ans;
 						handler(Response);
 					}
-				handler(Response);
+				else
+					handler(Response);
 			} catch (err) {
 				console.log(err);
 				// TimerDesynced = true;
@@ -2045,7 +2046,8 @@ function PGAMainbkup() {
 							PGAMain();
 						});
 					}
-				handler(Response);
+				else
+					handler(Response);
 			} catch (err) {
 				console.log(err);
 				// TimerDesynced = true;
@@ -3636,7 +3638,7 @@ ipcRenderer.on("config:maplayer", (event, mapName, state) => {
 // #endregion
 
 // #region EEW
-async function FCMdata(json, Unit) {
+function FCMdata(json, Unit) {
 	console.log(json);
 
 	if (server_timestamp.includes(json.TimeStamp) || NOW.getTime() - json.TimeStamp > 180000) return;
