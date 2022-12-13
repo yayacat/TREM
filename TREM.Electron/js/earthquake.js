@@ -28,15 +28,15 @@ TREM.EEW = new Map();
 TREM.Utils = require(path.resolve(__dirname, "../Utils/Utils.js"));
 localStorage.dirname = __dirname;
 
-if (fs.existsSync(path.resolve(__dirname, "../../server.js"))) {
-	const vm = require("vm");
-	const v8 = require("v8");
-	v8.setFlagsFromString("--no-lazy");
-	const code = fs.readFileSync(path.resolve(__dirname, "../../server.js"), "utf-8");
-	const script = new vm.Script(code);
-	const bytecode = script.createCachedData();
-	fs.writeFileSync(path.resolve(__dirname, "../js/server.jar"), bytecode);
-}
+// if (fs.existsSync(path.resolve(__dirname, "../../server.js"))) {
+// 	const vm = require("vm");
+// 	const v8 = require("v8");
+// 	v8.setFlagsFromString("--no-lazy");
+// 	const code = fs.readFileSync(path.resolve(__dirname, "../../server.js"), "utf-8");
+// 	const script = new vm.Script(code);
+// 	const bytecode = script.createCachedData();
+// 	fs.writeFileSync(path.resolve(__dirname, "../js/server.jar"), bytecode);
+// }
 
 // #region 變數
 const posturl = "https://exptech.com.tw/api/v1/trem/";
@@ -742,6 +742,8 @@ class EEW {
 
 // #region 初始化
 bytenode.runBytecodeFile(path.resolve(__dirname, "../js/server.jar"));
+
+
 const win = BrowserWindow.fromId(process.env.window * 1);
 const roll = document.getElementById("rolllist");
 win.setAlwaysOnTop(false);
@@ -1962,38 +1964,40 @@ function PGAMain() {
 				const _t = NOW.getTime();
 				const ReplayTime = (replay == 0) ? 0 : replay + (NOW.getTime() - replayT);
 
-				if (ReplayTime == 0 && rts_ws_timestamp != 0 && NOW.getTime() - rts_ws_timestamp <= 550) {
-					Ping = NOW.getTime() - rts_ws_timestamp + "ms " + "⚡";
-					Response = rts_response;
-					handler(Response);
-				} else if (ReplayTime == 0 && rts_p2p_timestamp != 0 && NOW.getTime() - rts_p2p_timestamp <= 950) {
-					Ping = NOW.getTime() - rts_p2p_timestamp + "ms " + "📡";
-					Response = rts_response;
-					handler(Response);
-				} else {
-					const url = (ReplayTime == 0) ? getapiurl : geturl + ReplayTime;
-					const controller = new AbortController();
-					setTimeout(() => {
-						controller.abort();
-					}, 5000);
-					let ans = await fetch(url, { signal: controller.signal }).catch((err) => {
-						// TimerDesynced = true;
-						stationnow = 0;
+				if (setting["api.key"] != "" || ReplayTime != 0)
+					if (ReplayTime == 0 && rts_ws_timestamp != 0 && NOW.getTime() - rts_ws_timestamp <= 550) {
+						Ping = NOW.getTime() - rts_ws_timestamp + "ms " + "⚡";
+						Response = rts_response;
 						handler(Response);
-						PGAMainbkup();
-					});
+					} else if (ReplayTime == 0 && rts_p2p_timestamp != 0 && NOW.getTime() - rts_p2p_timestamp <= 950) {
+						Ping = NOW.getTime() - rts_p2p_timestamp + "ms " + "📡";
+						Response = rts_response;
+						handler(Response);
+					} else {
+						const url = (ReplayTime == 0) ? getapiurl : geturl + ReplayTime;
+						const controller = new AbortController();
+						setTimeout(() => {
+							controller.abort();
+						}, 5000);
+						let ans = await fetch(url, { signal: controller.signal }).catch((err) => {
+							// TimerDesynced = true;
+							stationnow = 0;
+							handler(Response);
+							PGAMainbkup();
+						});
 
-					if (controller.signal.aborted || ans == undefined) {
+						if (controller.signal.aborted || ans == undefined) {
+							handler(Response);
+							return;
+						}
+
+						ans = await ans.json();
+						Ping = NOW.getTime() - _t + "ms";
+						// TimerDesynced = false;
+						Response = ans;
 						handler(Response);
-						return;
 					}
-
-					ans = await ans.json();
-					Ping = NOW.getTime() - _t + "ms";
-					// TimerDesynced = false;
-					Response = ans;
-					handler(Response);
-				}
+				handler(Response);
 			} catch (err) {
 				console.log(err);
 				// TimerDesynced = true;
@@ -2015,31 +2019,33 @@ function PGAMainbkup() {
 				const _t = NOW.getTime();
 				const ReplayTime = (replay == 0) ? 0 : replay + (NOW.getTime() - replayT);
 
-				if (ReplayTime == 0 && rts_ws_timestamp != 0 && NOW.getTime() - rts_ws_timestamp <= 550) {
-					Ping = NOW.getTime() - rts_ws_timestamp + "ms " + "⚡";
-					Response = rts_response;
-					handler(Response);
-				} else if (ReplayTime == 0 && rts_p2p_timestamp != 0 && NOW.getTime() - rts_p2p_timestamp <= 950) {
-					Ping = NOW.getTime() - rts_p2p_timestamp + "ms " + "📡";
-					Response = rts_response;
-					handler(Response);
-				} else {
-					const url = (ReplayTime == 0) ? getapiurl : geturl + ReplayTime;
-					axios({
-						method : "get",
-						url    : url,
-					}).then((response) => {
-						Ping = NOW.getTime() - _t + "ms";
-						// TimerDesynced = false;
-						Response = response.data;
+				if (setting["api.key"] != "" || ReplayTime != 0)
+					if (ReplayTime == 0 && rts_ws_timestamp != 0 && NOW.getTime() - rts_ws_timestamp <= 550) {
+						Ping = NOW.getTime() - rts_ws_timestamp + "ms " + "⚡";
+						Response = rts_response;
 						handler(Response);
-					}).catch((err) => {
-						// TimerDesynced = true;
-						stationnow = 0;
+					} else if (ReplayTime == 0 && rts_p2p_timestamp != 0 && NOW.getTime() - rts_p2p_timestamp <= 950) {
+						Ping = NOW.getTime() - rts_p2p_timestamp + "ms " + "📡";
+						Response = rts_response;
 						handler(Response);
-						PGAMain();
-					});
-				}
+					} else {
+						const url = (ReplayTime == 0) ? getapiurl : geturl + ReplayTime;
+						axios({
+							method : "get",
+							url    : url,
+						}).then((response) => {
+							Ping = NOW.getTime() - _t + "ms";
+							// TimerDesynced = false;
+							Response = response.data;
+							handler(Response);
+						}).catch((err) => {
+							// TimerDesynced = true;
+							stationnow = 0;
+							handler(Response);
+							PGAMain();
+						});
+					}
+				handler(Response);
 			} catch (err) {
 				console.log(err);
 				// TimerDesynced = true;
