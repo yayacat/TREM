@@ -2932,8 +2932,8 @@ function addReport(report, prepend = false) {
 			],
 		},
 	];
-	const Level = IntensityI(report.data[0]?.areaIntensity);
-	if (setting["api.key"] == "" && Level == 0) return;
+	const Level = IntensityI(report.data[0].areaIntensity);
+	// if (setting["api.key"] == "" && Level == 0) return;
 	let msg = "";
 
 	if (report.location.includes("("))
@@ -3078,7 +3078,7 @@ function addReport(report, prepend = false) {
 		report_container.append(report_intensity_container, report_detail_container);
 		ripple(Div);
 		Div.append(report_container);
-		Div.className += IntensityToClassString((report.data[0]?.areaIntensity == 0) ? 1 : report.data[0]?.areaIntensity);
+		Div.className += IntensityToClassString((report.data[0].areaIntensity == 0) ? 1 : report.data[0].areaIntensity);
 		Div.addEventListener("click", () => {
 			if (replay != 0) return;
 			TREM.set_report_overview = 1;
