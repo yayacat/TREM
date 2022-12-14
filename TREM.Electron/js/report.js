@@ -36,7 +36,7 @@ TREM.Report = {
 				.filter(v => this._filterHasNumber ? v.earthquakeNo % 1000 != 0 : true)
 				.filter(v => this._filterHasReplay ? v.ID?.length : true)
 				.filter(v => this._filterMagnitude ? this._filterMagnitudeValue == 1 ? v.magnitudeValue < 4.5 : v.magnitudeValue >= 4.5 : true)
-				.filter(v => this._filterIntensity ? v.data[0].areaIntensity == this._filterIntensityValue : true);
+				.filter(v => this._filterIntensity ? v.data[0]?.areaIntensity == this._filterIntensityValue : true);
 
 			for (const report of reports) {
 				if (setting["api.key"] == "" && report.data[0].areaIntensity == 0) continue;
@@ -46,7 +46,7 @@ TREM.Report = {
 					(this._filterHasNumber && !(report.earthquakeNo % 1000))
 					|| (this._filterHasReplay && !(report.ID?.length))
 					|| (this._filterMagnitude && !(this._filterMagnitudeValue == 1 ? report.magnitudeValue < 4.5 : report.magnitudeValue >= 4.5))
-					|| (this._filterIntensity && !(report.data[0].areaIntensity == this._filterIntensityValue))) {
+					|| (this._filterIntensity && !(report.data[0]?.areaIntensity == this._filterIntensityValue))) {
 					element.classList.add("hide");
 					element.style.display = "none";
 				} else if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl") {
@@ -54,7 +54,7 @@ TREM.Report = {
 						element: $(TREM.Resources.icon.cross(
 							{
 								size         : report.magnitudeValue * 4,
-								className    : `epicenterIcon clickable raise-on-hover ${IntensityToClassString(report.data[0].areaIntensity)}`,
+								className    : `epicenterIcon clickable raise-on-hover ${IntensityToClassString(report.data[0]?.areaIntensity)}`,
 								opacity      : (reports.length - reports.indexOf(report)) / reports.length,
 								zIndexOffset : 1000 + reports.length - reports.indexOf(report),
 							}))[0],
@@ -92,16 +92,21 @@ TREM.Report = {
 	_createReportItem(data) {
 		const el = document.importNode(this._reportItemTemplate.content, true).querySelector(".report-list-item");
 		el.id = data.identifier;
-		el.className += ` ${IntensityToClassString(data.data[0].areaIntensity)}`;
+		el.className += ` ${IntensityToClassString(data.data[0]?.areaIntensity)}`;
 		el.querySelector(".report-list-item-location").innerText = data.location;
 		el.querySelector(".report-list-item-id").innerText = data.earthquakeNo % 1000 ? data.earthquakeNo : "小區域有感地震";
 		el.querySelector(".report-list-item-time").innerText = data.originTime.replace(/-/g, "/");
-		el.querySelector("button").value = data.identifier;
-		el.querySelector("button").addEventListener("click", function() {
-			TREM.set_report_overview = 0;
-			TREM.Report.setView("report-overview", this.value);
-		});
-		ripple(el.querySelector("button"));
+
+		if (data.data[0]?.areaIntensity) {
+			el.querySelector("button").value = data.identifier;
+			el.querySelector("button").addEventListener("click", function() {
+				TREM.Report.setView("report-overview", this.value);
+			});
+			ripple(el.querySelector("button"));
+		} else {
+			el.querySelector("button").style.display = "none";
+		}
+
 		return el;
 	},
 
@@ -125,7 +130,7 @@ TREM.Report = {
 			.filter(v => this._filterHasNumber ? v.earthquakeNo % 1000 != 0 : true)
 			.filter(v => this._filterHasReplay ? v.ID?.length : true)
 			.filter(v => this._filterMagnitude ? this._filterMagnitudeValue == 1 ? v.magnitudeValue < 4.5 : v.magnitudeValue >= 4.5 : true)
-			.filter(v => this._filterIntensity ? v.data[0].areaIntensity == this._filterIntensityValue : true);
+			.filter(v => this._filterIntensity ? v.data[0]?.areaIntensity == this._filterIntensityValue : true);
 
 		this._updateReports(oldlist, this.reportList);
 	},
@@ -247,7 +252,7 @@ TREM.Report = {
 
 		for (const areaData of report.data) {
 			const areaString = [];
-			areaString.push(`${areaData.areaName}地區最大震度 ${int(areaData.areaIntensity)}`);
+			areaString.push(`${areaData.areaName}地區最大震度 ${int(areaData?.areaIntensity)}`);
 			for (const stationData of areaData.eqStation)
 				areaString.push(`　　　${name(stationData.stationName)} ${int(stationData.stationIntensity)}　　　`);
 
@@ -338,7 +343,7 @@ TREM.Report = {
 					element: $(TREM.Resources.icon.cross(
 						{
 							size         : report.magnitudeValue * 4,
-							className    : `epicenterIcon clickable raise-on-hover ${IntensityToClassString(report.data[0].areaIntensity)}`,
+							className    : `epicenterIcon clickable raise-on-hover ${IntensityToClassString(report.data[0]?.areaIntensity)}`,
 							opacity      : (newlist.length - newlist.indexOf(report)) / newlist.length,
 							zIndexOffset : 1000 + this.cache.size - keys.indexOf(report.identifier),
 						}))[0],
@@ -438,7 +443,7 @@ TREM.Report = {
 		document.getElementById("report-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hour12: false, timeZone: "Asia/Taipei" });
 		document.getElementById("report-overview-latitude").innerText = report.epicenterLat;
 		document.getElementById("report-overview-longitude").innerText = report.epicenterLon;
-		const int = `${IntensityI(report.data[0].areaIntensity)}`.split("");
+		const int = `${IntensityI(report.data[0]?.areaIntensity)}`.split("");
 		document.getElementById("report-overview-intensity").innerText = int[0];
 		document.getElementById("report-overview-intensity").className = (int[1] == "+") ? "strong"
 			: (int[1] == "-") ? "weak"
