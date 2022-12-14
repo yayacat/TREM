@@ -2906,6 +2906,18 @@ function ReportList(earthquakeReportArr, palert) {
 
 function addReport(report, prepend = false) {
 	if (replay != 0 && new Date(report.originTime).getTime() > new Date(replay + (NOW.getTime() - replayT)).getTime()) return;
+
+	if (report.data.length == 0) report.data = [
+		{
+			areaName      : "未知",
+			areaIntensity : 0,
+			eqStation     : [
+				{
+					stationName: "未知",
+				},
+			],
+		},
+	];
 	const Level = IntensityI(report.data[0].areaIntensity);
 	let msg = "";
 
@@ -3027,7 +3039,7 @@ function addReport(report, prepend = false) {
 
 		const report_intensity_value = document.createElement("span");
 		report_intensity_value.className = "report-intensity-value";
-		report_intensity_value.innerText = Level;
+		report_intensity_value.innerText = (Level == 0) ? "--" : Level;
 		report_intensity_container.append(report_intensity_title_container, report_intensity_value);
 
 
@@ -3687,6 +3699,13 @@ function FCMdata(json, Unit) {
 
 		if (setting["audio.report"]) audioPlay("../audio/Report.wav");
 
+		const now = new Date(json.Time);
+		json["UTC+8"] = now.getFullYear()
+				+ "/" + (now.getMonth() + 1)
+				+ "/" + now.getDate()
+				+ " " + now.getHours()
+				+ ":" + now.getMinutes()
+				+ ":" + now.getSeconds();
 		const report = json.raw;
 		const location = report.location.match(/(?<=位於).+(?=\))/);
 
