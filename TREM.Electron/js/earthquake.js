@@ -4125,9 +4125,9 @@ TREM.Earthquake.on("eew", (data) => {
 // #endregion
 
 // #region Event: eewEnd
-// TREM.Earthquake.on("eewEnd", (id) => {
-
-// });
+TREM.Earthquake.on("eewEnd", (id) => {
+	void 0;
+});
 // #endregion
 
 
