@@ -3319,7 +3319,7 @@ function handler(Json) {
 							Time     : NOW().getTime(),
 							Shot     : 1,
 						});
-					}, 250);
+					}, 300);
 
 					if (setting["Real-time.show"]) win.showInactive();
 
@@ -3329,8 +3329,6 @@ function handler(Json) {
 							win.focus();
 							win.setAlwaysOnTop(false);
 						}
-
-					if (!win.isFocused()) win.flashFrame(true);
 				}
 
 			intensitytag = -1;
@@ -5717,7 +5715,13 @@ TREM.Earthquake.on("eew", (data) => {
 					}
 
 					eew[data.id].t = setInterval(() => {
-						eew[data.id].value = Math.floor(_speed(data.depth, distance).Stime - (NOW().getTime() - data.time) / 1000);
+						try {
+							eew[data.id].value = Math.floor(_speed(data.depth, distance).Stime - (NOW().getTime() - data.time) / 1000);
+						} catch (err) {
+							log(err, 3, "Audio", "eew");
+							dump({ level: 2, message: err, origin: "Audio" });
+							console.log(err);
+						}
 
 						if (Math.sign(eew[data.id].value) != -1) {
 							eew[data.id].Second = eew[data.id].value;
@@ -7024,8 +7028,14 @@ function main(data) {
 		clearInterval(EarthquakeList[data.id].Timer);
 		document.getElementById("box-10").innerHTML = "";
 
+		if (eew[data.id].t != null) {
+			clearInterval(eew[data.id].t);
+			eew[data.id].t = null;
+		}
+
 		// if (EarthquakeList[data.id].Depth != null) Maps.main.removeLayer(EarthquakeList[data.id].Depth);
 		delete EarthquakeList[data.id];
+		delete eew[data.id];
 
 		if (Object.keys(EarthquakeList).length == 0) {
 			for (let index = 0, keys = Object.keys(eew), n = keys.length; index < n; index++)

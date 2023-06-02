@@ -121,6 +121,7 @@ TREM.Report = {
 		el.className += ` ${IntensityToClassString(report.data[0]?.areaIntensity)}`;
 		el.querySelector(".report-list-item-location").innerText = report.location;
 		el.querySelector(".report-list-item-id").innerText = TREM.Localization.getString(report.location.startsWith("地震資訊") ? "Report_Title_Local" : (report.earthquakeNo % 1000 ? report.earthquakeNo : "Report_Title_Small"));
+		el.querySelector(".report-list-item-unit-Magnitude").innerHTML = (report.location.startsWith("地震資訊")) ? "M<sub>d</sub>:" : "M<sub>L</sub>:";
 		el.querySelector(".report-list-item-Magnitude").innerText = report.magnitudeValue == 0 ? "0.0" : report.magnitudeValue;
 		el.querySelector(".report-list-item-time").innerText = report.originTime.replace(/-/g, "/");
 
@@ -612,6 +613,7 @@ TREM.Report = {
 		}
 
 		document.getElementById("report-overview-intensity-location").innerText = (report.location.startsWith("地震資訊")) ? "" : `${report.data[0].areaName} ${report.data[0].eqStation[0].stationName}`;
+		document.getElementById("report-overview-unit-magnitude").innerHTML = (report.location.startsWith("地震資訊")) ? "M<sub>d</sub>" : "M<sub>L</sub>";
 		document.getElementById("report-overview-magnitude").innerText = report.magnitudeValue == 0 ? "0.0" : report.magnitudeValue;
 		document.getElementById("report-overview-depth").innerText = report.depth;
 
