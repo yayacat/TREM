@@ -69,6 +69,9 @@ let MapBases = { main: new Map(), mini: new Map(), report: new Map(), intensity:
 const Station = {};
 const detected_box_list = {};
 const detected_list = {};
+let eew_list = {};
+let eew_number = 0;
+let eew_list_epicenterIcon = null;
 let Cancel = false;
 let Canceltime = 0;
 let RMT = 1;
@@ -172,6 +175,46 @@ TREM.MapIntensity = {
 					}
 				}
 
+				if (speecd_use && rawPalertData.final) {
+					const now = timeconvert(new Date(rawPalertData.time)).format("YYYY/MM/DD HH:mm:ss");
+					let intensity_index0 = 0;
+					let description0 = "";
+
+					for (let index = this.MaxI; index != 0; index--) {
+						const intensity0 = `${IntensityI(index)}級`;
+						let countyName_index0 = "";
+
+						for (const palertEntry of rawPalertData.intensity) {
+							const [countyName, townName] = palertEntry.loc.split(" ");
+
+							if (palertEntry.intensity == index) {
+								if (countyName_index0 == "") {
+									description0 += `${countyName} `;
+
+									if (rawPalertData.intensity.length != intensity_index0)
+										description0 += `${intensity0.replace("-級", "弱").replace("+級", "強")}\n`;
+								} else if (countyName_index0 == countyName) {
+									continue;
+								} else {
+									description0 += `\n${countyName} `;
+
+									if (rawPalertData.intensity.length != intensity_index0)
+										description0 += `${intensity0.replace("-級", "弱").replace("+級", "強")}\n`;
+								}
+
+								countyName_index0 = countyName;
+								intensity_index0 += 1;
+							}
+						}
+					}
+
+					TREM.speech.speak({ text: "震度速報"
+					+ "資料來源PAlert(最終報)"
+					+ "時間" + now
+					+ "觸發測站" + rawPalertData.tiggered + "台震度分布"
+					+ description0 });
+				}
+
 				if (setting["webhook.url"] != "" && setting["palert.Notification"]) {
 					log("Posting Notification palert Webhook", 1, "Webhook", "palert");
 					dump({ level: 0, message: "Posting Notification palert Webhook", origin: "Webhook" });
@@ -241,46 +284,6 @@ TREM.MapIntensity = {
 						log(error, 3, "Webhook", "palert");
 						dump({ level: 2, message: error, origin: "Webhook" });
 					});
-				}
-
-				if (speecd_use && rawPalertData.final) {
-					const now = timeconvert(new Date(rawPalertData.time)).format("YYYY/MM/DD HH:mm:ss");
-					let intensity_index0 = 0;
-					let description0 = "";
-
-					for (let index = this.MaxI; index != 0; index--) {
-						const intensity0 = `${IntensityI(index)}級`;
-						let countyName_index0 = "";
-
-						for (const palertEntry of rawPalertData.intensity) {
-							const [countyName, townName] = palertEntry.loc.split(" ");
-
-							if (palertEntry.intensity == index) {
-								if (countyName_index0 == "") {
-									description0 += `${countyName} `;
-
-									if (rawPalertData.intensity.length != intensity_index0)
-										description0 += `${intensity0.replace("-級", "弱").replace("+級", "強")}\n`;
-								} else if (countyName_index0 == countyName) {
-									continue;
-								} else {
-									description0 += `\n${countyName} `;
-
-									if (rawPalertData.intensity.length != intensity_index0)
-										description0 += `${intensity0.replace("-級", "弱").replace("+級", "強")}\n`;
-								}
-
-								countyName_index0 = countyName;
-								intensity_index0 += 1;
-							}
-						}
-					}
-
-					TREM.speech.speak({ text: "震度速報"
-					+ "資料來源PAlert(最終報)"
-					+ "時間" + now
-					+ "觸發測站" + rawPalertData.tiggered + "台震度分布"
-					+ description0 });
 				}
 
 				if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl") {
@@ -547,7 +550,7 @@ TREM.PWS = {
 						element: $("<img src=\"../image/warn.png\" height=\"32\" width=\"32\"></img>")[0],
 					})
 						.setLngLat([area.longitude, area.latitude])
-						.setPopup(new maplibregl.Popup({ closeButton: false, closeOnClick: false, maxWidth: 360 }).setHTML(`<div class="marker-popup pws-popup"><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString(undefined, { dateStyle: "long", timeStyle: "full", hour12: false, timeZone: "Asia/Taipei" })}\n失效時間：${pws.expireTime.toLocaleString(undefined, { dateStyle: "long", timeStyle: "full", hour12: false, timeZone: "Asia/Taipei" })}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`))
+						.setPopup(new maplibregl.Popup({ closeButton: false, closeOnClick: false, maxWidth: 360 }).setHTML(`<div class="marker-popup pws-popup"><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString(undefined, { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })}\n失效時間：${pws.expireTime.toLocaleString(undefined, { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`))
 						.addTo(Maps.main);
 					areaconst += 1;
 				} else {
@@ -569,7 +572,7 @@ TREM.PWS = {
 						keyboard : false,
 					})
 						.addTo(Maps.main)
-						.bindPopup(`<div><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString(undefined, { dateStyle: "long", timeStyle: "full", hour12: false, timeZone: "Asia/Taipei" })}\n失效時間：${pws.expireTime.toLocaleString(undefined, { dateStyle: "long", timeStyle: "full", hour12: false, timeZone: "Asia/Taipei" })}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`, {
+						.bindPopup(`<div><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString(undefined, { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })}\n失效時間：${pws.expireTime.toLocaleString(undefined, { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`, {
 							offset    : [8, 0],
 							permanent : false,
 							className : "marker-popup pws-popup",
@@ -671,9 +674,7 @@ TREM.PWS = {
 			}
 
 			TREM.PWS.cache.delete(pwsId);
-		}
-
-		if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl") {
+		} else if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl") {
 			if (TREM.PWS.cache.size) {
 				log("Clearing PWS map", 1, "PWS", "clear");
 				dump({ level: 0, message: "Clearing PWS map", origin: "PWS" });
@@ -774,7 +775,7 @@ TREM.MapArea2 = {
 	timer       : null,
 	PLoc        : {},
 	setArea(Json) {
-		console.log(Json);
+		// console.log(Json);
 
 		const max_intensity_list = {};
 
@@ -2930,7 +2931,7 @@ function handler(Json) {
 
 	if (detection_location.length) TREM.MapArea2.setArea(Json);
 
-	if (Object.keys(detection_list).length) console.log(detection_list);
+	// if (Object.keys(detection_list).length) console.log(detection_list);
 
 	for (let index = 0, keys = Object.keys(station), n = keys.length; index < n; index++) {
 		const uuid = keys[index];
@@ -3017,6 +3018,202 @@ function handler(Json) {
 				station_tooltip = `<div class="marker-popup rt-station-popup rt-station-detail-container"><span class="rt-station-id">${keys[index]}</span><span class="rt-station-name">${station[keys[index]].Loc}</span><span class="rt-station-pga">${amount}</span><span class="rt-station-int">${current_data.i}</span></div>`;
 			else
 				station_tooltip = `<div>${keys[index]}</div><div>${station[keys[index]].Loc}</div><div>${amount}</div><div>${current_data.i}</div>`;
+
+			// const intensityI = (amount > 800) ? 9
+			// 	: (amount > 440) ? 8
+			// 		: (amount > 250) ? 7
+			// 			: (amount > 140) ? 6
+			// 				: (amount > 80) ? 5
+			// 					: (amount > 25) ? 4
+			// 						: (amount > 8) ? 3
+			// 							: (amount > 2.5) ? 2
+			// 								: (amount > 0.8) ? 1
+			// 									: 0;
+			// // console.log(intensityI);
+
+			// if (current_data && current_data.alert !== undefined) {
+			// 	if (current_data.alert) {
+			// 		if (eew_list[uuid] == undefined)
+			// 			eew_list[uuid] = {
+			// 				latitude  : station[uuid].Lat,
+			// 				longitude : station[uuid].Long,
+			// 				intensity : intensityI,
+			// 				pga       : current_data.v,
+			// 			};
+			// 		else if (eew_list[uuid].pga < current_data.v)
+			// 			eew_list[uuid].pga = current_data.v;
+			// 		else if (eew_list[uuid].intensity < intensityI)
+			// 			eew_list[uuid].intensity = intensityI;
+
+			// 		console.log(eew_list);
+
+			// 		if (Object.keys(eew_list).length >= 3) {
+			// 			// 預估震央位置
+			// 			const epicenter = estimateEpicenter(eew_list);
+			// 			console.log("預估震央位置:", epicenter);
+
+			// 			// 預估地震規模
+			// 			const magnitude = estimateMagnitude(eew_list, epicenter);
+			// 			console.log("預估地震規模:", magnitude);
+
+			// 			// 預估地震深度
+			// 			const estimatedDepth = estimateDepth(eew_list, epicenter);
+			// 			console.log("預估地震深度:", estimatedDepth);
+
+			// 			eew_number += 1;
+
+			// 			if (eew_list_epicenterIcon != null) eew_list_epicenterIcon.remove();
+
+			// 			const IepicenterIcon = L.icon({
+			// 				iconUrl   : "../image/cross.png",
+			// 				iconSize  : [30, 30],
+			// 				className : "epicenterIcon",
+			// 			});
+			// 			eew_list_epicenterIcon = L.marker([+epicenter.latitude, +epicenter.longitude],
+			// 				{
+			// 					icon         : IepicenterIcon,
+			// 					zIndexOffset : 6000,
+			// 				})
+			// 				.addTo(Maps.main)
+			// 				.bindTooltip(`<div>社區 eew 第${eew_number}報</div><div>規模: ${magnitude.toFixed(1)}</div><div>深度: ${estimatedDepth.toFixed(0)}</div>`, {
+			// 					offset    : [8, 0],
+			// 					permanent : false,
+			// 					className : "eew-cursor-tooltip",
+			// 				});
+			// 		} else {
+			// 			// 預估震央位置
+			// 			const epicenter = estimateEpicenterone(eew_list);
+			// 			console.log("預估震央位置:", epicenter);
+
+			// 			// 預估地震規模
+			// 			const magnitude = estimateMagnitude(eew_list, epicenter);
+			// 			console.log("預估地震規模:", magnitude);
+
+			// 			// 預估地震深度
+			// 			const estimatedDepth = estimateDepth(eew_list, epicenter);
+			// 			console.log("預估地震深度:", estimatedDepth);
+
+			// 			eew_number += 1;
+
+			// 			if (eew_list_epicenterIcon != null) eew_list_epicenterIcon.remove();
+
+			// 			const IepicenterIcon = L.icon({
+			// 				iconUrl   : "../image/cross.png",
+			// 				iconSize  : [30, 30],
+			// 				className : "epicenterIcon",
+			// 			});
+			// 			eew_list_epicenterIcon = L.marker([+epicenter.latitude, +epicenter.longitude],
+			// 				{
+			// 					icon         : IepicenterIcon,
+			// 					zIndexOffset : 6000,
+			// 				})
+			// 				.addTo(Maps.main)
+			// 				.bindTooltip(`<div>社區 eew 第${eew_number}報</div><div>規模: ${magnitude.toFixed(1)}</div><div>深度: ${estimatedDepth.toFixed(0)}</div>`, {
+			// 					offset    : [8, 0],
+			// 					permanent : false,
+			// 					className : "eew-cursor-tooltip",
+			// 				});
+			// 		}
+			// 	}
+			// // } else if (Object.keys(eew_list).length == 0) {
+			// } else if (uuid.split("-")[1] != "000") {
+			// 	if (uuid.split("-")[0] == "H") {
+			// 		if (intensityI >= 0)
+			// 			if (eew_list[uuid] == undefined)
+			// 				eew_list[uuid] = {
+			// 					latitude  : station[uuid].Lat,
+			// 					longitude : station[uuid].Long,
+			// 					intensity : intensityI,
+			// 					pga       : current_data.v,
+			// 				};
+			// 			else if (eew_list[uuid].pga < current_data.v)
+			// 				eew_list[uuid].pga = current_data.v;
+			// 			else if (eew_list[uuid].intensity < intensityI)
+			// 				eew_list[uuid].intensity = intensityI;
+			// 		// else if (intensitytest >= 0)
+			// 		// 	if (eew_list[uuid] == undefined)
+			// 		// 		eew_list[uuid] = {
+			// 		// 			latitude  : station[uuid].Lat,
+			// 		// 			longitude : station[uuid].Long,
+			// 		// 			intensity : intensitytest,
+			// 		// 			pga       : current_data.v,
+			// 		// 		};
+			// 		// 	else if (eew_list[uuid].pga < current_data.v)
+			// 		// 		eew_list[uuid].pga = current_data.v;
+			// 		// 	else if (eew_list[uuid].intensity < intensityI)
+			// 		// 		eew_list[uuid].intensity = intensityI;
+			// 	} else if (uuid.split("-")[0] == "L") {
+			// 		if (intensityI >= 1)
+			// 			if (eew_list[uuid] == undefined)
+			// 				eew_list[uuid] = {
+			// 					latitude  : station[uuid].Lat,
+			// 					longitude : station[uuid].Long,
+			// 					intensity : intensityI,
+			// 					pga       : current_data.v,
+			// 				};
+			// 			else if (eew_list[uuid].pga < current_data.v)
+			// 				eew_list[uuid].pga = current_data.v;
+			// 			else if (eew_list[uuid].intensity < intensityI)
+			// 				eew_list[uuid].intensity = intensityI;
+			// 		// else if (intensitytest >= 1)
+			// 		// 	if (eew_list[uuid] == undefined)
+			// 		// 		eew_list[uuid] = {
+			// 		// 			latitude  : station[uuid].Lat,
+			// 		// 			longitude : station[uuid].Long,
+			// 		// 			intensity : intensitytest,
+			// 		// 			pga       : current_data.v,
+			// 		// 		};
+			// 		// 	else if (eew_list[uuid].pga < current_data.v)
+			// 		// 		eew_list[uuid].pga = current_data.v;
+			// 		// 	else if (eew_list[uuid].intensity < intensityI)
+			// 		// 		eew_list[uuid].intensity = intensityI;
+			// 	}
+			// 	console.log(eew_list);
+			// 	// 預估震央位置
+			// 	const epicenter = estimateEpicenterone(eew_list);
+			// 	console.log("預估震央位置:", epicenter);
+
+			// 	// 預估地震規模
+			// 	const magnitude = estimateMagnitude(eew_list, epicenter);
+			// 	console.log("預估地震規模:", magnitude);
+
+			// 	// 預估地震深度
+			// 	const estimatedDepth = estimateDepth(eew_list, epicenter);
+			// 	console.log("預估地震深度:", estimatedDepth);
+
+			// 	eew_number += 1;
+
+			// 	if (eew_list_epicenterIcon != null) eew_list_epicenterIcon.remove();
+
+			// 	const IepicenterIcon = L.icon({
+			// 		iconUrl   : "../image/cross.png",
+			// 		iconSize  : [30, 30],
+			// 		className : "epicenterIcon",
+			// 	});
+			// 	eew_list_epicenterIcon = L.marker([+epicenter.latitude, +epicenter.longitude],
+			// 		{
+			// 			icon         : IepicenterIcon,
+			// 			zIndexOffset : 6000,
+			// 		})
+			// 		.addTo(Maps.main)
+			// 		.bindTooltip(`<div>社區 eew 第${eew_number}報</div><div>規模: ${magnitude.toFixed(1)}</div><div>深度: ${estimatedDepth.toFixed(0)}</div>`, {
+			// 			offset    : [8, 0],
+			// 			permanent : false,
+			// 			className : "eew-cursor-tooltip",
+			// 		});
+			// 	console.log(eew_list_epicenterIcon);
+
+			// 	if (Object.keys(eew_list).length > 0) {
+			// 		if (eew_list_epicenterIcon != null) eew_list_epicenterIcon.remove();
+			// 		eew_list = {};
+			// 		eew_number = 0;
+			// 	}
+			// }
+			// //  else if (Object.keys(EarthquakeList).length == 0 && Object.keys(eew_list).length != 0) {
+			// // 	if (eew_list_epicenterIcon != null) eew_list_epicenterIcon.remove();
+			// // 	eew_list = {};
+			// // 	eew_number = 0;
+			// // }
 		}
 
 		if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl") {
@@ -3172,6 +3369,62 @@ function handler(Json) {
 			document.getElementById("rt-station-local-time").innerText = timeconvert(now).format("HH:mm:ss");
 			document.getElementById("rt-station-local-pga").innerText = amount;
 		}
+
+		// const IAll = (Json.Alert && Json.I && Json.I.length) ? Json.I : [];
+
+		// if (IAll.length) {
+		// 	console.log(IAll);
+
+		// 	for (let index = 0; index < IAll.length; index++) {
+		// 		const Iuuid = IAll[index].uuid;
+		// 		const Iintensity = IAll[index].intensity;
+
+		// 		if (eew_list[Iuuid] == undefined)
+		// 			eew_list[Iuuid] = {
+		// 				latitude  : station[Iuuid].Lat,
+		// 				longitude : station[Iuuid].Long,
+		// 				intensity : Iintensity,
+		// 				pga       : Json[Iuuid.split("-")[2]].v,
+		// 			};
+		// 		else if (eew_list[Iuuid].pga < Json[Iuuid.split("-")[2]].v)
+		// 			eew_list[Iuuid].pga = Json[Iuuid.split("-")[2]].v;
+		// 	}
+
+		// 	console.log(eew_list);
+		// 	// 預估震央位置
+		// 	const epicenter = estimateEpicenter(eew_list);
+		// 	console.log('預估震央位置:', epicenter);
+
+		// 	// 預估地震規模
+		// 	const magnitude = estimateMagnitude(eew_list, epicenter);
+		// 	console.log('預估地震規模:', magnitude);
+
+		// 	// 預估地震深度
+		// 	const estimatedDepth = estimateDepth(eew_list, epicenter);
+		// 	console.log('預估地震深度:', estimatedDepth);
+
+		// 	eew_number += 1;
+
+		// 	if (eew_list_epicenterIcon != null) eew_list_epicenterIcon.remove();
+
+		// 	const IepicenterIcon = L.icon({
+		// 		iconUrl   : "../image/cross.png",
+		// 		iconSize  : [30, 30],
+		// 		className : "epicenterIcon",
+		// 	});
+		// 	eew_list_epicenterIcon = L.marker([+epicenter.latitude, +epicenter.longitude],
+		// 	{
+		// 		icon         : IepicenterIcon,
+		// 		zIndexOffset : 6000,
+		// 	})
+		// 	.addTo(Maps.main)
+		// 	.bindTooltip(`<div>社區 eew 第${eew_number}報</div><div>規模: ${magnitude.toFixed(1)}</div><div>深度: ${estimatedDepth.toFixed(0)}</div>`, {
+		// 		offset    : [8, 0],
+		// 		permanent : false,
+		// 		className : "eew-cursor-tooltip",
+		// 	});
+		// } else if (IAll == [])
+		// 	if (eew_list_epicenterIcon != null) eew_list_epicenterIcon.remove();
 
 		if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999) {
 			detected_list[station[keys[index]].PGA] ??= {
@@ -4413,6 +4666,12 @@ function addReport(report, prepend = false, index = 0) {
 
 // #endregion
 
+ipcMain.on("Olddatabase_report", (event, json) => {
+	TREM.set_report_overview = 1;
+	TREM.Report.setView("eq-report-overview", json);
+	changeView("report", "#reportView_btn");
+});
+
 // #region 設定
 function openSettingWindow() {
 	// document.getElementById("setting_btn").classList.add("hide");
@@ -4515,21 +4774,48 @@ TREM.color = function color(Intensity) {
 // #region IPC
 ipcMain.once("start", () => {
 	try {
-		if (localStorage.TOS_v1_1 == undefined)
-			showDialog(
-				"warn",
-				"TOS 服務條款 1.1",
-				"• 使用本服務應視為用戶同意使用條款\n• TREM 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n• 禁止在未經允許的情況下二次分發 TREM 軟體內的任何資訊\n• 禁止轉售 TREM 提供之資訊\n• 禁止違反法律法規或違反公共秩序和道德的行為\n• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n• TREM 使用 P2P 技術傳遞資訊\n• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n• Powered by ExpTech | 2023/05/03",
-				0,
-				"warning",
-				() => {
-					localStorage.TOS_v1_1 = true;
-				},
-				"我已詳細閱讀 並同意上述條款",
-				"",
-				() => void 0,
-				0,
-				1);
+		showDialog(
+			"warn",
+			"免責聲明",
+			`• TREM 進階功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請理解並謹慎使用。\n
+			• 強震即時警報是利用少數幾個地震測站快速演算之結果，與最終地震報告可能存有若干差異，請理解並謹慎使用。\n
+			• 本軟體使用P2P的連線技術傳遞資料，您的電腦將會把收到的地震資訊轉傳給其他人的電腦，如此才能降低伺服器負荷與維持費用，也才能免費地提供服務給大家使用。若您開始使用本軟體則代表您已同意使用P2P連線技術將收到的資料轉傳給其他電腦。\n
+			• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
+			• Powered by ExpTech | 2023/06/13`,
+			0,
+			"warning",
+			() => {
+				setTimeout(() => {
+					if (localStorage.TOS_v1_1 == undefined)
+						showDialog(
+							"warn",
+							"TOS 服務條款 1.1",
+							`• 使用本服務應視為用戶同意使用條款\n
+							• TREM 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
+							• 禁止在未經允許的情況下二次分發 TREM 軟體內的任何資訊\n
+							• 禁止轉售 TREM 提供之資訊\n
+							• 禁止違反法律法規或違反公共秩序和道德的行為\n
+							• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
+							• TREM 使用 P2P 技術傳遞資訊\n
+							• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
+							• Powered by ExpTech | 2023/05/03`,
+							0,
+							"warning",
+							() => {
+								localStorage.TOS_v1_1 = true;
+							},
+							"我已詳細閱讀 並同意上述條款",
+							"",
+							() => void 0,
+							0,
+							1);
+				}, 1000);
+			},
+			"我已詳細閱讀 並同意上述免責聲明",
+			"",
+			() => void 0,
+			0,
+			1);
 
 		if (localStorage.rts_alert_false == undefined) {
 			localStorage.rts_alert_false = true;
@@ -4725,7 +5011,7 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 	const intensity1 = intensity.raw.intensity;
 	let description = "";
 	let city0 = "";
-	const intensity1r = {};
+	const intensity1r = Object.keys(intensity1).reverse();
 	const intensity1rkeys = Object.keys(intensity1).reverse();
 
 	for (let index = 0; index < intensity1rkeys.length; index++) {
@@ -4757,6 +5043,42 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 
 	description += "\n";
 
+	if (speecd_use && intensity.unit != "palert") {
+		const now = timeconvert(new Date(info.time != 0 ? info.time : intensity.timestamp)).format("YYYY/MM/DD HH:mm:ss");
+		let description0 = "";
+
+		for (let index = 0, keys = Object.keys(intensity1r), n = keys.length; index < n; index++) {
+			const intensity2 = keys.length - Number(keys[index]);
+			const ids = intensity1[intensity1r[index]];
+			const intensity3 = `${IntensityI(intensity2)}級`;
+
+			for (const city in TREM.Resources.region)
+				for (const town in TREM.Resources.region[city]) {
+					const loc = TREM.Resources.region[city][town];
+
+					for (const id of ids)
+						if (loc.id == id && city0 == city) {
+							continue;
+						} else if (loc.id == id && city0 == "") {
+							description0 += `${city}`;
+							description0 += `${intensity3.replace("-級", "弱").replace("+級", "強")}\n`;
+							city0 = city;
+						} else if (loc.id == id && city0 != city) {
+							description0 += `\n${city}`;
+							description0 += `${intensity3.replace("-級", "弱").replace("+級", "強")}\n`;
+							city0 = city;
+						}
+				}
+
+			city0 = "";
+		}
+
+		TREM.speech.speak({ text: "震度速報"
+		+ "資料來源" + intensity.unit
+		+ (info.time != 0 ? "發震時間" : "接收時間") + now
+		+ "震度分布" + description0 });
+	}
+
 	if (setting["webhook.url"] != "" && setting["intensity.Notification"]) {
 		log("Posting Notification intensity Webhook", 1, "Webhook", "intensity-Notification");
 		dump({ level: 0, message: "Posting Notification intensity Webhook", origin: "Webhook" });
@@ -4765,7 +5087,7 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ("震度速報"
 			+ "資料來源" + intensity.unit
-			+ (info.time != 0 ? "發震時間" : "接收時間") + new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hour12: false, timeZone: "Asia/Taipei" })
+			+ (info.time != 0 ? "發震時間" : "接收時間") + new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })
 			+ "芮氏規模" + (info.scale != 0 ? info.scale : "未知")
 			+ "深度" + (info.depth != 0 ? info.depth + " 公里" : "未知")
 			+ "震央位置" + "東經" + (info.lon != 0 ? info.lon : "未知") + "北緯" + (info.lat != 0 ? info.lat : "未知")) : "震度速報",
@@ -4785,7 +5107,7 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 						},
 						{
 							name   : info.time != 0 ? "發震時間" : "接收時間",
-							value  : new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hour12: false, timeZone: "Asia/Taipei" }),
+							value  : new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }),
 							inline : true,
 						},
 						{
@@ -4820,42 +5142,6 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 			log(error, 3, "Webhook", "intensity-Notification");
 			dump({ level: 2, message: error, origin: "Webhook" });
 		});
-	}
-
-	if (speecd_use && intensity.unit != "palert") {
-		const now = timeconvert(new Date(info.time != 0 ? info.time : intensity.timestamp)).format("YYYY/MM/DD HH:mm:ss");
-		let description0 = "";
-
-		for (let index = 0, keys = Object.keys(intensity1r), n = keys.length; index < n; index++) {
-			const intensity2 = keys.length - Number(keys[index]);
-			const ids = intensity1r[Number(keys[index])];
-			const intensity3 = `${IntensityI(intensity2)}級`;
-
-			for (const city in TREM.Resources.region)
-				for (const town in TREM.Resources.region[city]) {
-					const loc = TREM.Resources.region[city][town];
-
-					for (const id of ids)
-						if (loc.id == id && city0 == city) {
-							continue;
-						} else if (loc.id == id && city0 == "") {
-							description0 += `${city}`;
-							description0 += `${intensity3.replace("-級", "弱").replace("+級", "強")}\n`;
-							city0 = city;
-						} else if (loc.id == id && city0 != city) {
-							description0 += `\n${city}`;
-							description0 += `${intensity3.replace("-級", "弱").replace("+級", "強")}\n`;
-							city0 = city;
-						}
-				}
-
-			city0 = "";
-		}
-
-		TREM.speech.speak({ text: "震度速報"
-		+ "資料來源" + intensity.unit
-		+ (info.time != 0 ? "發震時間" : "接收時間") + now
-		+ "震度分布" + description0 });
 	}
 });
 
@@ -5402,6 +5688,26 @@ function FCMdata(json, Unit) {
 }
 // #endregion
 
+ipcMain.on("Olddatabase_eew", (event, json) => {
+	json.replay_time = json.time;
+	json.replay_timestamp = json.time;
+	json.time = NOW().getTime();
+	json.timestamp = NOW().getTime();
+	json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
+		: (json.type == "eew-scdzj") ? "四川省地震局 (SCDZJ)"
+			: (json.type == "eew-nied") ? "防災科学技術研究所 (NIED)"
+				: (json.type == "eew-kma") ? "기상청(KMA)"
+					: (json.type == "eew-jma") ? "気象庁(JMA)"
+						: (json.type == "eew-cwb") ? "中央氣象局 (CWB)"
+							: (json.type == "eew-fjdzj") ? "福建省地震局 (FJDZJ)"
+								: (json.type == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
+									: (json.type == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+										: (json.Unit) ? json.Unit : "";
+
+	stopReplaybtn();
+	TREM.Earthquake.emit("eew", json);
+});
+
 // #region Event: eew
 TREM.Earthquake.on("eew", (data) => {
 	log("Got EEW", 1, "API", "eew");
@@ -5508,10 +5814,11 @@ TREM.Earthquake.on("eew", (data) => {
 
 	if (setting["dev.mode"])
 		if (data.type != "trem-eew" || data.type != "eew-cwb" || data.type != "eew-fjdzj") {
+			const d = data.depth / 2;
 			const int = TREM.Utils.PGAToIntensity(
 				TREM.Utils.pga(
 					data.scale,
-					10,
+					d,
 					1,
 				),
 			);
@@ -5570,15 +5877,16 @@ TREM.Earthquake.on("eew", (data) => {
 		else if (data.cancel)
 			TREM.speech.speak({ text: `${data.Unit}，已取消警報` });
 
-		if (Number(speecd_scale) >= 7 && speecd_number == 1)
-			TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象局是否發布，海嘯警報" });
-		else if (Number(speecd_scale) >= 6 && speecd_number == 1)
-			TREM.speech.speak({ text: "沿岸地區應慎防海水位突變" });
-		else if (INFO[find0]?.alert_magnitude != speecd_scale)
-			if (Number(speecd_scale) >= 7)
+		if (data.type == "eew-cwb" && data.location.includes("海") && Number(data.depth) <= 35)
+			if (Number(speecd_scale) >= 7 && speecd_number == 1)
 				TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象局是否發布，海嘯警報" });
-			else if (Number(speecd_scale) >= 6)
+			else if (Number(speecd_scale) >= 6 && speecd_number == 1)
 				TREM.speech.speak({ text: "沿岸地區應慎防海水位突變" });
+			else if (INFO[find0]?.alert_magnitude != speecd_scale)
+				if (Number(speecd_scale) >= 7)
+					TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象局是否發布，海嘯警報" });
+				else if (Number(speecd_scale) >= 6)
+					TREM.speech.speak({ text: "沿岸地區應慎防海水位突變" });
 
 		if (data.type == "eew-cwb") audioPlay("../audio/cwbeew.wav");
 	}
@@ -5776,7 +6084,6 @@ TREM.Earthquake.on("eew", (data) => {
 	if (data.replay_timestamp) {
 		replay = data.replay_timestamp;
 		replayT = NOW().getTime();
-		stopReplaybtn();
 	} else {
 		replay = 0;
 	}
@@ -7207,7 +7514,7 @@ function NOW() {
 }
 
 function timeconvert(time) {
-	return new Date(time.toLocaleString("en-US", { timeZone: "Asia/Taipei" }));
+	return new Date(time.toLocaleString(undefined, { hourCycle: "h23", timeZone: "Asia/Taipei" }));
 }
 
 function globalgc() {

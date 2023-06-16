@@ -22,6 +22,16 @@
                 <div id="intensity-detail-container">
                     <div id="intensity-detail-header">
                         <span id="intensity-detail-header-title">震度速報</span>
+                        <label for="intensity" id="intensity-detail-header-old-database" class="chip filter md3-ripple" onclick="TREM.Old_database.init()">
+                            <div class="chip-label">
+                                <span lang="en">?</span>
+                                <span lang="ja">?</span>
+                                <span lang="kr">?</span>
+                                <span lang="ru">?</span>
+                                <span lang="zh-CN">?</span>
+                                <span lang="zh-TW">歷史資料庫</span>
+                            </div>
+                        </label>
                     </div>
                     <div id="intensity-detail-body">
                         <div id="intensity-overview" class="intensity-detail-panel">
@@ -155,6 +165,95 @@
                                         </span>
                                     </div>
                                 </div>
+                                <div class="report-overview-item">
+                                    <div class="report-overview-item-label">
+                                        <span class="report-overview-item-icon material-symbols-rounded">tag</span>
+                                        <span class="report-overview-unit">
+                                            <span lang="en">?</span>
+                                            <span lang="ja">?</span>
+                                            <span lang="kr">?</span>
+                                            <span lang="ru">?</span>
+                                            <span lang="zh-CN">第</span>
+                                            <span lang="zh-TW">第</span>
+                                        </span>
+                                        <span id="intensity-overview-number"></span>
+                                        <span class="report-overview-unit">
+                                            <span lang="en">?</span>
+                                            <span lang="ja">?</span>
+                                            <span lang="kr">?</span>
+                                            <span lang="ru">?</span>
+                                            <span lang="zh-CN">報</span>
+                                            <span lang="zh-TW">報</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="old-database-detail" style="display: none;">
+                <div id="old-database-detail-container">
+                    <div id="old-database-detail-header">
+                        <span id="old-database-detail-header-title">歷史資料庫</span>
+                        <label for="intensity" id="intensity-detail-header-intensity" class="chip filter md3-ripple" onclick="TREM.Old_database.exit()">
+                            <div class="chip-label">
+                                <span lang="en">?</span>
+                                <span lang="ja">?</span>
+                                <span lang="kr">?</span>
+                                <span lang="ru">?</span>
+                                <span lang="zh-CN">?</span>
+                                <span lang="zh-TW">震度速報</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div id="old-database-detail-body">
+                        <div id="old-database-overview" class="old-database-detail-panel">
+                            <hr class="divider">
+                            <div id="old-database-overview-body">
+                                <div class="report-overview-item">
+                                    <div class="report-overview-item-label">
+                                        <label for="intensity" id="old-database-label-search" class="chip filter md3-ripple" onclick="TREM.Old_database.search()">
+                                            <div class="chip-label">
+                                                <span lang="en">?</span>
+                                                <span lang="ja">?</span>
+                                                <span lang="kr">?</span>
+                                                <span lang="ru">?</span>
+                                                <span lang="zh-CN">?</span>
+                                                <span lang="zh-TW">查詢</span>
+                                            </div>
+                                        </label>
+                                        <label for="intensity" id="old-database-label-search-value" class="chip filter label md3-ripple"></label>
+                                        <br>
+                                        <label for="intensity" id="old-database-label-date" class="chip filter label md3-ripple">
+                                            <div class="offoutline">
+                                                <span lang="en">starttime</span>
+                                                <span lang="ja">starttime</span>
+                                                <span lang="kr">starttime</span>
+                                                <span lang="ru">starttime</span>
+                                                <span lang="zh-CN">開始時間</span>
+                                                <span lang="zh-TW">開始時間</span>
+                                                <input type="date" id="old-database-filter-startdate-value">
+                                                <input type="time" step="1" id="old-database-filter-starttime-value">
+                                            </div>
+                                        </label>
+                                        <br>
+                                        <label for="intensity" id="old-database-label-time" class="chip filter label md3-ripple">
+                                            <div class="offoutline">
+                                                <span lang="en">endtime</span>
+                                                <span lang="ja">endtime</span>
+                                                <span lang="kr">endtime</span>
+                                                <span lang="ru">endtime</span>
+                                                <span lang="zh-CN">結束時間</span>
+                                                <span lang="zh-TW">結束時間</span>
+                                                <input type="date" id="old-database-filter-enddate-value">
+                                                <input type="time" step="1" id="old-database-filter-endtime-value">
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <hr class="divider">
+                                <div id="report-list-container"></div>
                             </div>
                         </div>
                     </div>
@@ -162,6 +261,26 @@
             </div>
             <div id="map-intensity"></div>
         </div>
+
+        <template id="template-old-database-list-item">
+            <div class="report-list-item">
+                <div class="report-list-item-container">
+                    <div class="report-list-item-label">
+                        <span class="report-list-item-location"></span>
+                        <span class="report-list-item-description">
+                            <span class="report-list-item-Magnitude"></span>
+                            <span class="report-list-item-icon material-symbols-rounded">schedule</span><span class="report-list-item-time"></span>
+                            <span class="report-list-item-icon material-symbols-rounded">tag</span><span class="report-list-item-id"></span>
+                        </span>
+                    </div>
+                    <div class="report-list-item-button">
+                        <button class="filled-tonal-button icon md3-ripple">
+                            <span class="material-symbols-rounded filled-tonal-button-icon">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
 
         <footer>
         </footer>

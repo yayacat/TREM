@@ -27,6 +27,26 @@ label.chip > .chip-label {
 	margin: 0;
 }
 
+label.chip > .offoutline {
+	all: inherit;
+	display: inline-block;
+	position: relative;
+	height: 32px;
+	padding-right: 16px;
+	background-color: transparent;
+	border-radius: 8px;
+	color: rgb(var(--md-sys-color-on-surface-variant));
+	white-space: nowrap;
+	line-height: 32px;
+	transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out,
+		padding 0.1s ease-in-out, box-shadow 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
+	cursor: pointer;
+}
+
+label.chip > .offoutline {
+	margin: 0;
+}
+
 button.chip.assist {
 	padding: 0;
 }

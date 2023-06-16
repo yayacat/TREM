@@ -120,7 +120,7 @@ const showDialog
 	if (button == 1) {
 		const Accept = document.createElement("button");
 		Accept.classList.add("flat-button");
-		Accept.id = "dialog-Accept";
+		Accept.id = "dialog-Accept " + title;
 		Accept.textContent = buttonAccepttext ?? TREM.Localization.getString("Dialog_Button_Confirm");
 
 		Accept.onclick = (...args) => {

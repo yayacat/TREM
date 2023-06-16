@@ -2456,6 +2456,63 @@ button.hide + #report-detail-header-title {
 	opacity: 1;
 }
 
+#old-database-detail {
+	user-select: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 16px;
+	border-radius: 16px;
+	background-color: rgb(var(--md-sys-color-background));
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	color: rgb(var(--md-sys-color-on-surface));
+	font-size: 14px;
+	font-variant-numeric: tabular-nums;
+	z-index: 100000;
+	overflow: hidden;
+}
+
+#old-database-detail-container {
+	padding: 12px;
+	background-color: rgba(var(--md-sys-color-primary), 0.11);
+}
+
+#old-database-detail-header {
+	display: flex;
+	align-items: center;
+	line-height: 24px;
+}
+
+#old-database-detail-header-title {
+	margin: 8px;
+	font-size: 18px;
+	letter-spacing: 0;
+	font-weight: 400;
+	flex: 1;
+	transition: margin .1s ease-in-out;
+}
+
+#old-database-detail-body {
+	position: relative;
+	transition: height .5s cubic-bezier(0.45, -0.05, 0.58, 0.8),
+				width .5s cubic-bezier(0.45, -0.05, 0.58, 0.8);
+}
+
+.old-database-detail-panel {
+	margin: 8px;
+	position: absolute;
+	transform: translate3d(-50%, 0, 0);
+	opacity: 0;
+	transition: transform .25s ease-in-out,
+				opacity .25s ease-in-out;
+}
+
+.old-database-detail-panel.show {
+	position: relative;
+	transform: translateZ(0);
+	opacity: 1;
+}
+
 .progress_bar {
     position: absolute;
     border: 2px solid white;
