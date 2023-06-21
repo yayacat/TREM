@@ -69,9 +69,9 @@ let MapBases = { main: new Map(), mini: new Map(), report: new Map(), intensity:
 const Station = {};
 const detected_box_list = {};
 const detected_list = {};
-let eew_list = {};
-let eew_number = 0;
-let eew_list_epicenterIcon = null;
+// let eew_list = {};
+// let eew_number = 0;
+// let eew_list_epicenterIcon = null;
 let Cancel = false;
 let Canceltime = 0;
 let RMT = 1;
@@ -2924,6 +2924,8 @@ function handler(Json) {
 	let max_intensity = -1;
 	MaxIntensity1 = 0;
 	let stationnowindex = 0;
+	let level = 0;
+	let target_count = 0;
 	const detection_location = Json.area ?? [];
 	const detection_list = Json.box ?? {};
 	const Json_temp = Json;
@@ -3432,6 +3434,9 @@ function handler(Json) {
 				time      : 0,
 			};
 
+			level += Math.round(current_data.v);
+			target_count++;
+
 			if ((detected_list[station[keys[index]].PGA].intensity ?? 0) < intensity)
 				detected_list[station[keys[index]].PGA].intensity = intensity;
 
@@ -3582,6 +3587,9 @@ function handler(Json) {
 							win.focus();
 							win.setAlwaysOnTop(false);
 						}
+
+					level += Math.round(current_data.v);
+					target_count++;
 				}
 
 			intensitytag = -1;
@@ -3607,6 +3615,14 @@ function handler(Json) {
 		// 	MAXPGA.intensity = MaxIntensity1;
 		// 	MAXPGA.time = new Date(Json_Time * 1000);
 		// }
+	}
+
+	if (target_count != 0) {
+		$("#level").text(`level: ${level}`);
+		$("#target").text(`target: ${target_count}`);
+	} else {
+		$("#level").text("");
+		$("#target").text("");
 	}
 
 	if (MAXPGA.station != "NA") {

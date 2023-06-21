@@ -360,16 +360,16 @@ TREM.Intensity = {
 
 			// 判斷是否存在經緯度顛倒
 			if (raw_info_Data.lat >= -90 && raw_info_Data.lat <= 90 && raw_info_Data.lon >= -180 && raw_info_Data.lon <= 180) {
-				console.log('經緯度正確');
+				console.log("經緯度正確");
 			} else {
-				console.log('經緯度顛倒');
+				console.log("經緯度顛倒");
 
 				// 修正經緯度顛倒
 				const temp = raw_info_Data.lat;
 				raw_info_Data.lat = raw_info_Data.lon;
 				raw_info_Data.lon = temp;
 
-				console.log('修正後的經緯度:', raw_info_Data);
+				console.log("修正後的經緯度:", raw_info_Data);
 			}
 
 			if (unit == "cwb")
@@ -443,7 +443,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: 'h23', timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -463,7 +463,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: 'h23', timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -494,7 +494,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: 'h23', timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -549,7 +549,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: 'h23', timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -606,22 +606,22 @@ TREM.Intensity = {
 			// console.log(raw_info_Data);
 
 			if (!raw_info_Data) {
-				console.error('資料錯誤');
+				console.error("資料錯誤");
 				return;
 			}
 
 			// 判斷是否存在經緯度顛倒
 			if (raw_info_Data.lat >= -90 && raw_info_Data.lat <= 90 && raw_info_Data.lon >= -180 && raw_info_Data.lon <= 180) {
-				console.log('經緯度正確');
+				console.log("經緯度正確");
 			} else {
-				console.log('經緯度顛倒');
+				console.log("經緯度顛倒");
 
 				// 修正經緯度顛倒
 				const temp = raw_info_Data.lat;
 				raw_info_Data.lat = raw_info_Data.lon;
 				raw_info_Data.lon = temp;
 
-				console.log('修正後的經緯度:', raw_info_Data);
+				console.log("修正後的經緯度:", raw_info_Data);
 			}
 
 			if (this._raw != null) this.clear();
@@ -688,7 +688,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: 'h23', timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -708,7 +708,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: 'h23', timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -739,7 +739,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: 'h23', timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -794,7 +794,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: 'h23', timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = time.toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -857,9 +857,9 @@ TREM.Intensity = {
 };
 
 TREM.Old_database = {
-	cache                      : new Map(),
-	olddatabaseListElement     : document.getElementById("report-list-container"),
-	_olddatabaseItemTemplate   : document.getElementById("template-old-database-list-item"),
+	cache                    : new Map(),
+	olddatabaseListElement   : document.getElementById("report-list-container"),
+	_olddatabaseItemTemplate : document.getElementById("template-old-database-list-item"),
 	init() {
 		document.getElementById("intensity-detail").style.display = "none";
 		document.getElementById("old-database-detail").style.display = "";
@@ -885,9 +885,9 @@ TREM.Old_database = {
 			// const endTime = new Date("2023-06-12 00:00:00").getTime(); // 結束時間（毫秒數）
 
 			const startTime = new Date(document.getElementById("old-database-filter-startdate-value").value + " " + document.getElementById("old-database-filter-starttime-value").value).getTime();
-			const endTime = new Date(document.getElementById("old-database-filter-enddate-value").value + " "  + document.getElementById("old-database-filter-endtime-value").value).getTime();
-			console.log(document.getElementById("old-database-filter-startdate-value").value + " "  + document.getElementById("old-database-filter-starttime-value").value);
-			console.log(document.getElementById("old-database-filter-enddate-value").value + " "  + document.getElementById("old-database-filter-endtime-value").value);
+			const endTime = new Date(document.getElementById("old-database-filter-enddate-value").value + " " + document.getElementById("old-database-filter-endtime-value").value).getTime();
+			console.log(document.getElementById("old-database-filter-startdate-value").value + " " + document.getElementById("old-database-filter-starttime-value").value);
+			console.log(document.getElementById("old-database-filter-enddate-value").value + " " + document.getElementById("old-database-filter-endtime-value").value);
 			console.log(startTime);
 			console.log(endTime);
 
@@ -911,25 +911,24 @@ TREM.Old_database = {
 
 						const type = fileData.type;
 
-						if (type === "intensity") {
+						if (type === "intensity")
 							return this.setcache(file, type, fileData);
-						} else if (type === "eew-cwb") {
+						else if (type === "eew-cwb")
 							return this.setcache(file, type, fileData);
-						} else if (type === "eew-jma") {
+						else if (type === "eew-jma")
 							return this.setcache(file, type, fileData);
-						} else if (type === "eew-nied") {
+						else if (type === "eew-nied")
 							return this.setcache(file, type, fileData);
-						} else if (type === "eew-fjdzj") {
+						else if (type === "eew-fjdzj")
 							return this.setcache(file, type, fileData);
-						} else if (type === "eew-scdzj") {
+						else if (type === "eew-scdzj")
 							return this.setcache(file, type, fileData);
-						} else if (type === "eew-kma") {
+						else if (type === "eew-kma")
 							return this.setcache(file, type, fileData);
-						} else if (type === "report") {
+						else if (type === "report")
 							return this.setcache(file, type, fileData);
-						} else if (type === "pws") {
+						else if (type === "pws")
 							return this.setcache(file, type, fileData);
-						}
 						//  else {
 						// 	return this.setcache(file, type, fileData);
 						// }
@@ -964,9 +963,7 @@ TREM.Old_database = {
 		return true;
 	},
 	unloadReports(skipCheck = false) {
-		if (this.view == "report-list" || skipCheck) {
-			this.olddatabaseListElement.replaceChildren();
-		}
+		if (this.view == "report-list" || skipCheck) this.olddatabaseListElement.replaceChildren();
 	},
 	loadReports(skipCheck = false) {
 		if (this.view == "report-list" || skipCheck) {
@@ -985,7 +982,7 @@ TREM.Old_database = {
 		const el = document.importNode(this._olddatabaseItemTemplate.content, true).querySelector(".report-list-item");
 		const type = Olddatabase.type;
 		let unit = Olddatabase.unit ? Olddatabase.unit : Olddatabase.type;
-		let scale = "?"
+		let scale = "?";
 
 		if (unit == "cwb") unit = "CWB";
 
@@ -1003,17 +1000,17 @@ TREM.Old_database = {
 		el.querySelector(".report-list-item-location").innerText = unit;
 		el.querySelector(".report-list-item-id").innerText = Olddatabase.number ? Olddatabase.number : "1";
 		el.querySelector(".report-list-item-Magnitude").innerText = scale;
-		el.querySelector(".report-list-item-time").innerText = new Date(Olddatabase.timestamp).toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: 'h23', timeZone: "Asia/Taipei" });
+		el.querySelector(".report-list-item-time").innerText = new Date(Olddatabase.timestamp).toLocaleString(undefined, { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
 
 		el.querySelector("button").value = Olddatabase.timestamp;
-		el.querySelector("button").addEventListener("click", function() {
+		el.querySelector("button").addEventListener("click", () => {
 			if (type === "intensity") {
 				TREM.Intensity.load(Olddatabase);
 				TREM.Old_database.exit();
 			} else if (type === "report") {
 				ipcRenderer.send("Olddatabase_report", Olddatabase.raw);
 			} else if (type === "pws") {
-				return;
+				console.log(Olddatabase);
 			} else {
 				ipcRenderer.send("Olddatabase_eew", Olddatabase);
 			}

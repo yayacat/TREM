@@ -371,6 +371,18 @@ body:not(.darkmode) #here-marker {
 	font-weight: 600;
 }
 
+#level {
+	margin-left: 99px;
+	font-size: 14px;
+	color: rgba(var(--md-sys-color-on-surface-variant), .6);
+}
+
+#target {
+	margin-left: 99px;
+	font-size: 14px;
+	color: rgba(var(--md-sys-color-on-surface-variant), .6);
+}
+
 #log {
 	font-size: 14px;
 	color: rgba(var(--md-sys-color-on-surface-variant), .6);
