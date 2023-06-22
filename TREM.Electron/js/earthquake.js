@@ -79,6 +79,7 @@ let PGALimit = 0;
 let PGAtag = -1;
 let intensitytag = -1;
 let MAXPGA = { pga: 0, station: "NA", level: 0 };
+let level_list = {};
 let Info = { Notify: [], Warn: [], Focus: [] };
 const Focus = [
 	23.608428,
@@ -2924,7 +2925,6 @@ function handler(Json) {
 	let max_intensity = -1;
 	MaxIntensity1 = 0;
 	let stationnowindex = 0;
-	let level = 0;
 	let target_count = 0;
 	const detection_location = Json.area ?? [];
 	const detection_list = Json.box ?? {};
@@ -3014,6 +3014,13 @@ function handler(Json) {
 			if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y") {
 				stationnowindex += 1;
 				stationnow = stationnowindex;
+			}
+
+			if (!current_data.alert) delete level_list[uuid];
+
+			if (current_data.alert) {
+				if ((level_list[uuid] ?? 0) < current_data.v) level_list[uuid] = current_data.v;
+				target_count++;
 			}
 
 			if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl")
@@ -3434,9 +3441,6 @@ function handler(Json) {
 				time      : 0,
 			};
 
-			level += Math.round(current_data.v);
-			target_count++;
-
 			if ((detected_list[station[keys[index]].PGA].intensity ?? 0) < intensity)
 				detected_list[station[keys[index]].PGA].intensity = intensity;
 
@@ -3588,7 +3592,7 @@ function handler(Json) {
 							win.setAlwaysOnTop(false);
 						}
 
-					level += Math.round(current_data.v);
+					level_list[uuid] = current_data.v;
 					target_count++;
 				}
 
@@ -3618,9 +3622,17 @@ function handler(Json) {
 	}
 
 	if (target_count != 0) {
+		let level = 0;
+
+		for (let i = 0; i < Object.keys(level_list).length; i++) {
+			const uuid = Object.keys(level_list)[i];
+			level += Math.round(level_list[uuid]);
+		}
+
 		$("#level").text(`level: ${level}`);
 		$("#target").text(`target: ${target_count}`);
 	} else {
+		level_list = {};
 		$("#level").text("");
 		$("#target").text("");
 	}
