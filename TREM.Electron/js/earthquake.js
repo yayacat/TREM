@@ -551,7 +551,7 @@ TREM.PWS = {
 						element: $("<img src=\"../image/warn.png\" height=\"32\" width=\"32\"></img>")[0],
 					})
 						.setLngLat([area.longitude, area.latitude])
-						.setPopup(new maplibregl.Popup({ closeButton: false, closeOnClick: false, maxWidth: 360 }).setHTML(`<div class="marker-popup pws-popup"><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })}\n失效時間：${pws.expireTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`))
+						.setPopup(new maplibregl.Popup({ closeButton: false, closeOnClick: false, maxWidth: 360 }).setHTML(`<div class="marker-popup pws-popup"><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")}\n失效時間：${pws.expireTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`))
 						.addTo(Maps.main);
 					areaconst += 1;
 				} else {
@@ -573,7 +573,7 @@ TREM.PWS = {
 						keyboard : false,
 					})
 						.addTo(Maps.main)
-						.bindPopup(`<div><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })}\n失效時間：${pws.expireTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`, {
+						.bindPopup(`<div><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")}\n失效時間：${pws.expireTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`, {
 							offset    : [8, 0],
 							permanent : false,
 							className : "marker-popup pws-popup",
@@ -5115,7 +5115,7 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ("震度速報"
 			+ "資料來源" + intensity.unit
-			+ (info.time != 0 ? "發震時間" : "接收時間") + new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" })
+			+ (info.time != 0 ? "發震時間" : "接收時間") + new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")
 			+ "芮氏規模" + (info.scale != 0 ? info.scale : "未知")
 			+ "深度" + (info.depth != 0 ? info.depth + " 公里" : "未知")
 			+ "震央位置" + "東經" + (info.lon != 0 ? info.lon : "未知") + "北緯" + (info.lat != 0 ? info.lat : "未知")) : "震度速報",
@@ -5135,7 +5135,7 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 						},
 						{
 							name   : info.time != 0 ? "發震時間" : "接收時間",
-							value  : new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }),
+							value  : new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss"),
 							inline : true,
 						},
 						{

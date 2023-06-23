@@ -443,7 +443,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -463,7 +463,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -494,7 +494,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -549,7 +549,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -688,7 +688,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -708,7 +708,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -739,7 +739,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -794,7 +794,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-unit").innerText = unit;
 					document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
 					const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-					document.getElementById("intensity-overview-time").innerText = time.toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
 					document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
 					document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
@@ -853,6 +853,10 @@ TREM.Intensity = {
 				delete this.timer;
 			}
 		}
+	},
+
+	timeformat(time) {
+		return new Date(time.toLocaleString("en-US", {hourCycle: "h23", timeZone: "Asia/Taipei" })).format("YYYY/MM/DD HH:mm:ss");
 	},
 };
 
@@ -1000,7 +1004,7 @@ TREM.Old_database = {
 		el.querySelector(".report-list-item-location").innerText = unit;
 		el.querySelector(".report-list-item-id").innerText = Olddatabase.number ? Olddatabase.number : "1";
 		el.querySelector(".report-list-item-Magnitude").innerText = scale;
-		el.querySelector(".report-list-item-time").innerText = new Date(Olddatabase.timestamp).toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hourCycle: "h23", timeZone: "Asia/Taipei" });
+		el.querySelector(".report-list-item-time").innerText = TREM.Intensity.timeformat(new Date(Olddatabase.timestamp));
 
 		el.querySelector("button").value = Olddatabase.timestamp;
 		el.querySelector("button").addEventListener("click", () => {
