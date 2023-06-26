@@ -629,7 +629,7 @@ TREM.Report = {
 		document.getElementById("report-replay").value = report.identifier;
 		document.getElementById("report-replay-downloader").value = report.identifier;
 
-		if (report.trem[0]){
+		if (report.trem[0]) {
 			document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem[0]}`;
 			document.getElementById("report-TREM").style.display = "";
 		} else {

@@ -856,7 +856,7 @@ TREM.Intensity = {
 	},
 
 	timeformat(time) {
-		return new Date(time.toLocaleString("en-US", {hourCycle: "h23", timeZone: "Asia/Taipei" })).format("YYYY/MM/DD HH:mm:ss");
+		return new Date(time.toLocaleString("en-US", { hourCycle: "h23", timeZone: "Asia/Taipei" })).format("YYYY/MM/DD HH:mm:ss");
 	},
 };
 
