@@ -6187,6 +6187,10 @@ TREM.Earthquake.on("trem-eq", (data) => {
 	}
 });
 
+ipcMain.on("Olddatabase_tsunami", (event, json) => {
+	TREM.Earthquake.emit("tsunami", json);
+});
+
 TREM.Earthquake.on("tsunami", (data) => {
 	console.log(data);
 

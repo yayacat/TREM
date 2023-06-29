@@ -933,6 +933,10 @@ TREM.Old_database = {
 							return this.setcache(file, type, fileData);
 						else if (type === "pws")
 							return this.setcache(file, type, fileData);
+						else if (type === "tsunami")
+							return this.setcache(file, type, fileData);
+						else if (type === "tsunami-test")
+							return this.setcache(file, type, fileData);
 						//  else {
 						// 	return this.setcache(file, type, fileData);
 						// }
@@ -998,6 +1002,8 @@ TREM.Old_database = {
 			if (Olddatabase.raw.info?.scale == 0) scale = "0.0";
 			else if (Olddatabase.raw.info?.scale) scale = Olddatabase.raw.info.scale.toFixed(1);
 
+		if (Olddatabase.scale) scale = Olddatabase.scale;
+
 		if (unit == "intensity" && scale == "?") unit = "intensity" + " 資料有很大的機率無法顯示";
 		// el.id = report.identifier;
 		// el.className += ` ${IntensityToClassString(report.data[0]?.areaIntensity)}`;
@@ -1015,6 +1021,11 @@ TREM.Old_database = {
 				ipcRenderer.send("Olddatabase_report", Olddatabase.raw);
 			} else if (type === "pws") {
 				console.log(Olddatabase);
+			} else if (type === "tsunami") {
+				ipcRenderer.send("Olddatabase_tsunami", Olddatabase);
+			} else if (type === "tsunami-test") {
+				console.log(Olddatabase);
+				ipcRenderer.send("Olddatabase_tsunami", Olddatabase);
 			} else {
 				ipcRenderer.send("Olddatabase_eew", Olddatabase);
 			}
