@@ -4650,6 +4650,12 @@ ipcMain.on("testoldtimeEEW", (event, oldtime) => {
 	stopReplaybtn();
 });
 
+ipcMain.on("testoldtremEEW", (event, oldtrem) => {
+	let list = [];
+	list = list.concat(oldtrem);
+	ipcRenderer.send("testEEW", list);
+});
+
 ipcMain.on("testoldtime", (event, oldtime) => {
 	replayD = true;
 	replay = oldtime - 25000;

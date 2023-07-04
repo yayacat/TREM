@@ -1571,6 +1571,11 @@ function testoldtimeEEW() {
 	ipcRenderer.send("testoldtimeEEW", oldtime);
 }
 
+function testoldtremEEW() {
+	const oldtrem = document.getElementById("oldtrem").value;
+	ipcRenderer.send("testoldtremEEW", oldtrem);
+}
+
 function reset() {
 	showDialog("warn",
 		TREM.Localization.getString("Setting_Dialog_Reset_Title"),
