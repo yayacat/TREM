@@ -780,6 +780,7 @@ TREM.Report = {
 							console.log(err.message);
 							log(err, 3, "report_trem", "Report");
 							dump({ level: 2, message: err });
+							this._setupzoomPredict();
 						});
 				else
 					this._setuptremmarker(report);
