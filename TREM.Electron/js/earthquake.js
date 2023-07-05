@@ -3153,7 +3153,7 @@ function handler(Json) {
 			document.getElementById("rt-station-local-pga").innerText = amount;
 		}
 
-		if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999) {
+		if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999 && target_count > 1) {
 			detected_list[station[keys[index]].PGA] ??= {
 				intensity : intensity,
 				time      : 0,
@@ -3279,9 +3279,10 @@ function handler(Json) {
 					Json_temp[uuid.split("-")[2]].alert = true;
 					Json_temp.Alert = true;
 
-					if (speecd_use) TREM.speech.speak({ text: `測站反應，${station[uuid].area}` });
-
-					if (speecd_use) TREM.speech.speak({ text: `最大震度，${_intensity.replace("-級", "弱").replace("+級", "強")}` });
+					if (speecd_use) {
+						TREM.speech.speak({ text: `測站反應，${station[uuid].area}` });
+						TREM.speech.speak({ text: `最大震度，${_intensity.replace("-級", "弱").replace("+級", "強")}` });
+					}
 
 					if ((detected_list[current_station_data.PGA].intensity ?? 0) < intensitytest)
 						detected_list[current_station_data.PGA].intensity = intensitytest;
@@ -3991,7 +3992,6 @@ function ReportGET() {
 				}
 			})
 			.catch((err) => {
-				console.log(err);
 				log("Error fetching reports (fetch)", 3, "EQReportFetcher", "ReportGET");
 				log(err, 3, "EQReportFetcher", "ReportGET");
 				dump({ level: 2, message: "Error fetching reports (fetch)", origin: "EQReportFetcher" });
@@ -4014,7 +4014,6 @@ function ReportGET() {
 			});
 		report_get_timestamp = Date.now();
 	} catch (error) {
-		console.log(error);
 		log("Error fetching reports (try)", 3, "EQReportFetcher", "ReportGET");
 		log(error, 3, "EQReportFetcher", "ReportGET");
 		dump({ level: 2, message: "Error fetching reports (try)", origin: "EQReportFetcher" });
@@ -5611,6 +5610,12 @@ TREM.Earthquake.on("eew", (data) => {
 
 	if (data.depth == null) body = `${notify ?? "未知"}地震，${data.location ?? "未知區域"} (NSSPE)`;
 
+	new Notification("EEW 強震即時警報", {
+		body   : body,
+		icon   : "../TREM.ico",
+		silent : win.isFocused(),
+	});
+
 	if (speecd_use && data.type != "trem-eew") {
 		let speecd_scale = data.scale;
 		const speecd_number = data.number;
@@ -5620,34 +5625,33 @@ TREM.Earthquake.on("eew", (data) => {
 
 		if (find0 == -1) find0 = INFO.length;
 
-		if (speecd_number == 1)
-			TREM.speech.speak({ text: `${data.location}，發生規模${speecd_scale.toFixed(1).replace(".", "點")}地震` });
-		else if (INFO[find0]?.alert_magnitude != speecd_scale && speecd_scale != 0)
-			TREM.speech.speak({ text: `${data.location}，發生規模${speecd_scale.toFixed(1).replace(".", "點")}地震` });
-		else if (INFO[find0]?.alert_magnitude != speecd_scale && speecd_scale == 0)
-			TREM.speech.speak({ text: `${data.Unit}，已取消警報` });
-		else if (data.cancel)
-			TREM.speech.speak({ text: `${data.Unit}，已取消警報` });
+		if (speecd_number == 1) {
+			if (MaxIntensity.value >= 4) TREM.speech.speak({ text: "注意強震，此地震可能造成災害" });
 
-		if (data.type == "eew-cwb" && data.location.includes("海") && Number(data.depth) <= 35)
-			if (Number(speecd_scale) >= 7 && speecd_number == 1)
-				TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象局是否發布，海嘯警報" });
-			else if (Number(speecd_scale) >= 6 && speecd_number == 1)
-				TREM.speech.speak({ text: "沿岸地區應慎防海水位突變" });
-			else if (INFO[find0]?.alert_magnitude != speecd_scale)
-				if (Number(speecd_scale) >= 7)
+			TREM.speech.speak({ text: `${data.location}，發生規模${speecd_scale.toFixed(1).replace(".", "點")}地震` });
+		} else if (INFO[find0]?.alert_magnitude != speecd_scale && speecd_scale != 0) {
+			TREM.speech.speak({ text: `${data.location}，發生規模${speecd_scale.toFixed(1).replace(".", "點")}地震` });
+		} else if (INFO[find0]?.alert_magnitude != speecd_scale && speecd_scale == 0) {
+			TREM.speech.speak({ text: `${data.Unit}，已取消警報` });
+		} else if (data.cancel) {
+			TREM.speech.speak({ text: `${data.Unit}，已取消警報` });
+		}
+
+		if (data.type == "eew-cwb") {
+			audioPlay("../audio/cwbeew.wav");
+
+			if (data.location.includes("海") && Number(data.depth) <= 35)
+				if (Number(speecd_scale) >= 7 && speecd_number == 1)
 					TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象局是否發布，海嘯警報" });
-				else if (Number(speecd_scale) >= 6)
+				else if (Number(speecd_scale) >= 6 && speecd_number == 1)
 					TREM.speech.speak({ text: "沿岸地區應慎防海水位突變" });
-
-		if (data.type == "eew-cwb") audioPlay("../audio/cwbeew.wav");
+				else if (INFO[find0]?.alert_magnitude != speecd_scale)
+					if (Number(speecd_scale) >= 7)
+						TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象局是否發布，海嘯警報" });
+					else if (Number(speecd_scale) >= 6)
+						TREM.speech.speak({ text: "沿岸地區應慎防海水位突變" });
+		}
 	}
-
-	new Notification("EEW 強震即時警報", {
-		body   : body,
-		icon   : "../TREM.ico",
-		silent : win.isFocused(),
-	});
 
 	if (!Info.Notify.includes(data.id)) {
 		Info.Notify.push(data.id);
@@ -5705,8 +5709,6 @@ TREM.Earthquake.on("eew", (data) => {
 				}
 			}
 	}
-
-	if (MaxIntensity.value >= 4 && data.number == 1) if (speecd_use) TREM.speech.speak({ text: "注意強震，此地震可能造成災害" });
 
 	if (data.type != "trem-eew")
 		if (MaxIntensity.value >= 5) {
