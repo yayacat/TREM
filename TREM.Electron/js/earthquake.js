@@ -2733,37 +2733,40 @@ function PGAMain() {
 					}, 5000);
 					fetch(url, { signal: controller.signal }).then((res) => {
 						if (res.ok) {
-							res.json().then(res => {
-								if (controller.signal.aborted || res == undefined) {
+							res.json().then(res1 => {
+								if (controller.signal.aborted || res1 == undefined) {
 									Ping = "🔒";
 									stationnow = 0;
 									Response = {};
 								} else {
 									Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
-									Response = res;
+									Response = res1;
 								}
 							});
 						} else {
 							console.error(res);
-							switch (res.status) {
-							  case 429: {
-								Ping = `❌ ${res.status}`;
-								break;
-							  }
-							  case 404: {
-								Ping = `❌ ${res.status}`;
-								break;
-							  }
 
-							  default: break;
+							switch (res.status) {
+								case 429: {
+									Ping = `❌ ${res.status}`;
+									break;
+								}
+
+								case 404: {
+									Ping = `❌ ${res.status}`;
+									break;
+								}
+
+								default: break;
 							}
+
 							PGAMainbkup();
 						}
-						}).catch((err) => {
-							log(err, 3, "PGATimer", "PGAMain");
-							dump({ level: 2, message: err });
-							PGAMainbkup();
-						});
+					}).catch((err) => {
+						log(err, 3, "PGATimer", "PGAMain");
+						dump({ level: 2, message: err });
+						PGAMainbkup();
+					});
 				}
 
 				handler(Response);
@@ -2851,25 +2854,24 @@ function PGAMainbkup() {
 					}).then((response) => {
 						if (response.ok) {
 							Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
-
-							// Ping = NOW().getTime() - _t + "ms";
-
-							// TimerDesynced = false;
 							Response = response.data;
 						} else {
 							console.error(response);
-							switch (response.status) {
-							  case 429: {
-								Ping = `❌ ${response.status}`;
-								break;
-							  }
-							  case 404: {
-								Ping = `❌ ${response.status}`;
-								break;
-							  }
 
-							  default: break;
+							switch (response.status) {
+								case 429: {
+									Ping = `❌ ${response.status}`;
+									break;
+								}
+
+								case 404: {
+									Ping = `❌ ${response.status}`;
+									break;
+								}
+
+								default: break;
 							}
+
 							PGAMain();
 						}
 					}).catch((err) => {
@@ -3965,10 +3967,10 @@ function ReportGET() {
 			},
 			body   : bodyInfo,
 			signal : controller.signal })
-			.then((ans) => {
-				if (ans.ok) {
-					console.log(res);
-					ans.json().then((ans) => {
+			.then((ans0) => {
+				if (ans0.ok) {
+					console.log(ans0);
+					ans0.json().then((ans) => {
 						api_key_verify = false;
 
 						for (let i = 0; i < ans.length; i++) {
@@ -4020,13 +4022,14 @@ function ReportGET() {
 						}
 					});
 				} else {
-					console.error(ans);
-					switch (ans.status) {
+					console.error(ans0);
+
+					switch (ans0.status) {
 						case 429: {
 							log("Error fetching reports (fetch) 429", 3, "EQReportFetcher", "ReportGET");
-							log(ans, 3, "EQReportFetcher", "ReportGET");
+							log(ans0, 3, "EQReportFetcher", "ReportGET");
 							dump({ level: 2, message: "Error fetching reports (fetch) 429", origin: "EQReportFetcher" });
-							dump({ level: 2, message: ans, origin: "EQReportFetcher" });
+							dump({ level: 2, message: ans0, origin: "EQReportFetcher" });
 
 							if (_report_data.length > setting["cache.report"]) {
 								_report_data_temp = [];
@@ -4043,11 +4046,12 @@ function ReportGET() {
 								ReportGET();
 							}, 30_000);
 						}
+
 						case 404: {
 							log("Error fetching reports (fetch) 404", 3, "EQReportFetcher", "ReportGET");
-							log(ans, 3, "EQReportFetcher", "ReportGET");
+							log(ans0, 3, "EQReportFetcher", "ReportGET");
 							dump({ level: 2, message: "Error fetching reports (fetch) 404", origin: "EQReportFetcher" });
-							dump({ level: 2, message: ans, origin: "EQReportFetcher" });
+							dump({ level: 2, message: ans0, origin: "EQReportFetcher" });
 
 							if (_report_data.length > setting["cache.report"]) {
 								_report_data_temp = [];
@@ -5053,9 +5057,11 @@ ipcMain.on("testEEW", (event, list = []) => {
 		setTimeout(() => {
 			log("Start EEW Test", 1, "EEW", "testEEW");
 			dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
-			let data = {
+
+			const data = {
 				uuid: localStorage.UUID,
 			};
+
 			log(`Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, 0, "Verbose", "testEEW");
 			dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
 			axios.post(posturl + "replay", data)
@@ -5065,18 +5071,19 @@ ipcMain.on("testEEW", (event, list = []) => {
 						testEEWerror = false;
 					} else {
 						console.error(res);
+
 						switch (res.status) {
-						  case 429: {
-							console.error(res);
-							break;
-						  }
+							case 429: {
+								console.error(res);
+								break;
+							}
 
-						  case 404: {
-							console.error(res);
-							break;
-						  }
+							case 404: {
+								console.error(res);
+								break;
+							}
 
-						  default: break;
+							default: break;
 						}
 					}
 				})
@@ -5091,10 +5098,12 @@ ipcMain.on("testEEW", (event, list = []) => {
 			setTimeout(() => {
 				log("Start list EEW Test", 1, "EEW", "testEEW");
 				dump({ level: 0, message: "Start list EEW Test", origin: "EEW" });
-				let data = {
+
+				const data = {
 					uuid : localStorage.UUID,
 					id   : list[index],
 				};
+
 				log(`Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, 0, "Verbose", "testEEW");
 				dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
 				axios.post(posturl + "replay", data)
@@ -5104,6 +5113,7 @@ ipcMain.on("testEEW", (event, list = []) => {
 							testEEWerror = false;
 						} else {
 							console.error(res);
+
 							switch (res.status) {
 								case 429: {
 									console.error(res);
@@ -6769,7 +6779,7 @@ function main(data) {
 		showDialogtime.close();
 	}
 
-	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && data.type == "trem-eew") || data.type != "trem-eew")) {// if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && data.type != "trem-eew") {
+	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && data.type == "trem-eew") || data.type != "trem-eew")) {
 		if (data.depth != null) {
 
 			const wave = { p: 7, s: 4 };

@@ -409,6 +409,8 @@ function init() {
 			console.log("複製成功");
 		});
 	});
+
+	stream_mode(setting["stream.mode"]);
 }
 
 function SelectSave(id) {
@@ -568,12 +570,17 @@ function stream_mode(value) {
 		document.getElementById("trem.ps").checked = false;
 		document.getElementById("trem.ps").disabled = true;
 		ipcRenderer.send("config:value", "trem.ps", false);
+		document.getElementById("accept.eew.trem").checked = false;
+		document.getElementById("accept.eew.trem").disabled = true;
+		ipcRenderer.send("config:value", "accept.eew.trem", false);
 	} else if (!value) {
 		document.getElementById("report.changeView").disabled = false;
 		document.getElementById("report.onlycwbchangeView").disabled = false;
 		document.getElementById("report.getInfo").disabled = false;
 		document.getElementById("report.trem").disabled = false;
 		document.getElementById("Real-time.alert").disabled = false;
+		document.getElementById("trem.ps").disabled = false;
+		document.getElementById("accept.eew.trem").disabled = false;
 	}
 }
 

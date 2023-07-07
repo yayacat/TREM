@@ -322,7 +322,7 @@ TREM.Report = {
 					.then((res) => {
 						if (res.ok) {
 							console.log(res);
-							res.json().then(res => {
+							res.json().then(res1 => {
 								if (!fs.existsSync(`./replay_data/${time_hold}`)) fs.mkdirSync(`./replay_data/${time_hold}`);
 								fs.access(`./replay_data/${time_hold}/${time}.json`, (err) => {
 									if (!err) {
@@ -333,7 +333,7 @@ TREM.Report = {
 										report.download = true;
 										this.cache.set(report.identifier, report);
 									} else if (err.code == "ENOENT") {
-										fs.writeFile(`./replay_data/${time_hold}/${time}.json`, JSON.stringify(res), () => {
+										fs.writeFile(`./replay_data/${time_hold}/${time}.json`, JSON.stringify(res1), () => {
 											time += 1000;
 										});
 										progresstemp += (1 / progressStep) * 1;
@@ -345,12 +345,14 @@ TREM.Report = {
 							});
 						} else {
 							console.error(res);
+
 							switch (res.status) {
 								case 429: {
 									log(res.status, 3, "replaydownloader", "Report");
 									dump({ level: 2, message: res.status });
 									break;
 								}
+
 								case 404: {
 									log(res.status, 3, "replaydownloader", "Report");
 									dump({ level: 2, message: res.status });
@@ -791,20 +793,23 @@ TREM.Report = {
 						.then((res) => {
 							if (res.ok) {
 								console.log(res);
-								res.json().then(res => {
-									this._report_trem_data[report.trem[0]] = res;
+
+								res.json().then(res1 => {
+									this._report_trem_data[report.trem[0]] = res1;
 									this.report_trem_data[report.trem[0]] = this._report_trem_data[report.trem[0]];
 									storage.setItem("report_trem_data", this._report_trem_data);
 									this._setuptremmarker(report);
 								});
 							} else {
 								console.error(res);
+
 								switch (res.status) {
 									case 429: {
 										log(res.status, 3, "report_trem", "Report");
 										dump({ level: 2, message: res.status });
 										break;
 									}
+
 									case 404: {
 										log(res.status, 3, "report_trem", "Report");
 										dump({ level: 2, message: res.status });
