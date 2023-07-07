@@ -308,6 +308,10 @@ const Constants = Object.freeze({
 			type  : "toggle",
 			value : true,
 		},
+		"trem.ps": {
+			type  : "toggle",
+			value : false,
+		},
 		"exptech.name": {
 			type  : "string",
 			value : "",

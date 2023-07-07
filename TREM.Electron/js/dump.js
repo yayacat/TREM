@@ -160,12 +160,21 @@ function dumpUpload() {
 		UUID          : localStorage.UUID,
 	};
 	axios.post("https://exptech.mywire.org:1015", msg)
-		.then((response) => {
-			if (response.data.response == "Speed limit")
-				alert("Dump 發送限制\n稍等 5 分鐘後再次嘗試");
-			else
+		.then((res) => {
+			if (res.data.response == "Speed limit") alert("Dump 發送限制\n稍等 5 分鐘後再次嘗試");
+			if (res.ok) {
 				alert("Dump 發送成功");
+			} else {
+				console.error(res);
+				switch (res.status) {
+					case 429: {
+						alert("Dump 發送限制\n稍等 5 分鐘後再次嘗試");
+						break;
+					}
 
+					default: break;
+				}
+			}
 		})
 		.catch((error) => {
 			alert("Dump 發送失敗\nError > " + error);

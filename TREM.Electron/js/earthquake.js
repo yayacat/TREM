@@ -2731,26 +2731,37 @@ function PGAMain() {
 					setTimeout(() => {
 						controller.abort();
 					}, 5000);
-					fetch(url, { signal: controller.signal }).then(res => res.json())
-						.then(res => {
-							if (controller.signal.aborted || res == undefined) {
-								Ping = "🔒";
-								stationnow = 0;
-								Response = {};
-							} else {
-								Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
+					fetch(url, { signal: controller.signal }).then((res) => {
+						if (res.ok) {
+							res.json().then(res => {
+								if (controller.signal.aborted || res == undefined) {
+									Ping = "🔒";
+									stationnow = 0;
+									Response = {};
+								} else {
+									Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
+									Response = res;
+								}
+							});
+						} else {
+							console.error(res);
+							switch (res.status) {
+							  case 429: {
+								Ping = `❌ ${res.status}`;
+								break;
+							  }
+							  case 404: {
+								Ping = `❌ ${res.status}`;
+								break;
+							  }
 
-								// Ping = NOW().getTime() - _t + "ms";
-
-								// TimerDesynced = false;
-								Response = res;
+							  default: break;
 							}
-						})
-						.catch((err) => {
+							PGAMainbkup();
+						}
+						}).catch((err) => {
 							log(err, 3, "PGATimer", "PGAMain");
 							dump({ level: 2, message: err });
-							Ping = `❌ ${err.response.status}`;
-							// TimerDesynced = true;
 							PGAMainbkup();
 						});
 				}
@@ -2838,17 +2849,32 @@ function PGAMainbkup() {
 						method : "get",
 						url    : url,
 					}).then((response) => {
-						Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
+						if (response.ok) {
+							Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
 
-						// Ping = NOW().getTime() - _t + "ms";
+							// Ping = NOW().getTime() - _t + "ms";
 
-						// TimerDesynced = false;
-						Response = response.data;
+							// TimerDesynced = false;
+							Response = response.data;
+						} else {
+							console.error(response);
+							switch (response.status) {
+							  case 429: {
+								Ping = `❌ ${response.status}`;
+								break;
+							  }
+							  case 404: {
+								Ping = `❌ ${response.status}`;
+								break;
+							  }
+
+							  default: break;
+							}
+							PGAMain();
+						}
 					}).catch((err) => {
 						log(err, 3, "PGATimer", "PGAMainbkup");
 						dump({ level: 2, message: err });
-						Ping = `❌ ${err.response.status}`;
-						// TimerDesynced = true;
 						PGAMain();
 					});
 				}
@@ -3153,7 +3179,7 @@ function handler(Json) {
 			document.getElementById("rt-station-local-pga").innerText = amount;
 		}
 
-		if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999 && target_count > 1) {
+		if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999 && (target_count > 1 || Object.keys(eew).length != 0)) {
 			detected_list[station[keys[index]].PGA] ??= {
 				intensity : intensity,
 				time      : 0,
@@ -3939,59 +3965,110 @@ function ReportGET() {
 			},
 			body   : bodyInfo,
 			signal : controller.signal })
-			.then((ans) => ans.json())
 			.then((ans) => {
-				api_key_verify = false;
+				if (ans.ok) {
+					console.log(res);
+					ans.json().then((ans) => {
+						api_key_verify = false;
 
-				for (let i = 0; i < ans.length; i++) {
-					const id = ans[i].identifier;
+						for (let i = 0; i < ans.length; i++) {
+							const id = ans[i].identifier;
 
-					for (let _i = 0; _i < _report_data.length; _i++)
-						if (_report_data[_i].identifier == id) {
-							_report_data.splice(_i, 1);
-							break;
-						}
-				}
-
-				for (let i = 0; i < ans.length; i++) {
-					_report_data.push(ans[i]);
-
-					if (ans[i].location.startsWith("地震資訊"))
-						api_key_verify = true;
-				}
-
-				for (let i = 0; i < _report_data.length - 1; i++)
-					for (let _i = 0; _i < _report_data.length - 1; _i++)
-						if (new Date(_report_data[_i].originTime.replaceAll("/", "-")).getTime() < new Date(_report_data[_i + 1].originTime.replaceAll("/", "-")).getTime()) {
-							const temp = _report_data[_i + 1];
-							_report_data[_i + 1] = _report_data[_i];
-							_report_data[_i] = temp;
+							for (let _i = 0; _i < _report_data.length; _i++)
+								if (_report_data[_i].identifier == id) {
+									_report_data.splice(_i, 1);
+									break;
+								}
 						}
 
-				if (!_report_data) return setTimeout(ReportGET, 10_000);
+						for (let i = 0; i < ans.length; i++) {
+							_report_data.push(ans[i]);
 
-				storage.setItem("report_data", _report_data);
+							if (ans[i].location.startsWith("地震資訊"))
+								api_key_verify = true;
+						}
 
-				if (api_key_verify && setting["report.getInfo"]) {
-					log("Reports fetched (api key verify)", 1, "EQReportFetcher", "ReportGET");
-					dump({ level: 0, message: "Reports fetched (api key verify)", origin: "EQReportFetcher" });
-					cacheReport(_report_data);
+						for (let i = 0; i < _report_data.length - 1; i++)
+							for (let _i = 0; _i < _report_data.length - 1; _i++)
+								if (new Date(_report_data[_i].originTime.replaceAll("/", "-")).getTime() < new Date(_report_data[_i + 1].originTime.replaceAll("/", "-")).getTime()) {
+									const temp = _report_data[_i + 1];
+									_report_data[_i + 1] = _report_data[_i];
+									_report_data[_i] = temp;
+								}
+
+						if (!_report_data) return setTimeout(ReportGET, 10_000);
+
+						storage.setItem("report_data", _report_data);
+
+						if (api_key_verify && setting["report.getInfo"]) {
+							log("Reports fetched (api key verify)", 1, "EQReportFetcher", "ReportGET");
+							dump({ level: 0, message: "Reports fetched (api key verify)", origin: "EQReportFetcher" });
+							cacheReport(_report_data);
+						} else {
+							const _report_data_POST_temp = [];
+							let k = 0;
+
+							for (let i = 0; i < _report_data.length; i++)
+								if (_report_data[i].identifier.startsWith("CWB")) {
+									_report_data_POST_temp[k] = _report_data[i];
+									k += 1;
+								}
+
+							log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
+							dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
+							cacheReport(_report_data_POST_temp);
+						}
+					});
 				} else {
-					const _report_data_POST_temp = [];
-					let k = 0;
+					console.error(ans);
+					switch (ans.status) {
+						case 429: {
+							log("Error fetching reports (fetch) 429", 3, "EQReportFetcher", "ReportGET");
+							log(ans, 3, "EQReportFetcher", "ReportGET");
+							dump({ level: 2, message: "Error fetching reports (fetch) 429", origin: "EQReportFetcher" });
+							dump({ level: 2, message: ans, origin: "EQReportFetcher" });
 
-					for (let i = 0; i < _report_data.length; i++)
-						if (_report_data[i].identifier.startsWith("CWB")) {
-							_report_data_POST_temp[k] = _report_data[i];
-							k += 1;
+							if (_report_data.length > setting["cache.report"]) {
+								_report_data_temp = [];
+								for (let i = 0; i < setting["cache.report"]; i++)
+									_report_data_temp[i] = _report_data[i];
+								TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+								ReportList(_report_data_temp);
+							} else {
+								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+								ReportList(_report_data);
+							}
+
+							return setTimeout(() => {
+								ReportGET();
+							}, 30_000);
+						}
+						case 404: {
+							log("Error fetching reports (fetch) 404", 3, "EQReportFetcher", "ReportGET");
+							log(ans, 3, "EQReportFetcher", "ReportGET");
+							dump({ level: 2, message: "Error fetching reports (fetch) 404", origin: "EQReportFetcher" });
+							dump({ level: 2, message: ans, origin: "EQReportFetcher" });
+
+							if (_report_data.length > setting["cache.report"]) {
+								_report_data_temp = [];
+								for (let i = 0; i < setting["cache.report"]; i++)
+									_report_data_temp[i] = _report_data[i];
+								TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+								ReportList(_report_data_temp);
+							} else {
+								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+								ReportList(_report_data);
+							}
+
+							return setTimeout(() => {
+								ReportGET();
+							}, 30_000);
 						}
 
-					log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
-					dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
-					cacheReport(_report_data_POST_temp);
+						default: break;
+					}
 				}
-			})
-			.catch((err) => {
+			}).catch((err) => {
 				log("Error fetching reports (fetch)", 3, "EQReportFetcher", "ReportGET");
 				log(err, 3, "EQReportFetcher", "ReportGET");
 				dump({ level: 2, message: "Error fetching reports (fetch)", origin: "EQReportFetcher" });
@@ -4010,7 +4087,7 @@ function ReportGET() {
 
 				return setTimeout(() => {
 					ReportGET();
-				}, 10_000);
+				}, 60_000);
 			});
 		report_get_timestamp = Date.now();
 	} catch (error) {
@@ -4020,7 +4097,7 @@ function ReportGET() {
 		dump({ level: 2, message: error, origin: "EQReportFetcher" });
 		return setTimeout(() => {
 			ReportGET();
-		}, 10_000);
+		}, 60_000);
 	}
 }
 
@@ -4976,37 +5053,32 @@ ipcMain.on("testEEW", (event, list = []) => {
 		setTimeout(() => {
 			log("Start EEW Test", 1, "EEW", "testEEW");
 			dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
-			let data = {};
-
-			// if (setting["p2p.mode"])
-			// 	try {
-			// 		if (service_status.websocket.status) {
-			// 			data = {
-			// 				uuid: localStorage.UUID_p2p,
-			// 			};
-			// 			dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
-			// 			axios.post(posturl + "replay", data)
-			// 				.then(() => {
-			// 					testEEWerror = false;
-			// 				})
-			// 				.catch((error) => {
-			// 					testEEWerror = true;
-			// 					dump({ level: 2, message: error, origin: "Verbose" });
-			// 				});
-			// 		}
-			// 	} catch (e) {
-			// 		data = {};
-			// 	}
-
-			data = {
+			let data = {
 				uuid: localStorage.UUID,
 			};
 			log(`Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, 0, "Verbose", "testEEW");
 			dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
 			axios.post(posturl + "replay", data)
-			// Exptech.v1.post("/trem/replay", data)
-				.then(() => {
-					testEEWerror = false;
+				.then((res) => {
+					if (res.ok) {
+						console.log(res);
+						testEEWerror = false;
+					} else {
+						console.error(res);
+						switch (res.status) {
+						  case 429: {
+							console.error(res);
+							break;
+						  }
+
+						  case 404: {
+							console.error(res);
+							break;
+						  }
+
+						  default: break;
+						}
+					}
 				})
 				.catch((error) => {
 					testEEWerror = true;
@@ -5019,39 +5091,33 @@ ipcMain.on("testEEW", (event, list = []) => {
 			setTimeout(() => {
 				log("Start list EEW Test", 1, "EEW", "testEEW");
 				dump({ level: 0, message: "Start list EEW Test", origin: "EEW" });
-				let data = {};
-
-				// if (setting["p2p.mode"])
-				// 	try {
-				// 		if (service_status.websocket.status) {
-				// 			data = {
-				// 				uuid : localStorage.UUID_p2p,
-				// 				id   : list[index],
-				// 			};
-				// 			dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
-				// 			axios.post(posturl + "replay", data)
-				// 				.then(() => {
-				// 					testEEWerror = false;
-				// 				})
-				// 				.catch((error) => {
-				// 					testEEWerror = true;
-				// 					dump({ level: 2, message: error, origin: "Verbose" });
-				// 				});
-				// 		}
-				// 	} catch (e) {
-				// 		data = {};
-				// 	}
-
-				data = {
+				let data = {
 					uuid : localStorage.UUID,
 					id   : list[index],
 				};
 				log(`Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, 0, "Verbose", "testEEW");
 				dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
 				axios.post(posturl + "replay", data)
-				// Exptech.v1.post("/trem/replay", data)
-					.then(() => {
-						testEEWerror = false;
+					.then((res) => {
+						if (res.ok) {
+							console.log(res);
+							testEEWerror = false;
+						} else {
+							console.error(res);
+							switch (res.status) {
+								case 429: {
+									console.error(res);
+									break;
+								}
+
+								case 404: {
+									console.error(res);
+									break;
+								}
+
+								default: break;
+							}
+						}
 					})
 					.catch((error) => {
 						testEEWerror = true;
@@ -5354,7 +5420,7 @@ function FCMdata(json, Unit) {
 			setTimeout(() => {
 				ipcRenderer.send("screenshotEEW", {
 					Function : "report",
-					ID       : json.ID,
+					ID       : json.earthquakeNo,
 					Version  : 1,
 					Time     : NOW().getTime(),
 					Shot     : 1,
@@ -5376,7 +5442,7 @@ function FCMdata(json, Unit) {
 				setTimeout(() => {
 					ipcRenderer.send("screenshotEEW", {
 						Function : "report",
-						ID       : json.ID,
+						ID       : json.earthquakeNo,
 						Version  : 1,
 						Time     : NOW().getTime(),
 						Shot     : 1,
@@ -5397,7 +5463,7 @@ function FCMdata(json, Unit) {
 				setTimeout(() => {
 					ipcRenderer.send("screenshotEEW", {
 						Function : "report",
-						ID       : json.ID,
+						ID       : json.earthquakeNo,
 						Version  : 1,
 						Time     : NOW().getTime(),
 						Shot     : 1,
@@ -5586,10 +5652,10 @@ TREM.Earthquake.on("eew", (data) => {
 
 	let Nmsg = "";
 
-	if (data.type == "trem-eew" && data.number <= 3) {
-		data.scale = null;
-		data.depth = null;
-	}
+	// if (data.type == "trem-eew" && data.number <= 3) {
+	// 	data.scale = null;
+	// 	data.depth = null;
+	// }
 
 	clearInterval(AudioT);
 	audio.main_lock = false;
@@ -5907,7 +5973,7 @@ TREM.Earthquake.on("eew", (data) => {
 		_distance[index] = _speed(data.depth, index);
 	EarthquakeList[data.id].distance = _distance;
 
-	if (data.type == "trem-eew" && data.number <= 3) EarthquakeList[data.id].distance = null;
+	// if (data.type == "trem-eew" && data.number <= 3) EarthquakeList[data.id].distance = null;
 
 	main(data);
 
@@ -6703,7 +6769,7 @@ function main(data) {
 		showDialogtime.close();
 	}
 
-	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && data.type != "trem-eew") {
+	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && data.type == "trem-eew") || data.type != "trem-eew")) {// if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && data.type != "trem-eew") {
 		if (data.depth != null) {
 
 			const wave = { p: 7, s: 4 };
@@ -7055,7 +7121,7 @@ function main(data) {
 		EEWshot = NOW().getTime();
 		setTimeout(() => {
 			ipcRenderer.send("screenshotEEW", {
-				Function : data.Function,
+				Function : "eew",
 				ID       : data.id,
 				Version  : data.Version,
 				Time     : NOW().getTime(),
@@ -7150,15 +7216,15 @@ function tsunami_color_int(color) {
 }
 
 function clear(ID, type) {
-	if (type != "trem-eew") {
-		if (EarthquakeList[ID].CircleS != undefined) EarthquakeList[ID].CircleS = EarthquakeList[ID].CircleS.remove();
+	// if (type != "trem-eew") {
+	if (EarthquakeList[ID].CircleS != undefined) EarthquakeList[ID].CircleS = EarthquakeList[ID].CircleS.remove();
 
-		if (EarthquakeList[ID].CircleP != undefined) EarthquakeList[ID].CircleP = EarthquakeList[ID].CircleP.remove();
+	if (EarthquakeList[ID].CircleP != undefined) EarthquakeList[ID].CircleP = EarthquakeList[ID].CircleP.remove();
 
-		if (EarthquakeList[ID].CircleSTW != undefined) Maps.mini.removeLayer(EarthquakeList[ID].CircleSTW);
+	if (EarthquakeList[ID].CircleSTW != undefined) Maps.mini.removeLayer(EarthquakeList[ID].CircleSTW);
 
-		if (EarthquakeList[ID].CirclePTW != undefined) Maps.mini.removeLayer(EarthquakeList[ID].CirclePTW);
-	}
+	if (EarthquakeList[ID].CirclePTW != undefined) Maps.mini.removeLayer(EarthquakeList[ID].CirclePTW);
+	// }
 }
 
 function updateText() {

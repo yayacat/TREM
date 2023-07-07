@@ -319,29 +319,48 @@ TREM.Report = {
 
 				this.lock = true;
 				fetch(`https://exptech.com.tw/api/v2/trem/rts?time=${time}`)
-					.then(res => res.json())
-					.then(res => {
-						if (!fs.existsSync(`./replay_data/${time_hold}`)) fs.mkdirSync(`./replay_data/${time_hold}`);
-						fs.access(`./replay_data/${time_hold}/${time}.json`, (err) => {
-							if (!err) {
-								clearInterval(this.clock);
-								console.log("Finish!(is found it)");
-								document.getElementById("report-replay-downloader-text").innerHTML = "重複下載!";
-								downloader_progress.style.display = "none";
-								report.download = true;
-								this.cache.set(report.identifier, report);
-							} else if (err.code == "ENOENT") {
-								fs.writeFile(`./replay_data/${time_hold}/${time}.json`, JSON.stringify(res), () => {
-									time += 1000;
+					.then((res) => {
+						if (res.ok) {
+							console.log(res);
+							res.json().then(res => {
+								if (!fs.existsSync(`./replay_data/${time_hold}`)) fs.mkdirSync(`./replay_data/${time_hold}`);
+								fs.access(`./replay_data/${time_hold}/${time}.json`, (err) => {
+									if (!err) {
+										clearInterval(this.clock);
+										console.log("Finish!(is found it)");
+										document.getElementById("report-replay-downloader-text").innerHTML = "重複下載!";
+										downloader_progress.style.display = "none";
+										report.download = true;
+										this.cache.set(report.identifier, report);
+									} else if (err.code == "ENOENT") {
+										fs.writeFile(`./replay_data/${time_hold}/${time}.json`, JSON.stringify(res), () => {
+											time += 1000;
+										});
+										progresstemp += (1 / progressStep) * 1;
+										downloader_progress.value = progresstemp;
+										downloader_progress.title = `${Math.round(progresstemp * 10000) / 100}%`;
+										downloader_progress.style.display = "";
+									}
 								});
-								progresstemp += (1 / progressStep) * 1;
-								downloader_progress.value = progresstemp;
-								downloader_progress.title = `${Math.round(progresstemp * 10000) / 100}%`;
-								downloader_progress.style.display = "";
+							});
+						} else {
+							console.error(res);
+							switch (res.status) {
+								case 429: {
+									log(res.status, 3, "replaydownloader", "Report");
+									dump({ level: 2, message: res.status });
+									break;
+								}
+								case 404: {
+									log(res.status, 3, "replaydownloader", "Report");
+									dump({ level: 2, message: res.status });
+									break;
+								}
+
+								default: break;
 							}
-						});
-					})
-					.catch(err => {
+						}
+					}).catch(err => {
 						this.lock = false;
 						console.log(err.message);
 						log(err, 3, "replaydownloader", "Report");
@@ -769,14 +788,33 @@ TREM.Report = {
 			if (report.trem.length != 0)
 				if (!this.report_trem_data[report.trem[0]])
 					fetch(`https://exptech.com.tw/api/v1/file?path=/trem_report/${report.trem[0]}.json`)
-						.then(res => res.json())
-						.then(res => {
-							this._report_trem_data[report.trem[0]] = res;
-							this.report_trem_data[report.trem[0]] = this._report_trem_data[report.trem[0]];
-							storage.setItem("report_trem_data", this._report_trem_data);
-							this._setuptremmarker(report);
-						})
-						.catch(err => {
+						.then((res) => {
+							if (res.ok) {
+								console.log(res);
+								res.json().then(res => {
+									this._report_trem_data[report.trem[0]] = res;
+									this.report_trem_data[report.trem[0]] = this._report_trem_data[report.trem[0]];
+									storage.setItem("report_trem_data", this._report_trem_data);
+									this._setuptremmarker(report);
+								});
+							} else {
+								console.error(res);
+								switch (res.status) {
+									case 429: {
+										log(res.status, 3, "report_trem", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+									case 404: {
+										log(res.status, 3, "report_trem", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									default: break;
+								}
+							}
+						}).catch(err => {
 							console.log(err.message);
 							log(err, 3, "report_trem", "Report");
 							dump({ level: 2, message: err });
