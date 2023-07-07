@@ -565,6 +565,9 @@ function stream_mode(value) {
 		document.getElementById("Real-time.alert").checked = false;
 		document.getElementById("Real-time.alert").disabled = true;
 		ipcRenderer.send("config:value", "Real-time.alert", false);
+		document.getElementById("trem.ps").checked = false;
+		document.getElementById("trem.ps").disabled = true;
+		ipcRenderer.send("config:value", "trem.ps", false);
 	} else if (!value) {
 		document.getElementById("report.changeView").disabled = false;
 		document.getElementById("report.onlycwbchangeView").disabled = false;
