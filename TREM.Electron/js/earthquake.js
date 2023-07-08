@@ -548,7 +548,7 @@ TREM.PWS = {
 						element: $("<img src=\"../image/warn.png\" height=\"32\" width=\"32\"></img>")[0],
 					})
 						.setLngLat([area.longitude, area.latitude])
-						.setPopup(new maplibregl.Popup({ closeButton: false, closeOnClick: false, maxWidth: 360 }).setHTML(`<div class="marker-popup pws-popup"><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")}\n失效時間：${pws.expireTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`))
+						.setPopup(new maplibregl.Popup({ closeButton: false, closeOnClick: false, maxWidth: 360 }).setHTML(`<div class="marker-popup pws-popup"><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${timeconvert(pws.sentTime).format("YYYY/MM/DD HH:mm:ss")}\n失效時間：${timeconvert(pws.expireTime).format("YYYY/MM/DD HH:mm:ss")}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`))
 						.addTo(Maps.main);
 					areaconst += 1;
 				} else {
@@ -570,7 +570,7 @@ TREM.PWS = {
 						keyboard : false,
 					})
 						.addTo(Maps.main)
-						.bindPopup(`<div><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${pws.sentTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")}\n失效時間：${pws.expireTime.toLocaleString("en-US", { dateStyle: "long", timeStyle: "full", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`, {
+						.bindPopup(`<div><strong>${pws.title}</strong>\n發報單位：${pws.sender}\n內文：${pws.description}\n發報時間：${timeconvert(pws.sentTime).format("YYYY/MM/DD HH:mm:ss")}\n失效時間：${timeconvert(pws.expireTime).format("YYYY/MM/DD HH:mm:ss")}\n\n<span class="url" onclick="openURL('${pws.url}')">報告連結</span></div>`, {
 							offset    : [8, 0],
 							permanent : false,
 							className : "marker-popup pws-popup",
@@ -4919,7 +4919,7 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ("震度速報"
 			+ "資料來源" + intensity.unit
-			+ (info.time != 0 ? "發震時間" : "接收時間") + new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss")
+			+ (info.time != 0 ? "發震時間" : "接收時間") + timeconvert(info.time != 0 ? info.time : intensity.timestamp).format("YYYY/MM/DD HH:mm:ss")
 			+ "芮氏規模" + (info.scale != 0 ? info.scale : "未知")
 			+ "深度" + (info.depth != 0 ? info.depth + " 公里" : "未知")
 			+ "震央位置" + "東經" + (info.lon != 0 ? info.lon : "未知") + "北緯" + (info.lat != 0 ? info.lat : "未知")) : "震度速報",
@@ -4939,7 +4939,7 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 						},
 						{
 							name   : info.time != 0 ? "發震時間" : "接收時間",
-							value  : new Date(info.time != 0 ? info.time : intensity.timestamp).toLocaleString("en-US", { dateStyle: "long", timeStyle: "medium", hour12: false, hourCycle: "h23", timeZone: "Asia/Taipei" }).format("YYYY/MM/DD HH:mm:ss"),
+							value  : timeconvert(info.time != 0 ? info.time : intensity.timestamp).format("YYYY/MM/DD HH:mm:ss"),
 							inline : true,
 						},
 						{
@@ -5484,7 +5484,7 @@ function FCMdata(json, Unit) {
 	} else if (json.type.startsWith("eew") || json.type == "trem-eew") {
 		if (replay != 0 && !json.replay_timestamp) return;
 
-		if (json.type == "trem-eew" && !api_key_verify) return;
+		// if (json.type == "trem-eew" && !api_key_verify) return;
 
 		// if (json.max < 3) return;
 
@@ -6060,7 +6060,7 @@ TREM.Earthquake.on("eew", (data) => {
 					+ ":" + NOW().getSeconds();
 
 				let msg = setting["webhook.body"];
-				msg = msg.replace("%Depth%", data.depth == null ? "?" : data.depth).replace("%NorthLatitude%", data.lat).replace("%Time%", showtime).replace("%EastLongitude%", data.lon).replace("%location%", (data.type == "trem-eew" && data.number <= 3) ? "?" : data.location).replace("%Scale%", data.scale == null ? "?" : data.scale).replace("%Number%", data.number).replace("%Final%", (data.final) ? "(最終報)" : "");
+				msg = msg.replace("%Depth%", data.depth == null ? "?" : data.depth).replace("%NorthLatitude%", data.lat).replace("%Time%", showtime).replace("%EastLongitude%", data.lon).replace("%location%", data.location).replace("%Scale%", data.scale == null ? "?" : data.scale).replace("%Number%", data.number).replace("%Final%", (data.final) ? "(最終報)" : "");
 
 				if (data.type == "eew-cwb")
 					msg = msg.replace("%Provider%", "中央氣象局 (CWB)");
@@ -6088,7 +6088,7 @@ TREM.Earthquake.on("eew", (data) => {
 					icon_url : "https://raw.githubusercontent.com/ExpTechTW/API/master/image/Icon/ExpTech.png",
 				};
 				msg.tts = setting["tts.Notification"];
-				msg.content = setting["tts.Notification"] ? (showtime + "左右發生顯著有感地震東經" + data.lon + "北緯" + data.lat + "位於" + ((data.type == "trem-eew" && data.number <= 3) ? "?" : data.location) + "深度" + (data.depth == null ? "?" : data.depth + "公里") + "規模" + (data.scale == null ? "?" : data.scale) + "第" + data.number + "報發報單位" + data.Unit + "慎防強烈搖晃，就近避難 [趴下、掩護、穩住]") : "";
+				msg.content = setting["tts.Notification"] ? (showtime + "左右發生顯著有感地震東經" + data.lon + "北緯" + data.lat + "位於" + data.location + "深度" + (data.depth == null ? "?" : data.depth + "公里") + "規模" + (data.scale == null ? "?" : data.scale) + "第" + data.number + "報發報單位" + data.Unit + "慎防強烈搖晃，就近避難 [趴下、掩護、穩住]") : "";
 				log("Posting EEW Webhook", 1, "Webhook", "eew");
 				dump({ level: 0, message: "Posting EEW Webhook", origin: "Webhook" });
 				fetch(setting["webhook.url"], {
@@ -6108,7 +6108,7 @@ TREM.Earthquake.on("eew", (data) => {
 					+ ":" + NOW().getSeconds();
 
 				let msg = setting["webhook.body"];
-				msg = msg.replace("%Depth%", data.depth == null ? "?" : data.depth).replace("%NorthLatitude%", data.lat).replace("%Time%", showtime).replace("%EastLongitude%", data.lon).replace("%location%", data.location).replace("%Scale%", data.scale == null ? "?" : data.scale).replace("%Number%", data.number);
+				msg = msg.replace("%Depth%", data.depth == null ? "?" : data.depth).replace("%NorthLatitude%", data.lat).replace("%Time%", showtime).replace("%EastLongitude%", data.lon).replace("%location%", data.location).replace("%Scale%", data.scale == null ? "?" : data.scale).replace("%Number%", data.number).replace("%Final%", (data.final) ? "(最終報)" : "");
 
 				if (data.type == "eew-cwb")
 					msg = msg.replace("%Provider%", "中央氣象局 (CWB)");
@@ -7129,15 +7129,27 @@ function main(data) {
 	if (NOW().getTime() - EEWshot > 30000 && EEWshotC <= 2) {
 		EEWshotC++;
 		EEWshot = NOW().getTime();
-		setTimeout(() => {
-			ipcRenderer.send("screenshotEEW", {
-				Function : "eew",
-				ID       : data.id,
-				Version  : data.Version,
-				Time     : NOW().getTime(),
-				Shot     : EEWshotC,
-			});
-		}, 300);
+
+		if (data.replay_time)
+			setTimeout(() => {
+				ipcRenderer.send("screenshotEEW", {
+					Function : "replay_eew",
+					ID       : data.id,
+					Version  : data.Version,
+					Time     : NOW().getTime(),
+					Shot     : EEWshotC,
+				});
+			}, 300);
+		else
+			setTimeout(() => {
+				ipcRenderer.send("screenshotEEW", {
+					Function : "eew",
+					ID       : data.id,
+					Version  : data.Version,
+					Time     : NOW().getTime(),
+					Shot     : EEWshotC,
+				});
+			}, 300);
 	}
 
 	if (data.cancel) {

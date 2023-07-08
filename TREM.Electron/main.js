@@ -86,8 +86,15 @@ let RTSWindow = TREM.Window.get("rts");
  */
 let IntensityWindow = TREM.Window.get("Intensity");
 
+// const appFolder = path.dirname(
+// 	(process.env.APPDATA ? path.join(process.env.APPDATA, '..', 'Local', 'Programs', 'trem', 'trem') : process.env.APPDATA)
+// 	|| (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.APPDATA));
+// const runExe = path.resolve(appFolder, 'TREM.exe');
+// console.log(runExe);
+
 TREM.setLoginItemSettings({
 	openAtLogin : TREM.Configuration.data["windows.startup"],
+	// path		: runExe,
 	name        : "TREM",
 	args        : TREM.Configuration.data["windows.minimize"] ? ["--start"] : [],
 });
@@ -654,7 +661,7 @@ ipcMain.on("screenshotEEW", async (event, json) => {
 	const filename = `${json.Function}_${json.ID}_${json.Version}_${json.Time}_${json.Shot}.png`;
 	fs.writeFileSync(path.join(folder, filename), (await MainWindow.webContents.capturePage()).toPNG());
 
-	if (RTSWindow) {
+	if (RTSWindow && json.Function != "replay_eew") {
 		const filenameRTS = `${json.Function}_${json.ID}_${json.Version}_${json.Time}_${json.Shot}_RTS.png`;
 		fs.writeFileSync(path.join(folder, filenameRTS), (await RTSWindow.webContents.capturePage()).toPNG());
 	}
