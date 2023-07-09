@@ -3054,80 +3054,19 @@ function handler(Json) {
 				station_tooltip = `<div>${keys[index]}</div><div>${station[keys[index]].Loc}</div><div>${amount}</div><div>${current_data.i}</div>`;
 		}
 
-		if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl") {
-			const station_tooltip_popup = new maplibregl.Popup({ closeOnClick: false, closeButton: false });
+		if (current_data != undefined || api_key_verify || replay != 0)
+			if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl") {
+				const station_tooltip_popup = new maplibregl.Popup({ closeOnClick: false, closeButton: false });
 
-			if (!Station[keys[index]] && (!rts_remove_eew || Alert)) {
-				Station[keys[index]] = new maplibregl.Marker(
-					{
-						element: $(`<div class="map-intensity-icon rt-icon ${level_class}" style="z-index: ${50 + (amount < 999 ? amount : 0) * 10};"></div>`)[0],
-					})
-					.setLngLat([station[keys[index]].Long, station[keys[index]].Lat])
-					.setPopup(station_tooltip_popup.setHTML(station_tooltip))
-					.addTo(Maps.main);
-				Station[keys[index]].getElement().addEventListener("click", () => {
-					if (rtstation1 == "") {
-						rtstation1 = keys[index];
-						app.Configuration.data["Real-time.station"] = keys[index];
-					} else if (rtstation1 == keys[index]) {
-						rtstation1 = "";
-						app.Configuration.data["Real-time.station"] = setting["Real-time.station"];
-					} else if (rtstation1 != keys[index]) {
-						rtstation1 = keys[index];
-						app.Configuration.data["Real-time.station"] = keys[index];
-					}
-				});
-				Station[keys[index]].getElement().addEventListener("mouseover", () => {
-					station_tooltip_popup.setLngLat([station[keys[index]].Long, station[keys[index]].Lat]).setHTML(station_tooltip).addTo(Maps.main);
-				});
-				Station[keys[index]].getElement().addEventListener("mouseleave", () => {
-					station_tooltip_popup.remove();
-				});
-			}
-
-			if (Station[keys[index]]) {
-				Station[keys[index]].getPopup().setHTML(station_tooltip);
-
-				if (Station[keys[index]].getElement().className != `map-intensity-icon rt-icon ${level_class}`)
-					Station[keys[index]].getElement().className = `map-intensity-icon rt-icon ${level_class}`;
-				Station[keys[index]].getElement().style.zIndex = 50 + (amount < 999 ? amount : 0) * 10;
-			}
-
-			if (Station[keys[index]] && rts_remove_eew && !Alert) {
-				Station[keys[index]].remove();
-				delete Station[keys[index]];
-			}
-		} else if (!TREM.Detector.webgl || TREM.MapRenderingEngine == "leaflet") {
-			if (!Station[keys[index]] && (!rts_remove_eew || Alert))
-				Station[keys[index]] = L.marker(
-					[station[keys[index]].Lat, station[keys[index]].Long],
-					{
-						icon: L.divIcon({
-							iconSize  : [size, size],
-							className : `map-intensity-icon rt-icon ${level_class}`,
-						}),
-						keyboard: false,
-					})
-					.addTo(Maps.main)
-					.bindTooltip(station_tooltip, {
-						offset    : [8, 0],
-						permanent : false,
-						className : current_data == undefined ? "rt-station-tooltip-na" : "rt-station-tooltip",
-					})
-					.on("click", () => {
-						// Station[keys[index]].keepTooltipAlive = !Station[keys[index]].keepTooltipAlive;
-
-						// if (Maps.main.getZoom() < 11) {
-						// 	const tooltip = Station[keys[index]].getTooltip();
-						// 	Station[keys[index]].unbindTooltip();
-
-						// 	if (Station[keys[index]].keepTooltipAlive)
-						// 		tooltip.options.permanent = true;
-						// 	else
-						// 		tooltip.options.permanent = false;
-						// 	Station[keys[index]].bindTooltip(tooltip);
-						// }
-
+				if (!Station[keys[index]] && (!rts_remove_eew || Alert)) {
+					Station[keys[index]] = new maplibregl.Marker(
+						{
+							element: $(`<div class="map-intensity-icon rt-icon ${level_class}" style="z-index: ${50 + (amount < 999 ? amount : 0) * 10};"></div>`)[0],
+						})
+						.setLngLat([station[keys[index]].Long, station[keys[index]].Lat])
+						.setPopup(station_tooltip_popup.setHTML(station_tooltip))
+						.addTo(Maps.main);
+					Station[keys[index]].getElement().addEventListener("click", () => {
 						if (rtstation1 == "") {
 							rtstation1 = keys[index];
 							app.Configuration.data["Real-time.station"] = keys[index];
@@ -3139,19 +3078,81 @@ function handler(Json) {
 							app.Configuration.data["Real-time.station"] = keys[index];
 						}
 					});
+					Station[keys[index]].getElement().addEventListener("mouseover", () => {
+						station_tooltip_popup.setLngLat([station[keys[index]].Long, station[keys[index]].Lat]).setHTML(station_tooltip).addTo(Maps.main);
+					});
+					Station[keys[index]].getElement().addEventListener("mouseleave", () => {
+						station_tooltip_popup.remove();
+					});
+				}
 
-			if (Station[keys[index]]) {
-				if (Station[keys[index]].getIcon()?.options?.className != `map-intensity-icon rt-icon ${level_class}`)
-					Station[keys[index]].setIcon(L.divIcon({
-						iconSize  : [size, size],
-						className : `map-intensity-icon rt-icon ${level_class}`,
-					}));
+				if (Station[keys[index]]) {
+					Station[keys[index]].getPopup().setHTML(station_tooltip);
 
-				Station[keys[index]]
-					.setZIndexOffset(2000 + ~~(amount * 10) + intensity * 500)
-					.setTooltipContent(station_tooltip);
+					if (Station[keys[index]].getElement().className != `map-intensity-icon rt-icon ${level_class}`)
+						Station[keys[index]].getElement().className = `map-intensity-icon rt-icon ${level_class}`;
+					Station[keys[index]].getElement().style.zIndex = 50 + (amount < 999 ? amount : 0) * 10;
+				}
+
+				if (Station[keys[index]] && rts_remove_eew && !Alert) {
+					Station[keys[index]].remove();
+					delete Station[keys[index]];
+				}
+			} else if (!TREM.Detector.webgl || TREM.MapRenderingEngine == "leaflet") {
+				if (!Station[keys[index]] && (!rts_remove_eew || Alert))
+					Station[keys[index]] = L.marker(
+						[station[keys[index]].Lat, station[keys[index]].Long],
+						{
+							icon: L.divIcon({
+								iconSize  : [size, size],
+								className : `map-intensity-icon rt-icon ${level_class}`,
+							}),
+							keyboard: false,
+						})
+						.addTo(Maps.main)
+						.bindTooltip(station_tooltip, {
+							offset    : [8, 0],
+							permanent : false,
+							className : current_data == undefined ? "rt-station-tooltip-na" : "rt-station-tooltip",
+						})
+						.on("click", () => {
+							// Station[keys[index]].keepTooltipAlive = !Station[keys[index]].keepTooltipAlive;
+
+							// if (Maps.main.getZoom() < 11) {
+							// 	const tooltip = Station[keys[index]].getTooltip();
+							// 	Station[keys[index]].unbindTooltip();
+
+							// 	if (Station[keys[index]].keepTooltipAlive)
+							// 		tooltip.options.permanent = true;
+							// 	else
+							// 		tooltip.options.permanent = false;
+							// 	Station[keys[index]].bindTooltip(tooltip);
+							// }
+
+							if (rtstation1 == "") {
+								rtstation1 = keys[index];
+								app.Configuration.data["Real-time.station"] = keys[index];
+							} else if (rtstation1 == keys[index]) {
+								rtstation1 = "";
+								app.Configuration.data["Real-time.station"] = setting["Real-time.station"];
+							} else if (rtstation1 != keys[index]) {
+								rtstation1 = keys[index];
+								app.Configuration.data["Real-time.station"] = keys[index];
+							}
+						});
+
+				if (Station[keys[index]]) {
+					if (Station[keys[index]].getIcon()?.options?.className != `map-intensity-icon rt-icon ${level_class}`)
+						Station[keys[index]].setIcon(L.divIcon({
+							iconSize  : [size, size],
+							className : `map-intensity-icon rt-icon ${level_class}`,
+						}));
+
+					Station[keys[index]]
+						.setZIndexOffset(2000 + ~~(amount * 10) + intensity * 500)
+						.setTooltipContent(station_tooltip);
+				}
 			}
-		}
 
 		const Level = IntensityI(intensity);
 
