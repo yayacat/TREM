@@ -2661,7 +2661,7 @@ async function init() {
 	// TREM.Intensity.handle(userJSON2);
 	// ipcRenderer.send("intensity-Notification", userJSON);
 	// ipcRenderer.send("intensity-Notification", userJSON1);
-	// const userJSON = require(path.resolve(__dirname, "../js/1681959529950.json"));
+	// const userJSON = require(path.resolve(__dirname, "../js/1688811850345.json"));
 	// TREM.PWS.addPWS(userJSON.raw);
 
 	document.getElementById("rt-station-local").addEventListener("click", () => {
@@ -4919,8 +4919,8 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ("震度速報"
 			+ "資料來源" + intensity.unit
-			+ (info.time != 0 ? "發震時間" : "接收時間") + timeconvert(info.time != 0 ? info.time : intensity.timestamp).format("YYYY/MM/DD HH:mm:ss")
-			+ "芮氏規模" + (info.scale != 0 ? info.scale : "未知")
+			+ (info.time != 0 ? "發震時間" : "接收時間") + (info.time != 0 ? timeconvert(new Date(info.time)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(intensity.timestamp)).format("YYYY/MM/DD HH:mm:ss"))
+			+ "芮氏規模" + (info.scale != 0 ? info.scale.toFixed(1) : "未知")
 			+ "深度" + (info.depth != 0 ? info.depth + " 公里" : "未知")
 			+ "震央位置" + "東經" + (info.lon != 0 ? info.lon : "未知") + "北緯" + (info.lat != 0 ? info.lat : "未知")) : "震度速報",
 			tts    : setting["tts.Notification"],
@@ -4939,12 +4939,12 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 						},
 						{
 							name   : info.time != 0 ? "發震時間" : "接收時間",
-							value  : timeconvert(info.time != 0 ? info.time : intensity.timestamp).format("YYYY/MM/DD HH:mm:ss"),
+							value  : info.time != 0 ? timeconvert(new Date(info.time)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(intensity.timestamp)).format("YYYY/MM/DD HH:mm:ss"),
 							inline : true,
 						},
 						{
 							name   : "芮氏規模",
-							value  : info.scale != 0 ? info.scale : "未知",
+							value  : info.scale != 0 ? info.scale.toFixed(1) : "未知",
 							inline : true,
 						},
 						{
