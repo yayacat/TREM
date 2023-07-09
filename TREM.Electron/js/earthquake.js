@@ -4832,9 +4832,9 @@ ipcMain.on("report-Notification", (event, report) => {
 
 	if (report.data.length != 0 && speecd_use) {
 		const areaIntensity = `${IntensityI(report.data[0].areaIntensity)}級`;
-		TREM.speech.speak({ text: `${location}發生規模 ${report.magnitudeValue.toFixed(1).replace(".", "點")}，最大震度${report.data[0].areaName + report.data[0].eqStation[0].stationName + areaIntensity.replace("-級", "弱").replace("+級", "強")}` });
+		TREM.speech.speak({ text: `${location}發生規模 ${report.magnitudeValue.toFixed(1).replace(".", "點")}，最大震度${report.data[0].areaName + report.data[0].eqStation[0].stationName + areaIntensity.replace("-級", "弱").replace("+級", "強")}，深度 ${report.depth.toFixed(1).replace(".", "點")} 公里` });
 	} else if (speecd_use) {
-		TREM.speech.speak({ text: `${location}發生規模 ${report.magnitudeValue.toFixed(1).replace(".", "點")}` });
+		TREM.speech.speak({ text: `${location}發生規模 ${report.magnitudeValue.toFixed(1).replace(".", "點")}，深度 ${report.depth.toFixed(1).replace(".", "點")} 公里` });
 	}
 });
 
@@ -5693,7 +5693,7 @@ TREM.Earthquake.on("eew", (data) => {
 		silent : win.isFocused(),
 	});
 
-	if (speecd_use && data.type != "trem-eew") {
+	if (speecd_use) {
 		let speecd_scale = data.scale;
 		const speecd_number = data.number;
 		let find0 = INFO.findIndex(v => v.ID == data.id);
