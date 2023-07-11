@@ -464,6 +464,18 @@ const Constants = Object.freeze({
 			type  : "toggle",
 			value : true,
 		},
+		"rtw.key.only": {
+			type  : "toggle",
+			value : true,
+		},
+		"rtw.api.key": {
+			type  : "string",
+			value : "",
+		},
+		"rtw.api.key.Hide": {
+			type  : "toggle",
+			value : true,
+		},
 		"dev.mode": {
 			type  : "toggle",
 			value : false,

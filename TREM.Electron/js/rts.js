@@ -1,6 +1,5 @@
 const { getCurrentWindow, shell } = require("@electron/remote");
 const echarts = require("echarts");
-const WebSocket = require("ws");
 const win = getCurrentWindow();
 
 document.onreadystatechange = () => {
@@ -87,10 +86,12 @@ const connect = (retryTimeout) => {
 	};
 
 	ws.onopen = function() {
+		const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.api.key"] != "" ? app.Configuration.data["rtw.api.key"] : "") : (app.Configuration.data["api.key"] != "" ? app.Configuration.data["api.key"] : "");
 		ws.send(JSON.stringify({
-			uuid     : `TREM/${app.getVersion()} (${localStorage.UUID};)`,
+			uuid     : `rtw-TREM-${localStorage.UUID_rts}`,
 			function : "subscriptionService",
 			value    : ["trem-rts-original-v1"],
+			key      : key,
 			addition : {
 				"trem-rts-original-v1": chartuuids,
 			},
