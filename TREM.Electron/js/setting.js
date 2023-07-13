@@ -47,7 +47,7 @@ function handleWindowControls() {
 
 document.getElementById("client-version").innerText = `${app.getVersion()}`;
 document.getElementById("client-os").innerText = `${os.version()} (${os.release()})`;
-document.getElementById("client-uuid").title = `${localStorage.UUID}`;
+document.getElementById("client-uuid").title = `rts-TREM-${localStorage.UUID_rts}`;
 
 const openURL = url => {
 	shell.openExternal(url);
@@ -410,8 +410,8 @@ function init() {
 	// #endregion
 
 	document.getElementById("client-uuid").addEventListener("click", () => {
-		navigator.clipboard.writeText(localStorage.UUID).then(() => {
-			console.log(localStorage.UUID);
+		navigator.clipboard.writeText(`rts-TREM-${localStorage.UUID_rts}`).then(() => {
+			console.log(`rts-TREM-${localStorage.UUID_rts}`);
 			console.log("複製成功");
 		});
 	});
@@ -981,7 +981,7 @@ function send() {
 				Function      : "Send",
 				Type          : "test",
 				FormatVersion : 1,
-				UUID          : localStorage.UUID,
+				UUID          : `rts-TREM-${localStorage.UUID_rts}`,
 				Value         : {
 					type      : Unit_type,
 					timestamp : new Date(document.getElementById("TimeStamp").value).getTime(),
@@ -1028,7 +1028,7 @@ function send() {
 				Function      : "Send",
 				Type          : "test",
 				FormatVersion : 1,
-				UUID          : localStorage.UUID,
+				UUID          : `rts-TREM-${localStorage.UUID_rts}`,
 				Value         : {
 					Function      : "earthquake",
 					Type          : "data",
@@ -1103,7 +1103,7 @@ function send() {
 				Function      : "Send",
 				Type          : "test",
 				FormatVersion : 1,
-				UUID          : localStorage.UUID,
+				UUID          : `rts-TREM-${localStorage.UUID_rts}`,
 				Value         : {
 					Function      : "earthquake",
 					Type          : "data",

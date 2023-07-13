@@ -1346,7 +1346,7 @@ async function init() {
 					ReportTag = 0;
 					TREM.Report.setView("report-list");
 					changeView("main", "#mainView_btn");
-					globalgc();
+					stopReplay();
 				}
 			}, 1_000);
 
@@ -4694,7 +4694,7 @@ const stopReplay = function() {
 	// 		dump({ level: 2, message: e, origin: "Verbose" });
 	// 	}
 
-	axios.post(posturl + "stop", { uuid: localStorage.UUID })
+	axios.post(posturl + "stop", { uuid: `rts-TREM-${localStorage.UUID_rts}` })
 	// Exptech.v1.post("/trem/stop", { uuid: localStorage.UUID })
 		.catch((error) => {
 			log(error, 3, "Verbose", "stopReplay");
@@ -5060,7 +5060,7 @@ ipcMain.on("testEEW", (event, list = []) => {
 			dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
 
 			const data = {
-				uuid: localStorage.UUID,
+				uuid: `rts-TREM-${localStorage.UUID_rts}`,
 			};
 
 			log(`Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, 0, "Verbose", "testEEW");
@@ -5101,7 +5101,7 @@ ipcMain.on("testEEW", (event, list = []) => {
 				dump({ level: 0, message: "Start list EEW Test", origin: "EEW" });
 
 				const data = {
-					uuid : localStorage.UUID,
+					uuid : `rts-TREM-${localStorage.UUID_rts}`,
 					id   : list[index],
 				};
 
