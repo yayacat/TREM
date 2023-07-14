@@ -1177,7 +1177,7 @@ async function init() {
 	} catch (e) {
 		log(e, 3, "ResourceLoader", "init");
 		dump({ level: 2, message: e });
-	};
+	}
 
 	// Timers
 	(() => {
