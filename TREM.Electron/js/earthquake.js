@@ -1148,8 +1148,6 @@ async function init() {
 	const progressStep = 5;
 	report_get_timestamp = 0;
 
-	if (setting["p2p.mode"]) serverinit();
-
 	TREM.MapRenderingEngine = setting["map.engine"];
 
 	if (!localStorage.map_engine) {
@@ -1170,16 +1168,16 @@ async function init() {
 		);
 
 	// Connect to server
-	await (async () => {
+	try {
+		ReportGET();
 		$("#loading").text(TREM.Localization.getString("Application_Connecting"));
 		log("Trying to connect to the server...", 1, "ResourceLoader", "init");
 		dump({ level: 0, message: "Trying to connect to the server...", origin: "ResourceLoader" });
-		await ReportGET();
 		progressbar.value = (1 / progressStep) * 1;
-	})().catch(e => {
+	} catch (e) {
 		log(e, 3, "ResourceLoader", "init");
 		dump({ level: 2, message: e });
-	});
+	};
 
 	// Timers
 	(() => {
@@ -4100,6 +4098,25 @@ function ReportGET() {
 		log(error, 3, "EQReportFetcher", "ReportGET");
 		dump({ level: 2, message: "Error fetching reports (try)", origin: "EQReportFetcher" });
 		dump({ level: 2, message: error, origin: "EQReportFetcher" });
+
+		let _report_data = [];
+		_report_data = storage.getItem("report_data");
+
+		if (typeof _report_data != "object") _report_data = [];
+
+		if (_report_data == null) _report_data = [];
+
+		if (_report_data.length > setting["cache.report"]) {
+			_report_data_temp = [];
+			for (let i = 0; i < setting["cache.report"]; i++)
+				_report_data_temp[i] = _report_data[i];
+			TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+			ReportList(_report_data_temp);
+		} else {
+			TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+			ReportList(_report_data);
+		}
+
 		return setTimeout(() => {
 			ReportGET();
 		}, 60_000);
@@ -4612,6 +4629,7 @@ ipcMain.once("start", () => {
 			0,
 			"warning",
 			() => {
+				if (setting["p2p.mode"]) serverinit();
 				setTimeout(() => {
 					if (localStorage.TOS_v1_1 == undefined)
 						showDialog(
