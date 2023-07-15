@@ -5566,6 +5566,11 @@ TREM.Earthquake.on("eew", (data) => {
 
 	if (data.type == "trem-eew" && data.lat == null || data.lon == null) return;
 
+	if (data.number == 1 && setting["link.on"] && !link_on) {
+		link_on = true;
+		ipcRenderer.send("linkpathtest", setting["link.path"], setting["link.name"]);
+	}
+
 	if (!TREM.EEW.has(data.id))
 		TREM.EEW.set(data.id, new EEW(data));
 	else
@@ -5725,11 +5730,6 @@ TREM.Earthquake.on("eew", (data) => {
 
 		if (speecd_number == 1) {
 			if (MaxIntensity.value >= 4) TREM.speech.speak({ text: "注意強震，此地震可能造成災害" });
-
-			if (setting["link.on"] && !link_on) {
-				link_on = true;
-				ipcRenderer.send("linkpathtest", setting["link.path"], setting["link.name"]);
-			}
 
 			TREM.speech.speak({ text: `${data.location}，發生規模${speecd_scale.toFixed(1).replace(".", "點")}地震` });
 		} else if (INFO[find0]?.alert_magnitude != speecd_scale && speecd_scale != 0) {
