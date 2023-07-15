@@ -1241,6 +1241,10 @@ function testoldtremEEW() {
 	ipcRenderer.send("testoldtremEEW", oldtrem);
 }
 
+function linkpathtest() {
+	ipcRenderer.send("linkpathtest", setting["link.path"], setting["link.name"]);
+}
+
 function reset() {
 	showDialog("warn",
 		TREM.Localization.getString("Setting_Dialog_Reset_Title"),

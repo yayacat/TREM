@@ -128,6 +128,7 @@ let stationnow = 0;
 let RMTpgaTime = 0;
 let type_Unit = "";
 let api_key_verify = false;
+let link_on = false;
 // #endregion
 
 TREM.Detector = {
@@ -4694,6 +4695,8 @@ const stopReplay = function() {
 		ipcMain.emit("ReportGET");
 	}
 
+	if (link_on) link_on = false;
+
 	if (TREM.MapIntensity.isTriggered)
 		TREM.MapIntensity.clear();
 
@@ -5722,6 +5725,11 @@ TREM.Earthquake.on("eew", (data) => {
 
 		if (speecd_number == 1) {
 			if (MaxIntensity.value >= 4) TREM.speech.speak({ text: "注意強震，此地震可能造成災害" });
+
+			if (setting["link.on"] && !link_on) {
+				link_on = true;
+				ipcRenderer.send("linkpathtest", setting["link.path"], setting["link.name"]);
+			}
 
 			TREM.speech.speak({ text: `${data.location}，發生規模${speecd_scale.toFixed(1).replace(".", "點")}地震` });
 		} else if (INFO[find0]?.alert_magnitude != speecd_scale && speecd_scale != 0) {

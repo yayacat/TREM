@@ -7,6 +7,7 @@ const os = require("os");
 const logger = require("electron-log");
 const path = require("path");
 const pushReceiver = require("electron-fcm-push-receiver");
+const exec = require('child_process').exec;
 
 TREM.Configuration = new Configuration(TREM);
 TREM.Utils = require("./Utils/Utils.js");
@@ -335,6 +336,49 @@ TREM.on("ready", () => {
 	// globalShortcut.register("Tab", function() {
 	// 	console.log("Tab is pressed");
 	// })
+
+	// heliarun();
+});
+
+async function heliarun() {
+	try {
+		const { create_Helia, helia_unixfs, multiformats_CID, multiformats_base64 } = await import('./helia.mjs');
+		const helia = await create_Helia();
+		const libp2p = helia.libp2p;
+		const fs = helia_unixfs(helia);
+		const keychain = libp2p.keychain;
+		const id = libp2p.peerId;
+		const Multi = libp2p.getMultiaddrs();
+		const keyInfo = await keychain.createKey("TREM", 'RSA', 4096);
+		const peerId = await keychain.exportPeerId(keyInfo.name);
+		console.log(id);
+		console.log(Multi);
+		console.log(peerId);
+		const bafyFoo = fs.cat(multiformats_CID().parse('mAYAEEiCTojlxqRTl6svwqNJRVM2jCcPBxy+7mRTUfGDzy2gViA', multiformats_base64().decoder));
+		// console.log(bafyFoo);
+
+		libp2p.addEventListener('peer:discovery', (evt) => {
+			console.log(`Discovered peer ${evt.detail.id.toString()} peer: ${libp2p.getPeers().length}`);
+		});
+		libp2p.addEventListener('peer:connect', (evt) => {
+			console.log(`Connected to ${evt.detail.toString()} peer: ${libp2p.getPeers().length}`);
+		});
+		libp2p.addEventListener('peer:disconnect', (evt) => {
+			console.log(`Disconnected from ${evt.detail.toString()} peer: ${libp2p.getPeers().length}`);
+		});
+	} catch (err) {
+		console.error(err);
+	}
+}
+
+TREM.on('activate', function () {
+	if (MainWindow === null) {
+		createWindow();
+	} else if (MainWindow.isMinimized()) {
+		MainWindow.restore();
+	} else if (!MainWindow.isVisible()) {
+		MainWindow.show();
+	}
 });
 
 autoUpdater.on("update-available", (info) => {
@@ -492,6 +536,22 @@ ipcMain.on("openreleases", () => {
 
 ipcMain.on('startPushReceiver', (event, arg) => {
     pushReceiver.setup(MainWindow.webContents);
+});
+
+ipcMain.on('linkpathtest', (event, cmdPath, cmdStr) => {
+	const workerProcess = exec(cmdStr, {cwd: cmdPath});
+
+	workerProcess.stdout.on('data', function (data) {
+		console.log('stdout: ' + data);
+	});
+
+	workerProcess.stderr.on('data', function (data) {
+		console.log('stderr: ' + data);
+	});
+
+	workerProcess.on('close', function (code) {
+		console.log('out code:' + code);
+	});
 });
 
 TREM.Configuration.on("update", (data) => {

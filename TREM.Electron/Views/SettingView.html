@@ -3295,6 +3295,98 @@
                                     </div>
                                 </div>
                                 <div class="control-title">
+                                    <span lang="en">?</span>
+                                    <span lang="ja">?</span>
+                                    <span lang="kr">?</span>
+                                    <span lang="ru">?</span>
+                                    <span lang="zh-CN">?</span>
+                                    <span lang="zh-TW">連動設定</span>
+                                </div>
+                                <div class="control-container">
+                                    <div class="option-container">
+                                        <div class="option-label">
+                                            <div class="option-label-title">
+                                                <span lang="en">?</span>
+                                                <span lang="ja">?</span>
+                                                <span lang="kr">?</span>
+                                                <span lang="ru">?</span>
+                                                <span lang="zh-CN">?</span>
+                                                <span lang="zh-TW">連動開關</span>
+                                                <span class="option-label-id">link.on</span>
+                                            </div>
+                                            <div class="option-label-description">
+                                                <span lang="en">?</span>
+                                                <span lang="ja">?</span>
+                                                <span lang="kr">?</span>
+                                                <span lang="ru">?</span>
+                                                <span lang="zh-CN">?</span>
+                                                <span lang="zh-TW">啟用連動開關才能在速報時執行的連動檔案。</span>
+                                            </div>
+                                        </div>
+                                        <label class="md3 switch">
+                                            <input type="checkbox" id="link.on" onclick="CheckSave('link.on')">
+                                            <span class="slider">
+                                                <span class="material-symbols-rounded icon">done</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="option-container input-field">
+                                        <div class="option-label">
+                                            <div class="option-label-title">
+                                                <span lang="en">?</span>
+                                                <span lang="ja">?</span>
+                                                <span lang="kr">?</span>
+                                                <span lang="ru">?</span> <!-- TODO: Untranslated, remove this comment after translation -->
+                                                <span lang="zh-CN">?</span>
+                                                <span lang="zh-TW">連動路徑</span>
+                                                <span class="option-label-id">link.path</span>
+                                            </div>
+                                            <div class="option-label-description">
+                                                <span lang="en">?</span>
+                                                <span lang="ja">?</span>
+                                                <span lang="kr">?</span>
+                                                <span lang="ru">?</span>
+                                                <span lang="zh-CN">?</span>
+                                                <span lang="zh-TW">要執行的連動路徑。</span>
+                                            </div>
+                                        </div>
+                                        <input class="input-field" id="link.path" type="text" onchange="TextSave('link.path')" placeholder="..." />
+                                    </div>
+                                    <div class="option-container input-field">
+                                        <div class="option-label">
+                                            <div class="option-label-title">
+                                                <span lang="en">?</span>
+                                                <span lang="ja">?</span>
+                                                <span lang="kr">?</span>
+                                                <span lang="ru">?</span> <!-- TODO: Untranslated, remove this comment after translation -->
+                                                <span lang="zh-CN">?</span>
+                                                <span lang="zh-TW">連動檔名</span>
+                                                <span class="option-label-id">link.name</span>
+                                            </div>
+                                            <div class="option-label-description">
+                                                <span lang="en">?</span>
+                                                <span lang="ja">?</span>
+                                                <span lang="kr">?</span>
+                                                <span lang="ru">?</span>
+                                                <span lang="zh-CN">?</span>
+                                                <span lang="zh-TW">要執行的連動檔名。</span>
+                                            </div>
+                                        </div>
+                                        <div class="linkexec">
+                                            <div class="leleft">
+                                                <input class="input-field" id="link.name" type="text" onchange="TextSave('link.name')" placeholder="..."  style="width: 510px;" />
+                                            </div>
+                                            <div class="right" style="padding-top: 5px;">
+                                                <button  class="filled-tonal-button setting-button md3-ripple" id="link.path.test" type="button" onclick="linkpathtest()">
+                                                    <span class="filled-tonal-button-label">
+                                                        <span lang="zh-TW">測試</span>
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-title">
                                     <span lang="en">exptech</span>
                                     <span lang="ja">exptech</span>
                                     <span lang="kr">exptech</span>

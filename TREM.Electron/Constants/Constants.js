@@ -456,6 +456,18 @@ const Constants = Object.freeze({
 			type  : "select",
 			value : "1",
 		},
+		"link.on": {
+			type  : "toggle",
+			value : false,
+		},
+		"link.path": {
+			type  : "string",
+			value : "",
+		},
+		"link.name": {
+			type  : "string",
+			value : "",
+		},
 		"api.key": {
 			type  : "string",
 			value : "",
