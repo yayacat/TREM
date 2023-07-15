@@ -18,6 +18,8 @@ TREM.isQuiting = TREM.Configuration.data["windows.tray"];
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.logger = logger;
+TREM.commandLine.appendSwitch('disable-http2');
+autoUpdater.requestHeaders = {'Cache-Control' : 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'};
 
 // Object.defineProperty(TREM, 'isPackaged', {
 // 	get() {
