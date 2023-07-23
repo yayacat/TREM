@@ -1335,10 +1335,10 @@ async function init() {
 						globalgc();
 					}
 				} else
-				if (Date.now() - report_get_timestamp > 300_000) {
-					ReportGET();
-					globalgc();
-				}
+					if (Date.now() - report_get_timestamp > 300_000) {
+						ReportGET();
+						globalgc();
+					}
 
 				if (ReportTag != 0 && NOW().getTime() - ReportTag > 30_000) {
 					console.log("ReportTag end: ", NOW().getTime());
@@ -2594,10 +2594,10 @@ async function init() {
 
 				map_move_back = true;
 			} else
-			if (map_move_back) {
-				map_move_back = false;
-				Mapsmainfocus();
-			}
+				if (map_move_back) {
+					map_move_back = false;
+					Mapsmainfocus();
+				}
 		}
 	}, 500);
 	// const userJSON = require(path.resolve(__dirname, "../js/1669484541389.json"));
@@ -3625,7 +3625,7 @@ function handler(Json) {
 
 async function fetchFiles() {
 	try {
-		Location = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json")).json();
+		Location = require(path.resolve(__dirname, "../Resources/locations.json"));
 		log("Get Location File", 1, "Location", "fetchFiles");
 		dump({ level: 0, message: "Get Location File", origin: "Location" });
 
@@ -3650,7 +3650,32 @@ async function fetchFiles() {
 
 async function fetchFilesbackup() {
 	try {
-		Location = await (await fetch("https://exptech.com.tw/api/v1/file?path=/resource/locations.json")).json();
+		Location = require(path.resolve(__dirname, "../Resources/locations.json"));
+		log("Get Location backup File", 1, "Location", "fetchFilesbackup");
+		dump({ level: 0, message: "Get Location backup File", origin: "Location" });
+
+		if (setting["Real-time.local"]) {
+			station = require(path.resolve(__dirname, "../station.json"));
+			log("Get Local Station File", 1, "Location", "fetchFiles");
+			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
+		} else {
+			station = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/Json/earthquake/station.json")).json();
+			log("Get Station backup File", 1, "Location", "fetchFilesbackup");
+			dump({ level: 0, message: "Get Station backup File", origin: "Location" });
+		}
+
+		PGAMain();
+	} catch (err) {
+		console.log(err);
+		log(err, 3, "Location", "fetchFilesbackup");
+		dump({ level: 2, message: err, origin: "Location" });
+		await fetchFilesbackup0();
+	}
+}
+
+async function fetchFilesbackup0() {
+	try {
+		Location = require(path.resolve(__dirname, "../Resources/locations.json"));
 		log("Get Location backup File", 1, "Location", "fetchFilesbackup");
 		dump({ level: 0, message: "Get Location backup File", origin: "Location" });
 
@@ -3678,30 +3703,17 @@ async function fetchFilesbackup() {
  * 設定用戶所在位置
  * @param {string} town 鄉鎮
  */
-async function setUserLocationMarker(town, errcode = false) {
+function setUserLocationMarker(town) {
 	if (!Location)
-		if (!errcode)
-			try {
-				Location = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json")).json();
-				log("Get Location File 0", 1, "Location", "setUserLocationMarker");
-				dump({ level: 0, message: "Get Location File 0", origin: "Location" });
-			} catch (err) {
-				console.log(err);
-				log(err, 3, "Location", "setUserLocationMarker");
-				dump({ level: 2, message: err, origin: "Location" });
-				await setUserLocationMarker(town, true);
-			}
-		else
-			try {
-				Location = await (await fetch("https://exptech.com.tw/api/v1/file?path=/resource/locations.json")).json();
-				log("Get Location backup File 0", 1, "Location", "setUserLocationMarker");
-				dump({ level: 0, message: "Get Location backup File 0", origin: "Location" });
-			} catch (err) {
-				console.log(err);
-				log(err, 3, "Location", "setUserLocationMarker");
-				dump({ level: 2, message: err, origin: "Location" });
-				await setUserLocationMarker(town);
-			}
+		try {
+			Location = require(path.resolve(__dirname, "../Resources/locations.json"));
+			log("Get Location File 0", 1, "Location", "setUserLocationMarker");
+			dump({ level: 0, message: "Get Location File 0", origin: "Location" });
+		} catch (err) {
+			console.log(err);
+			log(err, 3, "Location", "setUserLocationMarker");
+			dump({ level: 2, message: err, origin: "Location" });
+		}
 
 	if (setting["location.lat"] != "" && setting["location.lon"] != "")
 		[

@@ -186,6 +186,10 @@ const fetch_files = async () => {
 		if (app.Configuration.data["Real-time.local"]) res = require(path.resolve(__dirname, "../station.json"));
 		else res = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/station.json")).json();
 
+		if (!res) res = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/Json/earthquake/station.json")).json();
+
+		if (!res) res = await (await fetch("https://exptech.com.tw/api/v1/file?path=/resource/station.json")).json();
+
 		if (res) {
 			for (let i = 0, k = Object.keys(res), n = k.length; i < n; i++) {
 				const id = k[i];

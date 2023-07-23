@@ -307,6 +307,10 @@ function init() {
 		if (setting["Real-time.local"]) station = require(path.resolve(__dirname, "../station.json"));
 		else station = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/station.json")).json();
 
+		if (!station) station = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/Json/earthquake/station.json")).json();
+
+		if (!station) station = await (await fetch("https://exptech.com.tw/api/v1/file?path=/resource/station.json")).json();
+
 		const el = document.getElementById("Real-time.station");
 		const el1 = document.getElementById("Real-time.station.1");
 		const el2 = document.getElementById("Real-time.station.2");
