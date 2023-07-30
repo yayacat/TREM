@@ -33,6 +33,10 @@ jobs:
         path: |
           D:/a/TREM/TREM/TREM.Electron/dev/*.exe
           D:/a/TREM/TREM/TREM.Electron/dev/*.msi
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   Linux_amd64:
     runs-on: ubuntu-latest
@@ -61,6 +65,10 @@ jobs:
           /home/runner/work/TREM/TREM/TREM.Electron/dev/*.deb
           /home/runner/work/TREM/TREM/TREM.Electron/dev/*.AppImage
           /home/runner/work/TREM/TREM/TREM.Electron/dev/*.rpm
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   macOS_x64:
     runs-on: macos-latest
@@ -88,3 +96,7 @@ jobs:
         path: |
           /Users/runner/work/TREM/TREM/TREM.Electron/dev/*.dmg
           /Users/runner/work/TREM/TREM/TREM.Electron/dev/*.pkg
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
