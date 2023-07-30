@@ -27,14 +27,14 @@ const toggleNav = state => {
 
 		if (setting["nav.ui.autoclose"]) {
 			TREM.toggleNavTime = NOW().getTime();
-			console.log("toggleNavTime: ", TREM.toggleNavTime);
+			console.debug("toggleNavTime: ", TREM.toggleNavTime);
 		}
 	} else {
 		$("#nav-rail").addClass("hide");
 
 		if (setting["nav.ui.autoclose"] && TREM.toggleNavTime != 0) {
 			TREM.toggleNavTime = 0;
-			console.log("toggleNavTime end: ", TREM.toggleNavTime);
+			console.debug("toggleNavTime end: ", TREM.toggleNavTime);
 		}
 	}
 

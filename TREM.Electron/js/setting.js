@@ -415,8 +415,8 @@ function init() {
 
 	document.getElementById("client-uuid").addEventListener("click", () => {
 		navigator.clipboard.writeText(`rts-TREM-${localStorage.UUID_rts}`).then(() => {
-			console.log(`rts-TREM-${localStorage.UUID_rts}`);
-			console.log("複製成功");
+			console.debug(`rts-TREM-${localStorage.UUID_rts}`);
+			console.debug("複製成功");
 		});
 	});
 
@@ -435,7 +435,7 @@ function SelectSave(id) {
 			if (TREM.voices[key].name == value) {
 				TREM.speech.setLanguage(TREM.voices[key].lang);
 				TREM.speech.setVoice(value);
-				console.log("Voices changed", TREM.voices[key]);
+				console.debug("Voices changed", TREM.voices[key]);
 			}
 
 	if (id == "map.engine")

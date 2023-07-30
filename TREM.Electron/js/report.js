@@ -286,7 +286,7 @@ TREM.Report = {
 	},
 	replaydownloader(id) {
 		const report = this.cache.get(id);
-		console.log(report);
+		console.debug(report);
 
 		let time = new Date(report.originTime.replace(/-/g, "/")).getTime() - 25000;
 		const time_hold = time;
@@ -305,7 +305,7 @@ TREM.Report = {
 			this.clock = setInterval(() => {
 				if (time > _end_time) {
 					clearInterval(this.clock);
-					console.log("Finish!");
+					console.debug("Finish!");
 					document.getElementById("report-replay-downloader-icon").innerHTML = "download_done";
 					document.getElementById("report-replay-downloader-text").innerHTML = "下載完成!";
 					downloader_progress.style.display = "none";
@@ -321,13 +321,15 @@ TREM.Report = {
 				fetch(`https://exptech.com.tw/api/v2/trem/rts?time=${time}`)
 					.then((res) => {
 						if (res.ok) {
-							console.log(res);
+							console.debug(res);
 							res.json().then(res1 => {
+								console.debug(res1);
+
 								if (!fs.existsSync(`./replay_data/${time_hold}`)) fs.mkdirSync(`./replay_data/${time_hold}`);
 								fs.access(`./replay_data/${time_hold}/${time}.json`, (err) => {
 									if (!err) {
 										clearInterval(this.clock);
-										console.log("Finish!(is found it)");
+										console.debug("Finish!(is found it)");
 										document.getElementById("report-replay-downloader-text").innerHTML = "重複下載!";
 										downloader_progress.style.display = "none";
 										report.download = true;
@@ -371,7 +373,7 @@ TREM.Report = {
 			}, 500);
 		} else {
 			downloader_progress.style.display = "none";
-			console.log("Finish!(is download)");
+			console.debug("Finish!(is download)");
 		}
 	},
 	replaydownloaderrm(id) {
@@ -611,7 +613,7 @@ TREM.Report = {
 	_setupReport(report) {
 		this._clearMap();
 
-		console.log(report);
+		console.debug(report);
 
 		if (!report) return;
 
@@ -787,14 +789,54 @@ TREM.Report = {
 	},
 	_setuptremget(report) {
 		if (this.report_trem)
-			if (report.trem.length != 0)
+			if (report.trem.length != 0) {
+				if (!this.report_trem_data[report.trem[0]]?.trem)
+					fetch(`https://exptech.com.tw/api/v1/earthquake/trem-info/${report.trem[0]}`)
+						.then((res) => {
+							if (res.ok) {
+								console.debug(res);
+
+								res.json().then(res1 => {
+									console.debug(res1);
+									this._report_trem_data[report.trem[0]] = res1;
+									this.report_trem_data[report.trem[0]] = this._report_trem_data[report.trem[0]];
+									storage.setItem("report_trem_data", this._report_trem_data);
+									this._setuptremmarker(report);
+								});
+							} else {
+								console.error(res);
+
+								switch (res.status) {
+									case 429: {
+										log(res.status, 3, "report_trem", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									case 404: {
+										log(res.status, 3, "report_trem", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									default: break;
+								}
+							}
+						}).catch(err => {
+							console.log(err.message);
+							log(err, 3, "report_trem", "Report");
+							dump({ level: 2, message: err });
+							this._setupzoomPredict();
+						});
+
 				if (!this.report_trem_data[report.trem[0]])
 					fetch(`https://exptech.com.tw/api/v1/file?path=/trem_report/${report.trem[0]}.json`)
 						.then((res) => {
 							if (res.ok) {
-								console.log(res);
+								console.debug(res);
 
 								res.json().then(res1 => {
+									console.debug(res1);
 									this._report_trem_data[report.trem[0]] = res1;
 									this.report_trem_data[report.trem[0]] = this._report_trem_data[report.trem[0]];
 									storage.setItem("report_trem_data", this._report_trem_data);
@@ -827,8 +869,9 @@ TREM.Report = {
 						});
 				else
 					this._setuptremmarker(report);
-			else
+			} else {
 				this._setupzoomPredict();
+			}
 		else
 			this._setupzoomPredict();
 	},
@@ -909,6 +952,30 @@ TREM.Report = {
 						}
 					}
 				}
+
+				if (res.trem)
+					for (let index0 = 0; index0 < res.trem.eew.length; index0++) {
+						const trem_eew = res.trem.eew[index0];
+						const trem_epicenterIcon = L.marker(
+							[trem_eew.lat, trem_eew.lon],
+							{
+								icon: L.divIcon({
+									html      : TREM.Resources.icon.oldcross,
+									iconSize  : [16, 16],
+									className : "epicenterIcon",
+								}),
+								zIndexOffset: 5000,
+							}).bindTooltip(`<div class='report_station_box'><div>報數: 第 ${index0 + 1} 報</div><div>位置: ${trem_eew.location} | ${trem_eew.lat}°N  ${trem_eew.lon} °E</div><div>類型: ${trem_eew.model}</div><div>規模: M ${trem_eew.scale}</div><div>深度: ${trem_eew.depth} km</div><div>預估最大震度: ${IntensityI(trem_eew.max)}</div></div>`, {
+							offset    : [8, 0],
+							permanent : false,
+							className : "report-cursor-tooltip",
+							opacity   : 1,
+						});
+						this._markers.push(trem_epicenterIcon);
+						this._setupzoomPredict();
+					}
+
+				this._setupzoomPredict();
 			}
 		// console.log(this.report_trem_station);
 	},

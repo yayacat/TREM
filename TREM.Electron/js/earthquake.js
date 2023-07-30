@@ -150,7 +150,7 @@ TREM.MapIntensity = {
 	intensities : new Map(),
 	description : "",
 	palert(rawPalertData) {
-		console.log(rawPalertData);
+		console.debug(rawPalertData);
 
 		if (rawPalertData.intensity?.length && !replay) {
 			if (rawPalertData.timestamp != this.alertTime) {
@@ -1237,7 +1237,7 @@ async function init() {
 					}
 
 					if (TREM.IntensityTag1 != 0 && NOW().getTime() - TREM.IntensityTag1 > 30_000) {
-						console.log("IntensityTag1 end: ", NOW().getTime());
+						console.debug("IntensityTag1 end: ", NOW().getTime());
 						TREM.IntensityTag1 = 0;
 						changeView("main", "#mainView_btn");
 						globalgc();
@@ -1341,7 +1341,7 @@ async function init() {
 					}
 
 				if (ReportTag != 0 && NOW().getTime() - ReportTag > 30_000) {
-					console.log("ReportTag end: ", NOW().getTime());
+					console.debug("ReportTag end: ", NOW().getTime());
 					ReportTag = 0;
 					TREM.Report.setView("report-list");
 					changeView("main", "#mainView_btn");
@@ -2466,7 +2466,7 @@ async function init() {
 				finalZoom = finalZoom / sampleCount;
 
 				if (finalZoom != Maps.main.getZoom() && !Maps.main.isEasing() && !trem_eew_type && !finalBounds.isEmpty()) {
-					console.log(finalBounds.isEmpty());
+					console.debug(finalBounds.isEmpty());
 					const camera = Maps.main.cameraForBounds(finalBounds, { padding: { top: 0, right: 100, bottom: 100, left: 0 } });
 					TREM.Earthquake.emit("focus", { center: camera.center, zoom: finalZoom }, true);
 				}
@@ -2665,8 +2665,8 @@ async function init() {
 
 	document.getElementById("rt-station-local").addEventListener("click", () => {
 		navigator.clipboard.writeText(document.getElementById("rt-station-local-id").innerText).then(() => {
-			console.log(document.getElementById("rt-station-local-id").innerText);
-			console.log("複製成功");
+			console.debug(document.getElementById("rt-station-local-id").innerText);
+			console.debug("複製成功");
 		});
 	});
 	globalgc();
@@ -3410,7 +3410,7 @@ function handler(Json) {
 
 				if (RMTpgaTime == 0) {
 					RMTpgaTime = NOW().getTime();
-					console.log(RMTpgaTime);
+					console.debug("檢知框框開始時間:", RMTpgaTime);
 				}
 
 				if (Intensity == undefined) {
@@ -3425,7 +3425,7 @@ function handler(Json) {
 				} else if (NOW().getTime() - RMTpgaTime > 30_000) {
 					delete detected_list[pgaKeys[index]];
 					RMTpgaTime = 0;
-					console.log(NOW().getTime());
+					console.debug("檢知框框結束時間:", NOW().getTime());
 					index--;
 				} else if (!detected_list[pgaKeys[index]].passed) {
 					let passed = false;
@@ -3478,7 +3478,7 @@ function handler(Json) {
 
 				if (RMTpgaTime == 0) {
 					RMTpgaTime = NOW().getTime();
-					console.log(RMTpgaTime);
+					console.debug("檢知框框開始時間:", RMTpgaTime);
 				}
 
 				if (time != 0 && NOW().getTime() - time > 30_000 || PGACancel) {
@@ -3487,7 +3487,7 @@ function handler(Json) {
 				} else if (NOW().getTime() - RMTpgaTime > 30_000) {
 					delete detected_list[Object.keys(detected_list)[index]];
 					RMTpgaTime = 0;
-					console.log(NOW().getTime());
+					console.debug("檢知框框結束時間:", NOW().getTime());
 					index--;
 				} else {
 					detected_box_list[Object.keys(detected_list)[index]] = L.polygon(TREM.Resources.area[Object.keys(detected_list)[index].toString()], {
@@ -3957,7 +3957,7 @@ function ReportGET() {
 		}
 
 		if (_report_data.length != 0)
-			for (let i = 0; i < 49; i++) {
+			for (let i = 0; i < 50; i++) {
 				const md5 = crypto.createHash("md5");
 				list[_report_data[i].identifier] = md5.update(JSON.stringify(_report_data[i])).digest("hex");
 			}
@@ -3981,8 +3981,9 @@ function ReportGET() {
 			signal : controller.signal })
 			.then((ans0) => {
 				if (ans0.ok) {
-					console.log(ans0);
+					console.debug(ans0);
 					ans0.json().then((ans) => {
+						console.debug(ans);
 						api_key_verify = false;
 
 						for (let i = 0; i < ans.length; i++) {
@@ -4011,6 +4012,8 @@ function ReportGET() {
 								}
 
 						if (!_report_data) return setTimeout(ReportGET, 10_000);
+
+						if (ans.length == 0) api_key_verify = true;
 
 						storage.setItem("report_data", _report_data);
 
@@ -4460,7 +4463,7 @@ function addReport(report, prepend = false, index = 0) {
 			TREM.Report.setView("eq-report-overview", report);
 			changeView("report", "#reportView_btn");
 			ReportTag = NOW().getTime();
-			console.log("ReportTag: ", ReportTag);
+			console.debug("ReportTag: ", ReportTag);
 			ipcRenderer.send("report-Notification", report);
 		});
 		Div.addEventListener("contextmenu", () => {
@@ -4469,7 +4472,7 @@ function addReport(report, prepend = false, index = 0) {
 			let list = [];
 
 			const reportD = TREM.Report.cache.get(report.identifier);
-			console.log(reportD);
+			console.debug(reportD);
 
 			if (reportD.download) {
 				const oldtime = new Date(report.originTime.replace(/-/g, "/")).getTime();
@@ -4508,12 +4511,12 @@ function addReport(report, prepend = false, index = 0) {
 				TREM.Report.setView("eq-report-overview", report);
 				changeView("report", "#reportView_btn");
 				ReportTag = NOW().getTime();
-				console.log("ReportTag: ", ReportTag);
+				console.debug("ReportTag: ", ReportTag);
 			} else if (setting["report.changeView"]) {
 				TREM.Report.setView("eq-report-overview", report);
 				changeView("report", "#reportView_btn");
 				ReportTag = NOW().getTime();
-				console.log("ReportTag: ", ReportTag);
+				console.debug("ReportTag: ", ReportTag);
 			}
 		} else {
 			roll.append(Div);
@@ -4793,7 +4796,7 @@ ipcMain.on("apikey", (event) => {
 
 ipcMain.on("report-Notification", (event, report) => {
 	if (setting["webhook.url"] != "" && setting["report.Notification"]) {
-		console.log(report);
+		console.debug(report);
 		log("Posting Notification report Webhook", 1, "Webhook", "report-Notification");
 		dump({ level: 0, message: "Posting Notification report Webhook", origin: "Webhook" });
 		const msg = {
@@ -5101,7 +5104,7 @@ ipcMain.on("testEEW", (event, list = []) => {
 			axios.post(posturl + "replay", data)
 				.then((res) => {
 					if (res.ok) {
-						console.log(res);
+						console.debug(res);
 						testEEWerror = false;
 					} else {
 						console.error(res);
@@ -5143,7 +5146,7 @@ ipcMain.on("testEEW", (event, list = []) => {
 				axios.post(posturl + "replay", data)
 					.then((res) => {
 						if (res.ok) {
-							console.log(res);
+							console.debug(res);
 							testEEWerror = false;
 						} else {
 							console.error(res);
@@ -5368,7 +5371,7 @@ function FCMdata(json, Unit) {
 	type_Unit = Unit;
 	log(`Latency: ${NOW().getTime() - json.timestamp}ms`, 1, "API", "FCMdata");
 	dump({ level: 0, message: `Latency: ${NOW().getTime() - json.timestamp}ms`, origin: "API" });
-	console.log(json);
+	console.debug(json);
 
 	if (json.type == "tsunami-info") {
 		const now = new Date(json.time);
@@ -5389,7 +5392,7 @@ function FCMdata(json, Unit) {
 	} else if (json.type == "palert") {
 		TREM.MapIntensity.palert(json);
 	} else if (json.type == "palert-app") {
-		console.log(json);
+		console.debug(json);
 	} else if (json.type == "pws") {
 		TREM.PWS.addPWS(json.raw);
 	} else if (json.type == "intensity") {
@@ -5573,7 +5576,7 @@ ipcMain.on("Olddatabase_eew", (event, json) => {
 TREM.Earthquake.on("eew", (data) => {
 	log("Got EEW", 1, "API", "eew");
 	dump({ level: 0, message: "Got EEW", origin: "API" });
-	console.log(data);
+	console.debug(data);
 	let Timer_run;
 
 	if (data.type == "trem-eew" && data.lat == null || data.lon == null) return;
@@ -6196,7 +6199,7 @@ TREM.Earthquake.on("eewEnd", (id, type) => {
 // #endregion
 
 TREM.Earthquake.on("trem-eq", (data) => {
-	console.log(data);
+	console.debug(data);
 	const now = new Date(data.time);
 	const Now2 = now.getFullYear()
 	+ "/" + (now.getMonth() + 1 < 10 ? "0" : "") + (now.getMonth() + 1)
@@ -6315,7 +6318,7 @@ ipcMain.on("Olddatabase_tsunami", (event, json) => {
 });
 
 TREM.Earthquake.on("tsunami", (data) => {
-	console.log(data);
+	console.debug(data);
 
 	if (data.cancel) {
 		if (speecd_use) TREM.speech.speak({ text: "海嘯警報已解除" });

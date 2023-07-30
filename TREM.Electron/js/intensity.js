@@ -347,7 +347,7 @@ TREM.Intensity = {
 	},
 
 	handle(rawIntensityData) {
-		console.log(rawIntensityData);
+		console.debug(rawIntensityData);
 
 		if (rawIntensityData.raw != undefined) {
 			let unit = rawIntensityData.unit;
@@ -360,16 +360,16 @@ TREM.Intensity = {
 
 			// 判斷是否存在經緯度顛倒
 			if (raw_info_Data.lat >= -90 && raw_info_Data.lat <= 90 && raw_info_Data.lon >= -180 && raw_info_Data.lon <= 180) {
-				console.log("經緯度正確");
+				console.debug("經緯度正確");
 			} else {
-				console.log("經緯度顛倒");
+				console.debug("經緯度顛倒");
 
 				// 修正經緯度顛倒
 				const temp = raw_info_Data.lat;
 				raw_info_Data.lat = raw_info_Data.lon;
 				raw_info_Data.lon = temp;
 
-				console.log("修正後的經緯度:", raw_info_Data);
+				console.debug("修正後的經緯度:", raw_info_Data);
 			}
 
 			if (unit == "cwb")
@@ -594,7 +594,7 @@ TREM.Intensity = {
 	},
 
 	load(rawIntensityData) {
-		console.log(rawIntensityData);
+		console.debug(rawIntensityData);
 
 		if (rawIntensityData.raw != undefined) {
 			let unit = rawIntensityData.unit;
@@ -612,16 +612,16 @@ TREM.Intensity = {
 
 			// 判斷是否存在經緯度顛倒
 			if (raw_info_Data.lat >= -90 && raw_info_Data.lat <= 90 && raw_info_Data.lon >= -180 && raw_info_Data.lon <= 180) {
-				console.log("經緯度正確");
+				console.debug("經緯度正確");
 			} else {
-				console.log("經緯度顛倒");
+				console.debug("經緯度顛倒");
 
 				// 修正經緯度顛倒
 				const temp = raw_info_Data.lat;
 				raw_info_Data.lat = raw_info_Data.lon;
 				raw_info_Data.lon = temp;
 
-				console.log("修正後的經緯度:", raw_info_Data);
+				console.debug("修正後的經緯度:", raw_info_Data);
 			}
 
 			if (this._raw != null) this.clear();
@@ -890,10 +890,10 @@ TREM.Old_database = {
 
 			const startTime = new Date(document.getElementById("old-database-filter-startdate-value").value + " " + document.getElementById("old-database-filter-starttime-value").value).getTime();
 			const endTime = new Date(document.getElementById("old-database-filter-enddate-value").value + " " + document.getElementById("old-database-filter-endtime-value").value).getTime();
-			console.log(document.getElementById("old-database-filter-startdate-value").value + " " + document.getElementById("old-database-filter-starttime-value").value);
-			console.log(document.getElementById("old-database-filter-enddate-value").value + " " + document.getElementById("old-database-filter-endtime-value").value);
-			console.log(startTime);
-			console.log(endTime);
+			console.debug(document.getElementById("old-database-filter-startdate-value").value + " " + document.getElementById("old-database-filter-starttime-value").value);
+			console.debug(document.getElementById("old-database-filter-enddate-value").value + " " + document.getElementById("old-database-filter-endtime-value").value);
+			console.debug(startTime);
+			console.debug(endTime);
 
 			// 過濾出符合時間範圍的檔案
 			const filteredFiles = files.filter((file) => {
@@ -958,15 +958,15 @@ TREM.Old_database = {
 				return false;
 			}).length;
 
-			console.log(`檔案總共 ${num} 個`);
+			console.debug(`檔案總共 ${num} 個`);
 			document.getElementById("old-database-label-search-value").innerText = `查詢檔案共 ${num} 個`;
 			this.refreshList();
 			// console.log(filteredFiles);
 		});
 	},
 	setcache(file, type, fileData) {
-		console.log(`檔案 ${file} 的 type 屬性為: ${type}`);
-		console.log(fileData);
+		console.debug(`檔案 ${file} 的 type 屬性為: ${type}`);
+		console.debug(fileData);
 		this.cache.set(fileData.timestamp, fileData);
 		return true;
 	},
@@ -1020,11 +1020,11 @@ TREM.Old_database = {
 			} else if (type === "report") {
 				ipcRenderer.send("Olddatabase_report", Olddatabase.raw);
 			} else if (type === "pws") {
-				console.log(Olddatabase);
+				console.debug(Olddatabase);
 			} else if (type === "tsunami") {
 				ipcRenderer.send("Olddatabase_tsunami", Olddatabase);
 			} else if (type === "tsunami-test") {
-				console.log(Olddatabase);
+				console.debug(Olddatabase);
 				ipcRenderer.send("Olddatabase_tsunami", Olddatabase);
 			} else {
 				ipcRenderer.send("Olddatabase_eew", Olddatabase);
