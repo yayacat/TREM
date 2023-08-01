@@ -5515,9 +5515,7 @@ function FCMdata(json, Unit) {
 	} else if (json.type.startsWith("eew") || json.type == "trem-eew") {
 		if (replay != 0 && !json.replay_timestamp) return;
 
-		// if (json.type == "trem-eew" && !api_key_verify) return;
-
-		// if (json.max < 3) return;
+		if (json.type == "trem-eew" && !api_key_verify) return;
 
 		if (
 			(json.type == "eew-scdzj" && !setting["accept.eew.SCDZJ"])
