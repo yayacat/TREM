@@ -1277,6 +1277,118 @@ function openUpdateFolder() {
 	ipcRenderer.send("openUpdateFolder");
 }
 
+function openexportFolder() {
+	ipcRenderer.send("openexportFolder");
+}
+
+function export_report() {
+	let _report_data = [];
+	_report_data = storage.getItem("report_data");
+	const jsonString = JSON.stringify(_report_data, null, 2); // 轉換成格式化的 JSON 字串
+
+	// 指定匯出檔案的路徑和檔案名稱
+	const folder = path.join(app.getPath("userData"), "export");
+	const exportPath = folder + "\\export_report.json";
+	if (!fs.existsSync(folder))
+		fs.mkdirSync(folder);
+	// 將 JSON 字串寫入檔案
+	fs.writeFile(exportPath, jsonString, 'utf8', (err) => {
+		if (err) {
+			showDialog("error", "匯出地震報告(資訊)", `無法匯出檔案:\n${err}`);
+			console.error('無法匯出檔案:', err);
+		} else {
+			showDialog("success",
+				"匯出地震報告(資訊)",
+				"匯出地震報告(資訊) JSON 檔案已成功匯出！");
+			console.log('JSON 檔案已成功匯出！');
+		}
+	});
+}
+
+function export_trem_report() {
+	let _report_trem_data = [];
+	_report_trem_data = storage.getItem("report_trem_data");
+	const jsonString = JSON.stringify(_report_trem_data, null, 2); // 轉換成格式化的 JSON 字串
+
+	// 指定匯出檔案的路徑和檔案名稱
+	const folder = path.join(app.getPath("userData"), "export");
+	const exportPath = folder + "\\export_trem_report.json";
+	if (!fs.existsSync(folder))
+		fs.mkdirSync(folder);
+	// 將 JSON 字串寫入檔案
+	fs.writeFile(exportPath, jsonString, 'utf8', (err) => {
+		if (err) {
+			showDialog("error", "匯出TREM地震報告(資訊)", `無法匯出檔案:\n${err}`);
+			console.error('無法匯出檔案:', err);
+		} else {
+			showDialog("success",
+				"匯出TREM地震報告(資訊)",
+				"匯出TREM地震報告(資訊) JSON 檔案已成功匯出！");
+			console.log('匯出TREM地震報告(資訊) JSON 檔案已成功匯出！');
+		}
+	});
+}
+
+function import_report() {
+	// 指定匯入檔案的路徑和檔案名稱
+	const folder = path.join(app.getPath("userData"), "export");
+	const importPath = folder + "\\export_report.json";
+	if (!fs.existsSync(folder))
+		fs.mkdirSync(folder);
+	// 讀取 JSON 檔案
+	fs.readFile(importPath, 'utf8', (err, data) => {
+		if (err) {
+			showDialog("error", "匯入地震報告(資訊)", `無法讀取檔案:\n${err}`);
+			console.error('無法讀取檔案:', err);
+		} else {
+			try {
+				// 解析 JSON 字串為 JavaScript 物件
+				const json = JSON.parse(data);
+				storage.setItem("report_data", json);
+				showDialog("success",
+				"匯入地震報告(資訊)",
+				"匯入地震報告(資訊) JSON 檔案已成功匯入！");
+
+				// 在這裡您可以使用 json 物件，例如將其存儲到本地或進行其他處理
+				console.log('匯入的 JSON:', json);
+			} catch (parseError) {
+				showDialog("error", "匯入地震報告(資訊)", `JSON 解析失敗:\n${parseError}`);
+				console.error('JSON 解析失敗:', parseError);
+			}
+		}
+	});
+}
+
+function import_trem_report() {
+	// 指定匯入檔案的路徑和檔案名稱
+	const folder = path.join(app.getPath("userData"), "export");
+	const importPath = folder + "\\export_trem_report.json";
+	if (!fs.existsSync(folder))
+		fs.mkdirSync(folder);
+	// 讀取 JSON 檔案
+	fs.readFile(importPath, 'utf8', (err, data) => {
+		if (err) {
+			showDialog("error", "匯入TREM地震報告(資訊)", `無法讀取檔案:\n${err}`);
+			console.error('無法讀取檔案:', err);
+		} else {
+			try {
+				// 解析 JSON 字串為 JavaScript 物件
+				const json = JSON.parse(data);
+				storage.setItem("report_trem_data", json);
+				showDialog("success",
+				"匯入TREM地震報告(資訊)",
+				"匯入TREM地震報告(資訊) JSON 檔案已成功匯入！");
+
+				// 在這裡您可以使用 json 物件，例如將其存儲到本地或進行其他處理
+				console.log('匯入的 JSON:', json);
+			} catch (parseError) {
+				showDialog("error", "匯入TREM地震報告(資訊)", `JSON 解析失敗:\n${parseError}`);
+				console.error('JSON 解析失敗:', parseError);
+			}
+		}
+	});
+}
+
 function openSettingFile() {
 	ipcRenderer.send("config:open");
 }

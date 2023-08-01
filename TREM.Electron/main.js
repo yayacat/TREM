@@ -524,6 +524,10 @@ ipcMain.on("openUpdateFolder", (event, arg) => {
 	shell.openPath(path.join(result, `${process.env.npm_package_name}-updater`));
 });
 
+ipcMain.on("openexportFolder", (event, arg) => {
+	shell.openPath(path.join(TREM.getPath("userData"), "export"));
+});
+
 ipcMain.on("reset", (event, arg) => {
 	TREM.quit();
 });
@@ -739,12 +743,15 @@ ipcMain.on("screenshotEEWI", async (event, json) => {
 });
 
 ipcMain.on("screenshot", async () => {
-	const folder = path.join(TREM.getPath("userData"), "Screenshots");
-	if (!fs.existsSync(folder))
-		fs.mkdirSync(folder);
-	const filename = "screenshot" + Date.now() + ".png";
-	fs.writeFileSync(path.join(folder, filename), (await MainWindow.webContents.capturePage()).toPNG());
-	shell.showItemInFolder(path.join(folder, filename));
+	const currentWindow = BrowserWindow.getFocusedWindow();
+	if (currentWindow) {
+		const folder = path.join(TREM.getPath("userData"), "Screenshots");
+		if (!fs.existsSync(folder))
+			fs.mkdirSync(folder);
+		const filename = "screenshot" + Date.now() + ".png";
+		fs.writeFileSync(path.join(folder, filename), (await currentWindow.webContents.capturePage()).toPNG());
+		shell.showItemInFolder(path.join(folder, filename));
+	}
 });
 
 function emitAllWindow(channel, ...args) {
