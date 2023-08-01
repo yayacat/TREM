@@ -127,7 +127,6 @@ TREM.win = BrowserWindow.fromId(process.env.window * 1);
 let stationnow = 0;
 let RMTpgaTime = 0;
 let type_Unit = "";
-// let api_key_verify = false;
 let link_on = false;
 // #endregion
 
@@ -3986,7 +3985,6 @@ function ReportGET() {
 					console.debug(ans0);
 					ans0.json().then((ans) => {
 						console.debug(ans);
-						// api_key_verify = false;
 
 						for (let i = 0; i < ans.length; i++) {
 							const id = ans[i].identifier;
@@ -3998,12 +3996,8 @@ function ReportGET() {
 								}
 						}
 
-						for (let i = 0; i < ans.length; i++) {
+						for (let i = 0; i < ans.length; i++)
 							_report_data.push(ans[i]);
-
-							// if (ans[i].location.startsWith("地震資訊"))
-							// 	api_key_verify = true;
-						}
 
 						for (let i = 0; i < _report_data.length - 1; i++)
 							for (let _i = 0; _i < _report_data.length - 1; _i++)
@@ -4014,8 +4008,6 @@ function ReportGET() {
 								}
 
 						if (!_report_data) return setTimeout(ReportGET, 10_000);
-
-						// if (ans.length == 0 && setting["api.key"] != "") api_key_verify = true;
 
 						storage.setItem("report_data", _report_data);
 
