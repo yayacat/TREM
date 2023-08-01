@@ -1,7 +1,6 @@
 const { BrowserWindow, Menu, Notification, app: TREM, Tray, ipcMain, nativeImage, shell, globalShortcut } = require("electron");
 const Configuration = require("./Configuration/Configuration");
 const { autoUpdater } = require("electron-updater");
-const fetch = require("node-fetch");
 const fs = require("fs");
 const os = require("os");
 const logger = require("electron-log");
@@ -334,6 +333,8 @@ TREM.on("ready", () => {
 			checkForUpdates();
 		}, time);
 	}
+
+	ipcMain.emit("ReportGET");
 
 	// globalShortcut.register("Tab", function() {
 	// 	console.log("Tab is pressed");

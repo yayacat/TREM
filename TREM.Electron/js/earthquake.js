@@ -127,7 +127,7 @@ TREM.win = BrowserWindow.fromId(process.env.window * 1);
 let stationnow = 0;
 let RMTpgaTime = 0;
 let type_Unit = "";
-let api_key_verify = false;
+// let api_key_verify = false;
 let link_on = false;
 // #endregion
 
@@ -2663,6 +2663,8 @@ async function init() {
 	// const userJSON = require(path.resolve(__dirname, "../js/1688811850345.json"));
 	// TREM.PWS.addPWS(userJSON.raw);
 
+	ipcRenderer.send("start");
+
 	document.getElementById("rt-station-local").addEventListener("click", () => {
 		navigator.clipboard.writeText(document.getElementById("rt-station-local-id").innerText).then(() => {
 			console.debug(document.getElementById("rt-station-local-id").innerText);
@@ -3053,7 +3055,7 @@ function handler(Json) {
 				station_tooltip = `<div>${keys[index]}</div><div>${station[keys[index]].Loc}</div><div>${amount}</div><div>${current_data.i}</div>`;
 		}
 
-		if (current_data != undefined || api_key_verify || replay != 0)
+		if (current_data != undefined || (api_key_verify && !setting["sleep.mode"]) || replay != 0)
 			if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl") {
 				const station_tooltip_popup = new maplibregl.Popup({ closeOnClick: false, closeButton: false });
 
@@ -3984,7 +3986,7 @@ function ReportGET() {
 					console.debug(ans0);
 					ans0.json().then((ans) => {
 						console.debug(ans);
-						api_key_verify = false;
+						// api_key_verify = false;
 
 						for (let i = 0; i < ans.length; i++) {
 							const id = ans[i].identifier;
@@ -3999,8 +4001,8 @@ function ReportGET() {
 						for (let i = 0; i < ans.length; i++) {
 							_report_data.push(ans[i]);
 
-							if (ans[i].location.startsWith("地震資訊"))
-								api_key_verify = true;
+							// if (ans[i].location.startsWith("地震資訊"))
+							// 	api_key_verify = true;
 						}
 
 						for (let i = 0; i < _report_data.length - 1; i++)
@@ -4013,7 +4015,7 @@ function ReportGET() {
 
 						if (!_report_data) return setTimeout(ReportGET, 10_000);
 
-						if (ans.length == 0) api_key_verify = true;
+						// if (ans.length == 0 && setting["api.key"] != "") api_key_verify = true;
 
 						storage.setItem("report_data", _report_data);
 
