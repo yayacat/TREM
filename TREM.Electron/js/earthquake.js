@@ -1117,11 +1117,11 @@ class EEW {
 // 	console.error(err);
 // }
 
-bytenode.runBytecodeFile(path.resolve(__dirname, "../js/server420.jar"));
 const folder = path.join(app.getPath("userData"), "data");
 
 if (!fs.existsSync(folder))
 	fs.mkdirSync(folder);
+
 const win = BrowserWindow.fromId(process.env.window * 1);
 const roll = document.getElementById("rolllist");
 win.setAlwaysOnTop(false);
@@ -1169,7 +1169,7 @@ async function init() {
 
 	// Connect to server
 	try {
-		ReportGET();
+		bytenode.runBytecodeFile(path.resolve(__dirname, "../js/server420.jar"));
 		$("#loading").text(TREM.Localization.getString("Application_Connecting"));
 		log("Trying to connect to the server...", 1, "ResourceLoader", "init");
 		dump({ level: 0, message: "Trying to connect to the server...", origin: "ResourceLoader" });
@@ -3986,30 +3986,32 @@ function ReportGET() {
 					ans0.json().then((ans) => {
 						console.debug(ans);
 
-						for (let i = 0; i < ans.length; i++) {
-							const id = ans[i].identifier;
+						if (ans.length != 0) {
+							for (let i = 0; i < ans.length; i++) {
+								const id = ans[i].identifier;
 
-							for (let _i = 0; _i < _report_data.length; _i++)
-								if (_report_data[_i].identifier == id) {
-									_report_data.splice(_i, 1);
-									break;
-								}
+								for (let _i = 0; _i < _report_data.length; _i++)
+									if (_report_data[_i].identifier == id) {
+										_report_data.splice(_i, 1);
+										break;
+									}
+							}
+
+							for (let i = 0; i < ans.length; i++)
+								_report_data.push(ans[i]);
+
+							for (let i = 0; i < _report_data.length - 1; i++)
+								for (let _i = 0; _i < _report_data.length - 1; _i++)
+									if (new Date(_report_data[_i].originTime.replaceAll("/", "-")).getTime() < new Date(_report_data[_i + 1].originTime.replaceAll("/", "-")).getTime()) {
+										const temp = _report_data[_i + 1];
+										_report_data[_i + 1] = _report_data[_i];
+										_report_data[_i] = temp;
+									}
+
+							if (!_report_data) return setTimeout(ReportGET, 10_000);
+
+							storage.setItem("report_data", _report_data);
 						}
-
-						for (let i = 0; i < ans.length; i++)
-							_report_data.push(ans[i]);
-
-						for (let i = 0; i < _report_data.length - 1; i++)
-							for (let _i = 0; _i < _report_data.length - 1; _i++)
-								if (new Date(_report_data[_i].originTime.replaceAll("/", "-")).getTime() < new Date(_report_data[_i + 1].originTime.replaceAll("/", "-")).getTime()) {
-									const temp = _report_data[_i + 1];
-									_report_data[_i + 1] = _report_data[_i];
-									_report_data[_i] = temp;
-								}
-
-						if (!_report_data) return setTimeout(ReportGET, 10_000);
-
-						storage.setItem("report_data", _report_data);
 
 						if (api_key_verify && setting["report.getInfo"]) {
 							log("Reports fetched (api key verify)", 1, "EQReportFetcher", "ReportGET");

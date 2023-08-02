@@ -334,8 +334,6 @@ TREM.on("ready", () => {
 		}, time);
 	}
 
-	ipcMain.emit("ReportGET");
-
 	// globalShortcut.register("Tab", function() {
 	// 	console.log("Tab is pressed");
 	// })
