@@ -108,6 +108,7 @@ let replay = 0;
 let replayT = 0;
 let replayD = false;
 let replayTemp = 0;
+let replaydir = 0;
 let replaytestEEW = 0;
 TREM.toggleNavTime = 0;
 let mapLock = false;
@@ -1200,11 +1201,8 @@ async function init() {
 					time.innerText = `${timeconvert(new Date(replayTemp)).format("YYYY/MM/DD HH:mm:ss")}`;
 
 					// if (NOW().getTime() - replayT > 180_000 && !Object.keys(eew).length) {
-					if (replayTemp - replay > 240_000) {
+					if ((replayTemp - replay) > 240_000) {
 						replayTemp = 0;
-						replay = 0;
-						Report = 0;
-						ipcMain.emit("ReportGET");
 						stopReplay();
 					}
 				} else if (replay) {
@@ -1214,9 +1212,7 @@ async function init() {
 
 					// if (NOW().getTime() - replayT > 180_000 && !Object.keys(eew).length) {
 					if (NOW().getTime() - replayT > 240_000) {
-						replay = 0;
-						Report = 0;
-						ipcMain.emit("ReportGET");
+						replayT = 0;
 						stopReplay();
 					}
 				} else {
@@ -2678,120 +2674,127 @@ function PGAMain() {
 	log("Starting PGA timer", 1, "PGATimer", "PGAMain");
 	dump({ level: 0, message: "Starting PGA timer", origin: "PGATimer" });
 
-	if (Timers.rts_clock) clearInterval(Timers.rts_clock);
-	Timers.rts_clock = setInterval(() => {
-		setTimeout(() => {
-			try {
-				const _t = NOW().getTime();
-				const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
-
-				if (ReplayTime == 0) {
-					if (rts_ws_timestamp) {
-						const t0 = Math.abs(rts_response.Time - NOW().getTime());
-
-						if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
-						else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
-						else Ping = `⚠️ ${(t0 / 1000).toFixed(1)}s`;
-
-						// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
-						Response = rts_response;
-
-						if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
-							Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
-							log("PGA timer time out 10s", 2, "PGATimer", "PGAMain");
-							dump({ level: 1, message: "PGA timer time out 10s", origin: "PGATimer" });
-							reconnect();
-							PGAMainbkup();
-						} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
-							stationnow = 0;
-							Response = {};
-							Ping = "💤";
-						} else if (setting["sleep.mode"]) {
-							Ping = "💤";
-						}
-						// ipcMain.emit("restart");
-					} else {
-						for (const removedKey of Object.keys(Station)) {
-							Station[removedKey].remove();
-							delete Station[removedKey];
-						}
-
-						if (setting["sleep.mode"])
-							Ping = "💤";
-						else
-							Ping = "🔒";
-
-						stationnow = 0;
-						Response = {};
-					}
-				} else if (!replayD) {
-					const url = geturl + ReplayTime;
-					// + "&key=" + setting["api.key"]
-					const controller = new AbortController();
-					setTimeout(() => {
-						controller.abort();
-					}, 5000);
-					fetch(url, { signal: controller.signal }).then((res) => {
-						if (res.ok) {
-							res.json().then(res1 => {
-								if (controller.signal.aborted || res1 == undefined) {
-									Ping = "🔒";
-									stationnow = 0;
-									Response = {};
-								} else {
-									Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
-									Response = res1;
-								}
-							});
-						} else {
-							console.error(res);
-
-							switch (res.status) {
-								case 429: {
-									Ping = `❌ ${res.status}`;
-									break;
-								}
-
-								case 404: {
-									Ping = `❌ ${res.status}`;
-									break;
-								}
-
-								default: break;
-							}
-
-							PGAMainbkup();
-						}
-					}).catch((err) => {
-						log(err, 3, "PGATimer", "PGAMain");
-						dump({ level: 2, message: err });
-						PGAMainbkup();
-					});
-				}
-
-				handler(Response);
-			} catch (err) {
-				console.log(err);
-				// TimerDesynced = true;
-				PGAMainbkup();
-			}
-		}, (NOW().getMilliseconds() > 500) ? 1000 - NOW().getMilliseconds() : 500 - NOW().getMilliseconds());
-	}, 500);
-
 	if (replayD) {
 		if (Timers.rts_clock) clearInterval(Timers.rts_clock);
 		Timers.rts_clock = setInterval(() => {
 			try {
-				const ReplayTimeD = (replayTemp == 0) ? 0 : replayTemp += 1000;
-				const userJSON = fs.readFileSync(`./replay_data/${replay}/${ReplayTimeD}.json`);
+				const ReplayTimed = replayTemp += 1000;
+				const ReplayTimeD = ReplayTimed - 1000;
+				const userJSON = JSON.parse(fs.readFileSync(`./replay_data/${replaydir}/${ReplayTimeD}.trem`).toString());
 				Ping = "🔁 cache";
-				handler(JSON.parse(userJSON.toString()));
+				handler(userJSON.rts);
+				// console.debug(replayTemp);
+				// console.debug(replay);
+				// console.debug(replayT);
+				// console.debug(replayTemp - replay);
+				// console.debug(userJSON.eew.eew);
+				// TREM.Earthquake.emit("eew", userJSON.eew.eew);
 			} catch (err) {
 				console.log(err);
 				// TimerDesynced = true;
 				PGAMainbkup();
 			}
-		}, 1000);
+		}, 1_000);
+	} else {
+		if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+		Timers.rts_clock = setInterval(() => {
+			setTimeout(() => {
+				try {
+					const _t = NOW().getTime();
+					const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
+
+					if (ReplayTime == 0) {
+						if (rts_ws_timestamp) {
+							const t0 = Math.abs(rts_response.Time - NOW().getTime());
+
+							if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
+							else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
+							else Ping = `⚠️ ${(t0 / 1000).toFixed(1)}s`;
+
+							// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
+							Response = rts_response;
+
+							if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
+								Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
+								log("PGA timer time out 10s", 2, "PGATimer", "PGAMain");
+								dump({ level: 1, message: "PGA timer time out 10s", origin: "PGATimer" });
+								reconnect();
+								PGAMainbkup();
+							} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
+								stationnow = 0;
+								Response = {};
+								Ping = "💤";
+							} else if (setting["sleep.mode"]) {
+								Ping = "💤";
+							}
+							// ipcMain.emit("restart");
+						} else {
+							for (const removedKey of Object.keys(Station)) {
+								Station[removedKey].remove();
+								delete Station[removedKey];
+							}
+
+							if (setting["sleep.mode"])
+								Ping = "💤";
+							else
+								Ping = "🔒";
+
+							stationnow = 0;
+							Response = {};
+						}
+					} else if (!replayD) {
+						const url = geturl + ReplayTime;
+						// + "&key=" + setting["api.key"]
+						const controller = new AbortController();
+						setTimeout(() => {
+							controller.abort();
+						}, 5000);
+						fetch(url, { signal: controller.signal }).then((res) => {
+							if (res.ok) {
+								res.json().then(res1 => {
+									if (controller.signal.aborted || res1 == undefined) {
+										Ping = "🔒";
+										stationnow = 0;
+										Response = {};
+									} else {
+										Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
+										Response = res1;
+									}
+								});
+							} else {
+								console.error(res);
+
+								switch (res.status) {
+									case 429: {
+										Ping = `❌ ${res.status}`;
+										break;
+									}
+
+									case 404: {
+										Ping = `❌ ${res.status}`;
+										break;
+									}
+
+									default: break;
+								}
+
+								PGAMainbkup();
+							}
+						}).catch((err) => {
+							log(err, 3, "PGATimer", "PGAMain");
+							dump({ level: 2, message: err });
+							PGAMainbkup();
+						});
+					}
+
+					handler(Response);
+				} catch (err) {
+					console.log(err);
+					// TimerDesynced = true;
+					PGAMainbkup();
+				}
+			}, (NOW().getMilliseconds() > 500) ? 1000 - NOW().getMilliseconds() : 500 - NOW().getMilliseconds());
+		}, 500);
 	}
 }
 
@@ -2799,111 +2802,116 @@ function PGAMainbkup() {
 	log("Starting PGA timer backup", 1, "PGATimer", "PGAMainbkup");
 	dump({ level: 0, message: "Starting PGA timer backup", origin: "PGATimer" });
 
-	if (Timers.rts_clock) clearInterval(Timers.rts_clock);
-	Timers.rts_clock = setInterval(() => {
-		setTimeout(() => {
-			try {
-				const _t = NOW().getTime();
-				const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
-
-				if (ReplayTime == 0) {
-					if (rts_ws_timestamp) {
-						const t1 = Math.abs(rts_response.Time - NOW().getTime());
-
-						if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
-						else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
-						else Ping = `⚠️ ${(t1 / 1000).toFixed(1)}s`;
-
-						// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
-						Response = rts_response;
-
-						if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
-							Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
-							log("PGA timer backup time out 10s", 2, "PGATimer", "PGAMainbkup");
-							dump({ level: 1, message: "PGA timer backup time out 10s", origin: "PGATimer" });
-							reconnect();
-							PGAMain();
-						} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
-							stationnow = 0;
-							Response = {};
-							Ping = "💤";
-						} else if (setting["sleep.mode"]) {
-							Ping = "💤";
-						}
-						// ipcMain.emit("restart");
-					} else {
-						for (const removedKey of Object.keys(Station)) {
-							Station[removedKey].remove();
-							delete Station[removedKey];
-						}
-
-						if (setting["sleep.mode"])
-							Ping = "💤";
-						else
-							Ping = "🔒";
-
-						stationnow = 0;
-						Response = {};
-					}
-				} else if (!replayD) {
-					const url = geturl + ReplayTime;
-					// + "&key=" + setting["api.key"]
-					axios({
-						method : "get",
-						url    : url,
-					}).then((response) => {
-						if (response.ok) {
-							Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
-							Response = response.data;
-						} else {
-							console.error(response);
-
-							switch (response.status) {
-								case 429: {
-									Ping = `❌ ${response.status}`;
-									break;
-								}
-
-								case 404: {
-									Ping = `❌ ${response.status}`;
-									break;
-								}
-
-								default: break;
-							}
-
-							PGAMain();
-						}
-					}).catch((err) => {
-						log(err, 3, "PGATimer", "PGAMainbkup");
-						dump({ level: 2, message: err });
-						PGAMain();
-					});
-				}
-
-				handler(Response);
-			} catch (err) {
-				console.log(err);
-				// TimerDesynced = true;
-				PGAMain();
-			}
-		}, (NOW().getMilliseconds() > 500) ? 1000 - NOW().getMilliseconds() : 500 - NOW().getMilliseconds());
-	}, 500);
-
 	if (replayD) {
 		if (Timers.rts_clock) clearInterval(Timers.rts_clock);
 		Timers.rts_clock = setInterval(() => {
 			try {
-				const ReplayTimeD = (replayTemp == 0) ? 0 : replayTemp += 1000;
-				const userJSON = fs.readFileSync(`./replay_data/${replay}/${ReplayTimeD}.json`);
+				const ReplayTimed = replayTemp += 1000;
+				const ReplayTimeD = ReplayTimed - 1000;
+				const userJSON = JSON.parse(fs.readFileSync(`./replay_data/${replaydir}/${ReplayTimeD}.trem`).toString());
 				Ping = "🔁 cache";
-				handler(JSON.parse(userJSON.toString()));
+				handler(userJSON.rts);
+				// console.debug(ReplayTimeD);
+				// console.debug(replayTemp - replay);
+				// console.debug(userJSON.eew.eew);
+				// TREM.Earthquake.emit("eew", userJSON.eew.eew);
 			} catch (err) {
 				console.log(err);
 				// TimerDesynced = true;
 				PGAMain();
 			}
-		}, 1000);
+		}, 1_000);
+	} else {
+		if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+		Timers.rts_clock = setInterval(() => {
+			setTimeout(() => {
+				try {
+					const _t = NOW().getTime();
+					const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
+
+					if (ReplayTime == 0) {
+						if (rts_ws_timestamp) {
+							const t1 = Math.abs(rts_response.Time - NOW().getTime());
+
+							if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
+							else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
+							else Ping = `⚠️ ${(t1 / 1000).toFixed(1)}s`;
+
+							// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
+							Response = rts_response;
+
+							if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
+								Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
+								log("PGA timer backup time out 10s", 2, "PGATimer", "PGAMainbkup");
+								dump({ level: 1, message: "PGA timer backup time out 10s", origin: "PGATimer" });
+								reconnect();
+								PGAMain();
+							} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
+								stationnow = 0;
+								Response = {};
+								Ping = "💤";
+							} else if (setting["sleep.mode"]) {
+								Ping = "💤";
+							}
+							// ipcMain.emit("restart");
+						} else {
+							for (const removedKey of Object.keys(Station)) {
+								Station[removedKey].remove();
+								delete Station[removedKey];
+							}
+
+							if (setting["sleep.mode"])
+								Ping = "💤";
+							else
+								Ping = "🔒";
+
+							stationnow = 0;
+							Response = {};
+						}
+					} else if (!replayD) {
+						const url = geturl + ReplayTime;
+						// + "&key=" + setting["api.key"]
+						axios({
+							method : "get",
+							url    : url,
+						}).then((response) => {
+							if (response.ok) {
+								Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
+								Response = response.data;
+							} else {
+								console.error(response);
+
+								switch (response.status) {
+									case 429: {
+										Ping = `❌ ${response.status}`;
+										break;
+									}
+
+									case 404: {
+										Ping = `❌ ${response.status}`;
+										break;
+									}
+
+									default: break;
+								}
+
+								PGAMain();
+							}
+						}).catch((err) => {
+							log(err, 3, "PGATimer", "PGAMainbkup");
+							dump({ level: 2, message: err });
+							PGAMain();
+						});
+					}
+
+					handler(Response);
+				} catch (err) {
+					console.log(err);
+					// TimerDesynced = true;
+					PGAMain();
+				}
+			}, (NOW().getMilliseconds() > 500) ? 1000 - NOW().getMilliseconds() : 500 - NOW().getMilliseconds());
+		}, 500);
 	}
 }
 
@@ -4774,6 +4782,8 @@ ipcMain.on("testoldtime", (event, oldtime) => {
 	replay = oldtime - 25000;
 	replayTemp = replay;
 	replayT = NOW().getTime();
+	replaydir = replay;
+	ReportTag = 0;
 	ipcMain.emit("ReportGET");
 	stopReplaybtn();
 	PGAMain();
@@ -5950,8 +5960,6 @@ TREM.Earthquake.on("eew", (data) => {
 	if (data.replay_timestamp) {
 		replay = data.replay_timestamp;
 		replayT = NOW().getTime();
-	} else {
-		replay = 0;
 	}
 
 	if (data.cancel)
@@ -7238,13 +7246,6 @@ function main(data) {
 			Timers.ticker = null;
 			Cancel = false;
 			Canceltime = 0;
-
-			if (replay != 0) {
-				replay = 0;
-				Report = 0;
-				ipcMain.emit("ReportGET");
-			}
-
 			INFO = [];
 			Info = { Notify: [], Warn: [], Focus: [] };
 			$("#alert-box").removeClass("show");

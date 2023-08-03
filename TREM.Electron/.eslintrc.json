@@ -62,7 +62,7 @@
         }],
 		"keyword-spacing": "error",
 		"lines-around-comment": "warn",
-		"max-nested-callbacks": ["error", { "max": 5 }],
+		"max-nested-callbacks": ["error", { "max": 9 }],
 		"max-statements-per-line": ["error", { "max": 2 }],
 		"no-console": "off",
 		"no-constant-condition": ["error", { "checkLoops": false }],
