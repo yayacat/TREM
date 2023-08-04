@@ -33,6 +33,7 @@
 		"storage": "writable",
 		"showDialog": "readonly",
 		"TimerDesynced": "writable",
+		"ReportTag": "writable",
 		"toggleNav": "readonly",
 		"TREM": "readonly"
 	},
