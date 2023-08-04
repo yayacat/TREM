@@ -501,10 +501,14 @@ ipcMain.on("saveSetting", (event, arg) => {
 });
 
 ipcMain.on("openScreenshotsFolder", (event, arg) => {
+	if (!fs.existsSync(path.join(TREM.getPath("userData"), "Screenshots"))) fs.mkdirSync(path.join(TREM.getPath("userData"), "Screenshots"));
+
 	shell.openPath(path.join(TREM.getPath("userData"), "Screenshots"));
 });
 
 ipcMain.on("openEEWScreenshotsFolder", (event, arg) => {
+	if (!fs.existsSync(path.join(TREM.getPath("userData"), "EEW"))) fs.mkdirSync(path.join(TREM.getPath("userData"), "EEW"));
+
 	shell.openPath(path.join(TREM.getPath("userData"), "EEW"));
 });
 
@@ -524,10 +528,14 @@ ipcMain.on("openUpdateFolder", (event, arg) => {
 });
 
 ipcMain.on("openreplayFolder", (event, arg) => {
-	shell.openPath(path.resolve(__dirname, "./replay_data"));
+	if (!fs.existsSync(path.join(TREM.getPath("userData"), "replay_data"))) fs.mkdirSync(path.join(TREM.getPath("userData"), "replay_data"));
+
+	shell.openPath(path.join(TREM.getPath("userData"), "replay_data"));
 });
 
 ipcMain.on("openexportFolder", (event, arg) => {
+	if (!fs.existsSync(path.join(TREM.getPath("userData"), "export"))) fs.mkdirSync(path.join(TREM.getPath("userData"), "export"));
+
 	shell.openPath(path.join(TREM.getPath("userData"), "export"));
 });
 

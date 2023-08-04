@@ -2684,7 +2684,7 @@ function PGAMain() {
 				const ReplayTimed = replayTemp += 1000;
 				const ReplayTimeD = ReplayTimed - 1000;
 				const gettime = ReplayTimeD / 1000;
-				const userJSON = JSON.parse(fs.readFileSync(`./replay_data/${replaydir}/${gettime}.trem`).toString());
+				const userJSON = JSON.parse(fs.readFileSync(`${path.join(path.join(app.getPath("userData"), "replay_data"), String(replaydir))}/${gettime}.trem`).toString());
 				const ans_eew = userJSON.eew;
 				Ping = "🔁 cache";
 				handler(userJSON.rts);
@@ -2816,7 +2816,7 @@ function PGAMainbkup() {
 				const ReplayTimed = replayTemp += 1000;
 				const ReplayTimeD = ReplayTimed - 1000;
 				const gettime = ReplayTimeD / 1000;
-				const userJSON = JSON.parse(fs.readFileSync(`./replay_data/${replaydir}/${gettime}.trem`).toString());
+				const userJSON = JSON.parse(fs.readFileSync(`${path.join(path.join(app.getPath("userData"), "replay_data"), String(replaydir))}/${gettime}.trem`).toString());
 				const ans_eew = userJSON.eew;
 				Ping = "🔁 cache";
 				handler(userJSON.rts);
@@ -4386,8 +4386,8 @@ function addReport(report, prepend = false, index = 0) {
 		investigation = true;
 	} else {
 		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 25000;
-		const timed_hold = timed;
-		fs.access(`./replay_data/${timed_hold}/${timed}.json`, (err) => {
+		const timed_hold = String(timed);
+		fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), timed_hold)}/${timed}.trem`, (err) => {
 			if (!err) {
 				report.download = true;
 				TREM.Report.cache.set(report.identifier, report);
