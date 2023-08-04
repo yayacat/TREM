@@ -1285,6 +1285,8 @@ async function init() {
 
 				else if (type_Unit == "fcm") GetDataState += "🟥 FCM";
 
+				else if (type_Unit == "cache") GetDataState += "🟩 Cache";
+
 				type_Unit = "";
 
 				if (setting["stream.mode"]) GetDataState += "⏺";
@@ -2674,29 +2676,34 @@ function PGAMain() {
 	log("Starting PGA timer", 1, "PGATimer", "PGAMain");
 	dump({ level: 0, message: "Starting PGA timer", origin: "PGATimer" });
 
-	if (replayD) {
-		if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+	if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+
+	if (replayD)
 		Timers.rts_clock = setInterval(() => {
 			try {
 				const ReplayTimed = replayTemp += 1000;
 				const ReplayTimeD = ReplayTimed - 1000;
-				const userJSON = JSON.parse(fs.readFileSync(`./replay_data/${replaydir}/${ReplayTimeD}.trem`).toString());
+				const gettime = ReplayTimeD / 1000;
+				const userJSON = JSON.parse(fs.readFileSync(`./replay_data/${replaydir}/${gettime}.trem`).toString());
+				const ans_eew = userJSON.eew;
 				Ping = "🔁 cache";
 				handler(userJSON.rts);
-				// console.debug(replayTemp);
-				// console.debug(replay);
-				// console.debug(replayT);
-				// console.debug(replayTemp - replay);
-				// console.debug(userJSON.eew.eew);
-				// TREM.Earthquake.emit("eew", userJSON.eew.eew);
+
+				for (let i = 0; i < ans_eew.eew.length; i++) {
+					console.debug(ans_eew.eew[i]);
+					ans_eew.eew[i].replay_timestamp = ans_eew.eew[i].timestamp;
+					ans_eew.eew[i].replay_time = ans_eew.eew[i].time;
+					ans_eew.eew[i].time = Now().getTime() - (ans_eew.eew[i].timestamp - ans_eew.eew[i].time);
+					ans_eew.eew[i].timestamp = Now().getTime();
+					FCMdata(ans_eew.eew[i], "cache");
+				}
 			} catch (err) {
 				console.log(err);
 				// TimerDesynced = true;
 				PGAMainbkup();
 			}
 		}, 1_000);
-	} else {
-		if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+	else
 		Timers.rts_clock = setInterval(() => {
 			setTimeout(() => {
 				try {
@@ -2795,34 +2802,40 @@ function PGAMain() {
 				}
 			}, (NOW().getMilliseconds() > 500) ? 1000 - NOW().getMilliseconds() : 500 - NOW().getMilliseconds());
 		}, 500);
-	}
 }
 
 function PGAMainbkup() {
 	log("Starting PGA timer backup", 1, "PGATimer", "PGAMainbkup");
 	dump({ level: 0, message: "Starting PGA timer backup", origin: "PGATimer" });
 
-	if (replayD) {
-		if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+	if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+
+	if (replayD)
 		Timers.rts_clock = setInterval(() => {
 			try {
 				const ReplayTimed = replayTemp += 1000;
 				const ReplayTimeD = ReplayTimed - 1000;
-				const userJSON = JSON.parse(fs.readFileSync(`./replay_data/${replaydir}/${ReplayTimeD}.trem`).toString());
+				const gettime = ReplayTimeD / 1000;
+				const userJSON = JSON.parse(fs.readFileSync(`./replay_data/${replaydir}/${gettime}.trem`).toString());
+				const ans_eew = userJSON.eew;
 				Ping = "🔁 cache";
 				handler(userJSON.rts);
-				// console.debug(ReplayTimeD);
-				// console.debug(replayTemp - replay);
-				// console.debug(userJSON.eew.eew);
-				// TREM.Earthquake.emit("eew", userJSON.eew.eew);
+
+				for (let i = 0; i < ans_eew.eew.length; i++) {
+					console.debug(ans_eew.eew[i]);
+					ans_eew.eew[i].replay_timestamp = ans_eew.eew[i].timestamp;
+					ans_eew.eew[i].replay_time = ans_eew.eew[i].time;
+					ans_eew.eew[i].time = Now().getTime() - (ans_eew.eew[i].timestamp - ans_eew.eew[i].time);
+					ans_eew.eew[i].timestamp = Now().getTime();
+					FCMdata(ans_eew.eew[i], "cache");
+				}
 			} catch (err) {
 				console.log(err);
 				// TimerDesynced = true;
 				PGAMain();
 			}
 		}, 1_000);
-	} else {
-		if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+	else
 		Timers.rts_clock = setInterval(() => {
 			setTimeout(() => {
 				try {
@@ -2912,7 +2925,6 @@ function PGAMainbkup() {
 				}
 			}, (NOW().getMilliseconds() > 500) ? 1000 - NOW().getMilliseconds() : 500 - NOW().getMilliseconds());
 		}, 500);
-	}
 }
 
 function handler(Json) {
@@ -4708,9 +4720,15 @@ const stopReplay = function() {
 
 	if (Object.keys(detected_list).length != 0) PGACancel = true;
 
-	if (replay != 0) {
+	if (replay != 0 || Report != 0 || replayTemp != 0 || replayT != 0 || replaydir != 0 || replayD) {
 		replay = 0;
 		Report = 0;
+		replayTemp = 0;
+		replayT = 0;
+		replaydir = 0;
+		replayD = false;
+		clearInterval(Timers.rts_clock);
+		PGAMain();
 		ipcMain.emit("ReportGET");
 	}
 
@@ -4721,8 +4739,6 @@ const stopReplay = function() {
 
 	if (TREM.MapArea2.isTriggered)
 		TREM.MapArea2.clear();
-
-	if (replayD) replayD = false;
 
 	WarnAudio = Date.now() + 3000;
 
@@ -4782,12 +4798,26 @@ ipcMain.on("testoldtime", (event, oldtime) => {
 	replay = oldtime - 25000;
 	replayTemp = replay;
 	replayT = NOW().getTime();
-	replaydir = replay;
+	replaydir = replay / 1000;
 	ReportTag = 0;
 	ipcMain.emit("ReportGET");
 	stopReplaybtn();
 	PGAMain();
 });
+
+ipcMain.on("testreplaytime", (event, oldtime) => {
+	console.debug(oldtime);
+	replayD = true;
+	replay = oldtime;
+	replayTemp = oldtime;
+	replayT = NOW().getTime();
+	replaydir = replay / 1000;
+	ReportTag = 0;
+	ipcMain.emit("ReportGET");
+	stopReplaybtn();
+	PGAMain();
+});
+
 
 ipcMain.on("sleep", (event, mode) => {
 	if (mode)
@@ -5606,6 +5636,7 @@ TREM.Earthquake.on("eew", (data) => {
 		epicenterIcon   : null,
 		epicenterIconTW : null,
 	};
+	else if (EarthquakeList[data.id].number == data.number) return;
 
 	EarthquakeList[data.id].epicenter = [+data.lon, +data.lat];
 	EarthquakeList[data.id].Time = data.time;

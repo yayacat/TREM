@@ -3505,6 +3505,30 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="control-title">
+                                    <div>
+                                        <span lang="zh-TW">lite重播時間</span>
+                                    </div>
+                                </div>
+                                <div class="option-container">
+                                    <div class="option-label">
+                                        <div class="option-label-title">
+                                            <span lang="zh-TW">lite重播時間</span>
+                                        </div>
+                                        <div class="option-label-description">
+                                            <span lang="zh-TW">lite重播時間</span>
+                                        </div>
+                                    </div>
+                                    <div class="control">
+                                        <input class="input-field" id="replaytime" type="text" placeholder="輸入UNIX時間格式" style="width: 330px;">
+                                        <button class="filled-tonal-button setting-button md3-ripple" onclick="testreplaytime()" style="margin-top: 10px; left: 10px;">
+                                            <span class="material-symbols-rounded filled-tonal-button-icon">replay</span>
+                                            <span class="filled-tonal-button-label">
+                                                <span lang="zh-TW">lite重播時間</span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="list-container" id="Windows">
                                 <div class="control-title">
@@ -4102,6 +4126,14 @@
                                     <span lang="ru">?</span>
                                     <span lang="zh-CN">?</span>
                                     <span lang="zh-TW">開啟更新檔資料夾</span>
+                                </button>
+                                <button class="flat-button md3-ripple" onclick="openreplayFolder()">
+                                    <span lang="en">Open replay folder</span>
+                                    <span lang="ja">?</span>
+                                    <span lang="kr">?</span>
+                                    <span lang="ru">?</span>
+                                    <span lang="zh-CN">?</span>
+                                    <span lang="zh-TW">開啟重播資料夾</span>
                                 </button>
                                 <button class="flat-button md3-ripple" onclick="openexportFolder()">
                                     <span lang="en">Open export folder</span>

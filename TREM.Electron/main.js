@@ -523,6 +523,10 @@ ipcMain.on("openUpdateFolder", (event, arg) => {
 	shell.openPath(path.join(result, `${process.env.npm_package_name}-updater`));
 });
 
+ipcMain.on("openreplayFolder", (event, arg) => {
+	shell.openPath(path.resolve(__dirname, "./replay_data"));
+});
+
 ipcMain.on("openexportFolder", (event, arg) => {
 	shell.openPath(path.join(TREM.getPath("userData"), "export"));
 });

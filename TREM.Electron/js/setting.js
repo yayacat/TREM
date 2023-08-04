@@ -1240,6 +1240,19 @@ function testoldtimeEEW() {
 	ipcRenderer.send("testoldtimeEEW", oldtime);
 }
 
+function testreplaytime() {
+	let replaytime = document.getElementById("replaytime").value;
+
+	// 刪除字串中所有非數字的字符
+	replaytime = replaytime.replace(/\D/g, "");
+
+	// 確認replaytime是13位數，不足的話在後面補0
+	replaytime = parseInt(replaytime.padEnd(13, "0"));
+
+	console.debug(replaytime);
+	ipcRenderer.send("testreplaytime", replaytime);
+}
+
 function testoldtremEEW() {
 	const oldtrem = document.getElementById("oldtrem").value;
 	ipcRenderer.send("testoldtremEEW", oldtrem);
@@ -1275,6 +1288,10 @@ function openEEWScreenshotsFolder() {
 
 function openUpdateFolder() {
 	ipcRenderer.send("openUpdateFolder");
+}
+
+function openreplayFolder() {
+	ipcRenderer.send("openreplayFolder");
 }
 
 function openexportFolder() {

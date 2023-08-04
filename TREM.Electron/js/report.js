@@ -289,7 +289,7 @@ TREM.Report = {
 		console.debug(report);
 
 		let time = new Date(report.originTime.replace(/-/g, "/")).getTime() - 25000;
-		const time_hold = time;
+		const time_hold = time / 1000;
 		const _end_time = time + 205000;
 
 		const downloader_progress = document.getElementById("downloader_progress");
@@ -325,42 +325,25 @@ TREM.Report = {
 						time : time,
 					},
 				};
+				const gettime = time / 1000;
 				fetch(`https://exptech.com.tw/api/v2/trem/rts?time=${time}`)
 					.then((res) => {
 						if (res.ok) {
-							console.debug(res);
+							// console.debug(res);
 							res.json().then(res1 => {
-								console.debug(res1);
+								// console.debug(res1);
 
 								if (!fs.existsSync(`./replay_data/${time_hold}`)) fs.mkdirSync(`./replay_data/${time_hold}`);
-								// fs.access(`./replay_data/${time_hold}/${now_time}.json`, (err) => {
-								// 	if (!err) {
-								// 		clearInterval(this.clock);
-								// 		console.debug("Finish!(is found it)");
-								// 		document.getElementById("report-replay-downloader-text").innerHTML = "重複下載!";
-								// 		downloader_progress.style.display = "none";
-								// 		report.download = true;
-								// 		this.cache.set(report.identifier, report);
-								// 		this.lock = false;
-								// 	} else if (err.code == "ENOENT") {
-								// 		fs.writeFile(`./replay_data/${time_hold}/${now_time}.json`, JSON.stringify(res1), () => {
-								// 			time += 1000;
-								// 		});
-								// 		progresstemp += (1 / progressStep) * 1;
-								// 		downloader_progress.value = progresstemp;
-								// 		downloader_progress.title = `${Math.round(progresstemp * 10000) / 100}%`;
-								// 		downloader_progress.style.display = "";
-								// 	}
-								// });
+
 								result.rts = res1;
-								fetch(`https://exptech.com.tw/api/v1/earthquake/info?time=${time}&type=all`)
+								fetch(`https://exptech.com.tw/api/v1/earthquake/info?time=${gettime}&type=all`)
 									.then((res0) => {
 										if (res0.ok) {
-											console.debug(res);
+											// console.debug(res);
 											res0.json().then(res2 => {
-												console.debug(res2);
+												// console.debug(res2);
 												result.eew = res2;
-												fs.access(`./replay_data/${time_hold}/${time}.trem`, (err) => {
+												fs.access(`./replay_data/${time_hold}/${gettime}.trem`, (err) => {
 													if (!err) {
 														clearInterval(this.clock);
 														console.debug("Finish!(is found it)");
@@ -370,7 +353,7 @@ TREM.Report = {
 														this.cache.set(report.identifier, report);
 														this.lock = false;
 													} else if (err.code == "ENOENT") {
-														fs.writeFile(`./replay_data/${time_hold}/${time}.trem`, JSON.stringify(result), () => {
+														fs.writeFile(`./replay_data/${time_hold}/${gettime}.trem`, JSON.stringify(result), () => {
 															time += 1000;
 														});
 														progresstemp += (1 / progressStep) * 1;
@@ -393,6 +376,7 @@ TREM.Report = {
 												case 404: {
 													log(res0.status, 3, "replaydownloader", "Report");
 													dump({ level: 2, message: res0.status });
+													time += 1000;
 													break;
 												}
 
@@ -419,6 +403,7 @@ TREM.Report = {
 								case 404: {
 									log(res.status, 3, "replaydownloader", "Report");
 									dump({ level: 2, message: res.status });
+									time += 1000;
 									break;
 								}
 
@@ -440,8 +425,9 @@ TREM.Report = {
 	replaydownloaderrm(id) {
 		const report = this.cache.get(id);
 		const time = new Date(report.originTime.replace(/-/g, "/")).getTime() - 25000;
+		const time_hold = time / 1000;
 
-		fs.rm(`./replay_data/${time}/`, { recursive: true }, () => {
+		fs.rm(`./replay_data/${time_hold}/`, { recursive: true }, () => {
 			document.getElementById("report-replay-downloader-icon").innerHTML = "download";
 			document.getElementById("report-replay-downloader-text").innerHTML = "下載";
 			document.getElementById("downloader_progress").style.display = "none";
@@ -721,14 +707,16 @@ TREM.Report = {
 		}
 
 		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 25000;
-		const _end_timed = timed + 205000;
-		fs.access(`./replay_data/${timed}/${timed}.trem`, (err) => {
+		const time_hold = timed / 1000;
+		const _end_timed = time_hold + 205;
+
+		fs.access(`./replay_data/${time_hold}/${time_hold}.trem`, (err) => {
 			if (!err) {
 				document.getElementById("report-replay-downloader-icon").innerHTML = "download_done";
 				document.getElementById("report-replay-downloader-text").innerHTML = "已下載!";
 				report.download = true;
 				this.cache.set(report.identifier, report);
-				fs.access(`./replay_data/${timed}/${_end_timed}.trem`, (err) => {
+				fs.access(`./replay_data/${time_hold}/${_end_timed}.trem`, (err) => {
 					if (err) {
 						document.getElementById("report-replay-downloader-icon").innerHTML = "download";
 						document.getElementById("report-replay-downloader-text").innerHTML = "下載中...";
