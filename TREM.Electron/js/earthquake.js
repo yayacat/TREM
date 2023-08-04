@@ -4818,7 +4818,6 @@ ipcMain.on("testreplaytime", (event, oldtime) => {
 	PGAMain();
 });
 
-
 ipcMain.on("sleep", (event, mode) => {
 	if (mode)
 		sleep(mode);
