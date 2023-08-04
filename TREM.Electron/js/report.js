@@ -296,9 +296,9 @@ TREM.Report = {
 		const progressStep = 206;
 		let progresstemp = 0;
 
-		if (ReportTag) return;
+		fs.mkdirSync(path.join(path.join(app.getPath("userData"), "replay_data"), time_hold), { recursive: true });
 
-		if (!fs.existsSync(path.join(app.getPath("userData"), "replay_data"))) fs.mkdirSync(path.join(app.getPath("userData"), "replay_data"));
+		if (ReportTag) ReportTag = 0;
 
 		if (this.lock) return;
 
@@ -334,9 +334,6 @@ TREM.Report = {
 							// console.debug(res);
 							res.json().then(res1 => {
 								// console.debug(res1);
-
-								if (!fs.existsSync(path.join(path.join(app.getPath("userData"), "replay_data"), time_hold))) fs.mkdirSync(path.join(path.join(app.getPath("userData"), "replay_data"), time_hold));
-
 								result.rts = res1;
 								fetch(`https://exptech.com.tw/api/v1/earthquake/info?time=${gettime}&type=all`)
 									.then((res0) => {
