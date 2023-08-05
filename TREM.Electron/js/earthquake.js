@@ -3002,11 +3002,14 @@ function handler(Json) {
 		if (current_data == undefined) {
 			level_class = "na";
 
-			if (station_time_json[uuid] == undefined) {
+			if (station_time_json[uuid] == undefined && replay == 0) {
 				station_time_json[uuid] = Date.now();
 				localStorage.stationtime = JSON.stringify(station_time_json);
-			} else if (station_time_json[uuid] == 0) {
+			} else if (station_time_json[uuid] == 0 && replay == 0) {
 				station_time_json[uuid] = Date.now();
+				localStorage.stationtime = JSON.stringify(station_time_json);
+			} else if (station_time_json[uuid] == undefined && replay != 0) {
+				station_time_json[uuid] = 0;
 				localStorage.stationtime = JSON.stringify(station_time_json);
 			}
 
