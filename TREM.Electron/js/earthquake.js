@@ -4730,6 +4730,10 @@ ipcMain.once("start", () => {
 		}
 
 		setInterval(() => {
+			ipcMain.emit("apikey");
+		}, 30_000);
+
+		setInterval(() => {
 			if (DATAstamp != 0 && Stamp != DATAstamp) {
 				Stamp = DATAstamp;
 				FCMdata(DATA, ServerType);
