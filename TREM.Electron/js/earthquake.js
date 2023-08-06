@@ -4651,7 +4651,7 @@ TREM.color = function color(Intensity) {
 // #region IPC
 ipcMain.once("start", () => {
 	try {
-		if (!(api_key_verify ? storage.getItem("disclaimer_off") : false) && !api_key_verify)
+		if (!(api_key_verify ? storage.getItem("disclaimer_off") : false) && !api_key_verify) {
 			showDialog(
 				"warn",
 				"免責聲明",
@@ -4695,7 +4695,34 @@ ipcMain.once("start", () => {
 				() => void 0,
 				0,
 				1);
-		else if (setting["p2p.mode"]) serverinit();
+		} else {
+			if (setting["p2p.mode"]) serverinit();
+			setTimeout(() => {
+				if (localStorage.TOS_v1_1 == undefined)
+					showDialog(
+						"warn",
+						"TOS 服務條款 1.1",
+						`• 使用本服務應視為用戶同意使用條款\n
+						• TREM 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
+						• 禁止在未經允許的情況下二次分發 TREM 軟體內的任何資訊\n
+						• 禁止轉售 TREM 提供之資訊\n
+						• 禁止違反法律法規或違反公共秩序和道德的行為\n
+						• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
+						• TREM 使用 P2P 技術傳遞資訊\n
+						• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
+						• Powered by ExpTech | 2023/05/03`,
+						0,
+						"warning",
+						() => {
+							localStorage.TOS_v1_1 = true;
+						},
+						"我已詳細閱讀 並同意上述條款",
+						"",
+						() => void 0,
+						0,
+						1);
+			}, 1000);
+		}
 
 		if (localStorage.rts_alert_false == undefined) {
 			localStorage.rts_alert_false = true;
