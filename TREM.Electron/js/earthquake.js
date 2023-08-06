@@ -2660,8 +2660,6 @@ async function init() {
 	// const userJSON = require(path.resolve(__dirname, "../js/1688811850345.json"));
 	// TREM.PWS.addPWS(userJSON.raw);
 
-	ipcRenderer.send("start");
-
 	document.getElementById("rt-station-local").addEventListener("click", () => {
 		navigator.clipboard.writeText(document.getElementById("rt-station-local-id").innerText).then(() => {
 			console.debug(document.getElementById("rt-station-local-id").innerText);
@@ -4653,49 +4651,51 @@ TREM.color = function color(Intensity) {
 // #region IPC
 ipcMain.once("start", () => {
 	try {
-		showDialog(
-			"warn",
-			"免責聲明",
-			`• TREM 進階功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請所有使用者理解並謹慎使用。\n
-			• 強震即時警報是利用少數幾個地震測站快速演算之結果，與最終地震報告可能存有若干差異，請所有使用者理解並謹慎使用。\n
-			• 本軟體使用P2P的連線技術傳遞資料，您的電腦將會把收到的地震資訊轉傳給其他人的電腦，如此才能降低伺服器負荷與維持費用，也才能免費地提供服務給大家使用。若您開始使用本軟體則代表您已同意使用P2P連線技術將收到的資料轉傳給其他電腦。\n
-			• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
-			• Powered by ExpTech | 2023/06/22`,
-			0,
-			"warning",
-			() => {
-				if (setting["p2p.mode"]) serverinit();
-				setTimeout(() => {
-					if (localStorage.TOS_v1_1 == undefined)
-						showDialog(
-							"warn",
-							"TOS 服務條款 1.1",
-							`• 使用本服務應視為用戶同意使用條款\n
-							• TREM 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
-							• 禁止在未經允許的情況下二次分發 TREM 軟體內的任何資訊\n
-							• 禁止轉售 TREM 提供之資訊\n
-							• 禁止違反法律法規或違反公共秩序和道德的行為\n
-							• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
-							• TREM 使用 P2P 技術傳遞資訊\n
-							• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
-							• Powered by ExpTech | 2023/05/03`,
-							0,
-							"warning",
-							() => {
-								localStorage.TOS_v1_1 = true;
-							},
-							"我已詳細閱讀 並同意上述條款",
-							"",
-							() => void 0,
-							0,
-							1);
-				}, 1000);
-			},
-			"我已詳細閱讀 並同意上述免責聲明",
-			"",
-			() => void 0,
-			0,
-			1);
+		if (!(api_key_verify ? storage.getItem("disclaimer_off") : false) && !api_key_verify)
+			showDialog(
+				"warn",
+				"免責聲明",
+				`• TREM 進階功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請所有使用者理解並謹慎使用。\n
+				• 強震即時警報是利用少數幾個地震測站快速演算之結果，與最終地震報告可能存有若干差異，請所有使用者理解並謹慎使用。\n
+				• 本軟體使用P2P的連線技術傳遞資料，您的電腦將會把收到的地震資訊轉傳給其他人的電腦，如此才能降低伺服器負荷與維持費用，也才能免費地提供服務給大家使用。若您開始使用本軟體則代表您已同意使用P2P連線技術將收到的資料轉傳給其他電腦。\n
+				• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
+				• Powered by ExpTech | 2023/06/22`,
+				0,
+				"warning",
+				() => {
+					if (setting["p2p.mode"]) serverinit();
+					setTimeout(() => {
+						if (localStorage.TOS_v1_1 == undefined)
+							showDialog(
+								"warn",
+								"TOS 服務條款 1.1",
+								`• 使用本服務應視為用戶同意使用條款\n
+								• TREM 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
+								• 禁止在未經允許的情況下二次分發 TREM 軟體內的任何資訊\n
+								• 禁止轉售 TREM 提供之資訊\n
+								• 禁止違反法律法規或違反公共秩序和道德的行為\n
+								• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
+								• TREM 使用 P2P 技術傳遞資訊\n
+								• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
+								• Powered by ExpTech | 2023/05/03`,
+								0,
+								"warning",
+								() => {
+									localStorage.TOS_v1_1 = true;
+								},
+								"我已詳細閱讀 並同意上述條款",
+								"",
+								() => void 0,
+								0,
+								1);
+					}, 1000);
+				},
+				"我已詳細閱讀 並同意上述免責聲明",
+				"",
+				() => void 0,
+				0,
+				1);
+		else if (setting["p2p.mode"]) serverinit();
 
 		if (localStorage.rts_alert_false == undefined) {
 			localStorage.rts_alert_false = true;
