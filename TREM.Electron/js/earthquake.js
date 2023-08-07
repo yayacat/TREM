@@ -2780,7 +2780,15 @@ function PGAMain() {
 										break;
 									}
 
-									default: break;
+									case 500: {
+										Ping = `❌ ${res.status}`;
+										break;
+									}
+
+									default: {
+										Ping = `❌ ${res.status}`;
+										break;
+									}
 								}
 
 								PGAMainbkup();
@@ -2903,7 +2911,15 @@ function PGAMainbkup() {
 										break;
 									}
 
-									default: break;
+									case 500: {
+										Ping = `❌ ${response.status}`;
+										break;
+									}
+
+									default: {
+										Ping = `❌ ${response.status}`;
+										break;
+									}
 								}
 
 								PGAMain();
@@ -4101,6 +4117,28 @@ function ReportGET() {
 							}, 30_000);
 						}
 
+						case 500: {
+							log("Error fetching reports (fetch) 500", 3, "EQReportFetcher", "ReportGET");
+							log(ans0, 3, "EQReportFetcher", "ReportGET");
+							dump({ level: 2, message: "Error fetching reports (fetch) 500", origin: "EQReportFetcher" });
+							dump({ level: 2, message: ans0, origin: "EQReportFetcher" });
+
+							if (_report_data.length > setting["cache.report"]) {
+								_report_data_temp = [];
+								for (let i = 0; i < setting["cache.report"]; i++)
+									_report_data_temp[i] = _report_data[i];
+								TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+								ReportList(_report_data_temp);
+							} else {
+								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+								ReportList(_report_data);
+							}
+
+							return setTimeout(() => {
+								ReportGET();
+							}, 30_000);
+						}
+
 						default: break;
 					}
 				}
@@ -5180,12 +5218,20 @@ ipcMain.on("testEEW", (event, list = []) => {
 
 						switch (res.status) {
 							case 429: {
-								console.error(res);
+								log(res.status, 3, "testEEW", "replay");
+								dump({ level: 2, message: res.status });
 								break;
 							}
 
 							case 404: {
-								console.error(res);
+								log(res.status, 3, "testEEW", "replay");
+								dump({ level: 2, message: res.status });
+								break;
+							}
+
+							case 500: {
+								log(res.status, 3, "testEEW", "replay");
+								dump({ level: 2, message: res.status });
 								break;
 							}
 
@@ -5222,12 +5268,20 @@ ipcMain.on("testEEW", (event, list = []) => {
 
 							switch (res.status) {
 								case 429: {
-									console.error(res);
+									log(res.status, 3, "testEEW", "replay");
+									dump({ level: 2, message: res.status });
 									break;
 								}
 
 								case 404: {
-									console.error(res);
+									log(res.status, 3, "testEEW", "replay");
+									dump({ level: 2, message: res.status });
+									break;
+								}
+
+								case 500: {
+									log(res.status, 3, "testEEW", "replay");
+									dump({ level: 2, message: res.status });
 									break;
 								}
 

@@ -380,6 +380,12 @@ TREM.Report = {
 													break;
 												}
 
+												case 500: {
+													log(res.status, 3, "replaydownloader", "Report");
+													dump({ level: 2, message: res.status });
+													break;
+												}
+
 												default: break;
 											}
 										}
@@ -404,6 +410,12 @@ TREM.Report = {
 									log(res.status, 3, "replaydownloader", "Report");
 									dump({ level: 2, message: res.status });
 									time += 1000;
+									break;
+								}
+
+								case 500: {
+									log(res.status, 3, "replaydownloader", "Report");
+									dump({ level: 2, message: res.status });
 									break;
 								}
 
@@ -857,19 +869,27 @@ TREM.Report = {
 
 								switch (res.status) {
 									case 429: {
-										log(res.status, 3, "report_trem", "Report");
+										log(res.status, 3, "report_trem_info", "Report");
 										dump({ level: 2, message: res.status });
 										break;
 									}
 
 									case 404: {
-										log(res.status, 3, "report_trem", "Report");
+										log(res.status, 3, "report_trem_info", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									case 500: {
+										log(res.status, 3, "report_trem_info", "Report");
 										dump({ level: 2, message: res.status });
 										break;
 									}
 
 									default: break;
 								}
+
+								this._setupzoomPredict();
 							}
 						}).catch(err => {
 							console.log(err.message);
@@ -907,8 +927,16 @@ TREM.Report = {
 										break;
 									}
 
+									case 500: {
+										log(res.status, 3, "report_trem", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
 									default: break;
 								}
+
+								this._setupzoomPredict();
 							}
 						}).catch(err => {
 							console.log(err.message);
