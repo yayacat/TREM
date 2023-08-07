@@ -4769,7 +4769,7 @@ ipcMain.once("start", () => {
 
 		setInterval(() => {
 			ipcMain.emit("apikey");
-		}, 3_000);
+		}, 9_000);
 
 		setInterval(() => {
 			if (DATAstamp != 0 && Stamp != DATAstamp) {
