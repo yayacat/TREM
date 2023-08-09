@@ -4814,6 +4814,8 @@ const stopReplay = function() {
 
 	WarnAudio = Date.now() + 3000;
 
+	stationnow = 0;
+
 	// if (setting["p2p.mode"])
 	// 	try {
 	// 		if (service_status.websocket.status)
