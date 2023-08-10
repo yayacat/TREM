@@ -343,7 +343,8 @@ TREM.Report = {
 												result.eew = res2;
 												fs.writeFile(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${gettime}.trem`, JSON.stringify(result), () => {
 													time += 1000;
-													if (!report.download){
+
+													if (!report.download) {
 														progresstemp += (1 / progressStep) * 1;
 														downloader_progress.value = progresstemp;
 														downloader_progress.title = `${Math.round(progresstemp * 10000) / 100}%`;
