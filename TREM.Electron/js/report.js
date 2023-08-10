@@ -121,7 +121,7 @@ TREM.Report = {
 		el.className += ` ${IntensityToClassString(report.data[0]?.areaIntensity)}`;
 		el.querySelector(".report-list-item-location").innerText = report.location;
 		el.querySelector(".report-list-item-id").innerText = TREM.Localization.getString(report.location.startsWith("地震資訊") ? "Report_Title_Local" : (report.earthquakeNo % 1000 ? report.earthquakeNo : "Report_Title_Small"));
-		el.querySelector(".report-list-item-unit-Magnitude").innerHTML = (report.location.startsWith("地震資訊")) ? "M<sub>d</sub>:" : "M<sub>L</sub>:";
+		el.querySelector(".report-list-item-unit-Magnitude").innerText = (report.location.startsWith("地震資訊")) ? "d" : "L";
 		el.querySelector(".report-list-item-Magnitude").innerText = report.magnitudeValue == 0 ? "0.0" : report.magnitudeValue;
 		el.querySelector(".report-list-item-time").innerText = report.originTime.replace(/-/g, "/");
 
@@ -285,6 +285,9 @@ TREM.Report = {
 		}
 	},
 	replaydownloader(id) {
+		if (this.lock) return;
+
+		this.lock = true;
 		const report = this.cache.get(id);
 		console.debug(report);
 
@@ -300,16 +303,16 @@ TREM.Report = {
 
 		if (ReportTag) ReportTag = 0;
 
-		if (this.lock) return;
-
 		if (!report.download) {
-			document.getElementById("report-replay-downloader-text").innerHTML = "下載中...";
+			document.getElementById("report-replay-downloader-text").innerText = "下載中...";
 			this.clock = setInterval(() => {
+				if (report.download) return;
+
 				if (time > _end_time) {
 					clearInterval(this.clock);
 					console.debug("Finish!");
-					document.getElementById("report-replay-downloader-icon").innerHTML = "download_done";
-					document.getElementById("report-replay-downloader-text").innerHTML = "下載完成!";
+					document.getElementById("report-replay-downloader-icon").innerText = "download_done";
+					document.getElementById("report-replay-downloader-text").innerText = "下載完成!";
 					downloader_progress.style.display = "none";
 					report.download = true;
 					this.cache.set(report.identifier, report);
@@ -317,9 +320,6 @@ TREM.Report = {
 					return;
 				}
 
-				if (report.download) return;
-
-				this.lock = true;
 				const result = {
 					rts : {},
 					eew : {
@@ -340,22 +340,10 @@ TREM.Report = {
 										if (res0.ok) {
 											// console.debug(res);
 											res0.json().then(res2 => {
-												// console.debug(res2);
 												result.eew = res2;
-												fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${gettime}.trem`, (err) => {
-													if (!err) {
-														clearInterval(this.clock);
-														console.debug(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${gettime}.trem`);
-														console.debug("Finish!(is found it)");
-														document.getElementById("report-replay-downloader-text").innerHTML = "重複下載!";
-														downloader_progress.style.display = "none";
-														report.download = true;
-														this.cache.set(report.identifier, report);
-														this.lock = false;
-													} else if (err.code == "ENOENT") {
-														fs.writeFile(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${gettime}.trem`, JSON.stringify(result), () => {
-															time += 1000;
-														});
+												fs.writeFile(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${gettime}.trem`, JSON.stringify(result), () => {
+													time += 1000;
+													if (!report.download){
 														progresstemp += (1 / progressStep) * 1;
 														downloader_progress.value = progresstemp;
 														downloader_progress.title = `${Math.round(progresstemp * 10000) / 100}%`;
@@ -432,6 +420,7 @@ TREM.Report = {
 		} else {
 			downloader_progress.style.display = "none";
 			console.debug("Finish!(is download)");
+			this.lock = false;
 		}
 	},
 	replaydownloaderrm(id) {
@@ -440,8 +429,8 @@ TREM.Report = {
 		const time_hold = String(time / 1000);
 
 		fs.rm(path.join(path.join(app.getPath("userData"), "replay_data"), time_hold), { recursive: true }, () => {
-			document.getElementById("report-replay-downloader-icon").innerHTML = "download";
-			document.getElementById("report-replay-downloader-text").innerHTML = "下載";
+			document.getElementById("report-replay-downloader-icon").innerText = "download";
+			document.getElementById("report-replay-downloader-text").innerText = "下載";
 			document.getElementById("downloader_progress").style.display = "none";
 			report.download = false;
 			this.cache.set(report.identifier, report);
@@ -695,7 +684,7 @@ TREM.Report = {
 		}
 
 		document.getElementById("report-overview-intensity-location").innerText = (report.location.startsWith("地震資訊")) ? "" : `${report.data[0].areaName} ${report.data[0].eqStation[0].stationName}`;
-		document.getElementById("report-overview-unit-magnitude").innerHTML = (report.location.startsWith("地震資訊")) ? "M<sub>d</sub>" : "M<sub>L</sub>";
+		document.getElementById("report-overview-unit-magnitude").innerText = (report.location.startsWith("地震資訊")) ? "d" : "L";
 		document.getElementById("report-overview-magnitude").innerText = report.magnitudeValue == 0 ? "0.0" : report.magnitudeValue;
 		document.getElementById("report-overview-depth").innerText = report.depth;
 
@@ -724,21 +713,21 @@ TREM.Report = {
 
 		fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${time_hold}.trem`, (err) => {
 			if (!err) {
-				document.getElementById("report-replay-downloader-icon").innerHTML = "download_done";
-				document.getElementById("report-replay-downloader-text").innerHTML = "已下載!";
+				document.getElementById("report-replay-downloader-icon").innerText = "download_done";
+				document.getElementById("report-replay-downloader-text").innerText = "已下載!";
 				report.download = true;
 				this.cache.set(report.identifier, report);
 				fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${_end_timed}.trem`, (err) => {
 					if (err) {
-						document.getElementById("report-replay-downloader-icon").innerHTML = "download";
-						document.getElementById("report-replay-downloader-text").innerHTML = "下載中...";
+						document.getElementById("report-replay-downloader-icon").innerText = "download";
+						document.getElementById("report-replay-downloader-text").innerText = "下載中...";
 						report.download = false;
 						this.cache.set(report.identifier, report);
 					}
 				});
 			} else {
-				document.getElementById("report-replay-downloader-icon").innerHTML = "download";
-				document.getElementById("report-replay-downloader-text").innerHTML = "下載";
+				document.getElementById("report-replay-downloader-icon").innerText = "download";
+				document.getElementById("report-replay-downloader-text").innerText = "下載";
 				report.download = false;
 				this.cache.set(report.identifier, report);
 			}
