@@ -112,6 +112,7 @@ TREM.Report = {
 				fragment.appendChild(element);
 			}
 
+			document.getElementById("report-detail-header-number").innerText = `共 ${this.reportList.length} 個`;
 			this.reportListElement.appendChild(fragment);
 		}
 	},
@@ -195,6 +196,7 @@ TREM.Report = {
 			.filter(v => this._filterDate ? v.originTime.split(" ")[0] == this._filterDateValue : true)
 			.filter(v => this._filterMonth ? (v.originTime.split(" ")[0].split("/")[0] + "/" + v.originTime.split(" ")[0].split("/")[1]) == this._filterMonthValue : true);
 
+		document.getElementById("report-detail-header-number").innerText = `共 ${this.reportList.length} 個`;
 		this._updateReports(oldlist, this.reportList);
 	},
 	setView(view, reportIdentifier) {
@@ -214,6 +216,7 @@ TREM.Report = {
 				this.loadReports(true);
 				document.getElementById("report-detail-back").classList.add("hide");
 				document.getElementById("report-detail-refresh").classList.remove("hide");
+				document.getElementById("report-detail-header-number").style.display = "";
 				break;
 			}
 
@@ -222,6 +225,7 @@ TREM.Report = {
 				this._setupReport(this.cache.get(reportIdentifier));
 				document.getElementById("report-detail-back").classList.remove("hide");
 				document.getElementById("report-detail-refresh").classList.add("hide");
+				document.getElementById("report-detail-header-number").style.display = "none";
 				break;
 			}
 
@@ -230,6 +234,7 @@ TREM.Report = {
 				this._setupReport(reportIdentifier);
 				document.getElementById("report-detail-back").classList.remove("hide");
 				document.getElementById("report-detail-refresh").classList.add("hide");
+				document.getElementById("report-detail-header-number").style.display = "none";
 				break;
 			}
 
@@ -1111,6 +1116,19 @@ TREM.on("viewChange", (oldView, newView) => {
 	switch (newView) {
 		case "report": {
 			TREM.Report.loadReports();
+
+			if (TREM.Report._filterDateValue == "" && TREM.Report._filterMonthValue == "") {
+				const input = document.getElementById('report-filter-month-value');
+				const today = new Date();
+				const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+				const yyyy = today.getFullYear();
+				input.value = yyyy + '-' + mm;
+				const checkbox = document.getElementById('report-filter-month');
+				checkbox.checked = true;
+				TREM.Report._handleFilter('filterMonthValue', input.value);
+				TREM.Report._handleFilter('filterMonth', true);
+			}
+
 			TREM.Report._focusMap();
 			TREM.Report._setup_api_key_verify();
 			break;
