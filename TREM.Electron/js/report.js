@@ -1037,7 +1037,7 @@ TREM.Report = {
 									className : "epicenterIcon",
 								}),
 								zIndexOffset: 5000,
-							}).bindTooltip(`<div class='report_station_box'><div>報數: 第 ${index0 + 1} 報</div><div>位置: ${trem_eew.location} | ${trem_eew.lat}°N  ${trem_eew.lon} °E</div><div>類型: ${trem_eew.model}</div><div>規模: M ${trem_eew.scale}</div><div>深度: ${trem_eew.depth} km</div><div>預估最大震度: ${IntensityI(trem_eew.max)}</div></div>`, {
+							}).bindTooltip(`<div class="report_station_box"><div>報數: 第 ${index0 + 1} 報</div><div>位置: ${trem_eew.location} | ${trem_eew.lat}°N  ${trem_eew.lon} °E</div><div>類型: ${trem_eew.model}</div><div>規模: M ${trem_eew.scale}</div><div>深度: ${trem_eew.depth} km</div><div>預估最大震度: ${IntensityI(trem_eew.max)}</div></div>`, {
 							offset    : [8, 0],
 							permanent : false,
 							className : "report-cursor-tooltip",
@@ -1118,15 +1118,15 @@ TREM.on("viewChange", (oldView, newView) => {
 			TREM.Report.loadReports();
 
 			if (TREM.Report._filterDateValue == "" && TREM.Report._filterMonthValue == "") {
-				const input = document.getElementById('report-filter-month-value');
+				const input = document.getElementById("report-filter-month-value");
 				const today = new Date();
-				const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+				const mm = String(today.getMonth() + 1).padStart(2, "0");
 				const yyyy = today.getFullYear();
-				input.value = yyyy + '-' + mm;
-				const checkbox = document.getElementById('report-filter-month');
+				input.value = yyyy + "-" + mm;
+				const checkbox = document.getElementById("report-filter-month");
 				checkbox.checked = true;
-				TREM.Report._handleFilter('filterMonthValue', input.value);
-				TREM.Report._handleFilter('filterMonth', true);
+				TREM.Report._handleFilter("filterMonthValue", input.value);
+				TREM.Report._handleFilter("filterMonth", true);
 			}
 
 			TREM.Report._focusMap();
