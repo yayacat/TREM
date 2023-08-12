@@ -1059,7 +1059,7 @@ TREM.Report = {
 					this.report_circle_trem = L.circle([report.epicenterLat, report.epicenterLon], {
 						color     : "grey",
 						fillColor : "transparent",
-						radius    : (res.alert - new Date(report.originTime.replaceAll("/", "-")).getTime()) * 3.5,
+						radius    : this.speed_to_dis((res.alert - new Date(report.originTime.replaceAll("/", "-")).getTime()) / 1000, report.depth),
 						className : "s_wave",
 						weight    : 1,
 					});
@@ -1071,7 +1071,7 @@ TREM.Report = {
 					this.report_circle_cwb = L.circle([report.epicenterLat, report.epicenterLon], {
 						color     : "red",
 						fillColor : "transparent",
-						radius    : (res.eew - new Date(report.originTime.replaceAll("/", "-")).getTime()) * 3.5,
+						radius    : this.speed_to_dis((res.eew - new Date(report.originTime.replaceAll("/", "-")).getTime()) / 1000, report.depth),
 						className : "s_wave",
 						weight    : 1,
 					});
@@ -1083,7 +1083,7 @@ TREM.Report = {
 					this.report_circle_rf = L.circle([report.epicenterLat, report.epicenterLon], {
 						color     : "black",
 						fillColor : "transparent",
-						radius    : (res.note.rf - new Date(report.originTime.replaceAll("/", "-")).getTime()) * 3.5,
+						radius    : this.speed_to_dis((res.note.rf - new Date(report.originTime.replaceAll("/", "-")).getTime()) / 1000, report.depth),
 						className : "s_wave",
 						weight    : 1,
 					});
@@ -1093,6 +1093,11 @@ TREM.Report = {
 				this._setupzoomPredict();
 			}
 		// console.log(this.report_trem_station);
+	},
+	speed_to_dis(sec, depth) {
+		for (let i = 1; i <= 1000; i++)
+			if (_speed(depth, i).Stime > sec) return i * 1000;
+		return 0;
 	},
 	_setupzoomPredict() {
 		if (TREM.Detector.webgl || TREM.MapRenderingEngine == "mapbox-gl") {
@@ -1163,7 +1168,7 @@ TREM.on("viewChange", (oldView, newView) => {
 			TREM.Report._focusMap();
 			TREM.Report._setup_api_key_verify();
 
-			if (TREM.Report._filterDateValue == "" && TREM.Report._filterMonthValue == "") {
+			if (TREM.Report.view != "report-overview" && TREM.Report._filterDateValue == "" && TREM.Report._filterMonthValue == "") {
 				const input = document.getElementById("report-filter-month-value");
 				const today = new Date();
 				const mm = String(today.getMonth() + 1).padStart(2, "0");

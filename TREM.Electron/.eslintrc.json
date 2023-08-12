@@ -35,7 +35,8 @@
 		"TimerDesynced": "writable",
 		"ReportTag": "writable",
 		"toggleNav": "readonly",
-		"TREM": "readonly"
+		"TREM": "readonly",
+		"_speed": "writable"
 	},
 	"rules": {
 		"array-bracket-newline": ["warn", { "multiline": true, "minItems": 3 }],
