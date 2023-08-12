@@ -145,6 +145,7 @@ TREM.Detector = {
 
 TREM.MapIntensity = {
 	isTriggered : false,
+	trem        : false,
 	alertTime   : 0,
 	MaxI        : 0,
 	intensities : new Map(),
@@ -168,6 +169,7 @@ TREM.MapIntensity = {
 					PLoc[towncode] = palertEntry.intensity;
 
 					if (palertEntry.intensity > this.MaxI) {
+						this.trem = false;
 						this.MaxI = palertEntry.intensity;
 						Report = rawPalertData.time;
 						ipcMain.emit("ReportGET");
@@ -2691,8 +2693,8 @@ function PGAMain() {
 					console.debug(ans_eew.eew[i]);
 					ans_eew.eew[i].replay_timestamp = ans_eew.eew[i].timestamp;
 					ans_eew.eew[i].replay_time = ans_eew.eew[i].time;
-					ans_eew.eew[i].time = Now().getTime() - (ans_eew.eew[i].timestamp - ans_eew.eew[i].time);
-					ans_eew.eew[i].timestamp = Now().getTime();
+					ans_eew.eew[i].time = NOW().getTime() - (ans_eew.eew[i].timestamp - ans_eew.eew[i].time);
+					ans_eew.eew[i].timestamp = NOW().getTime();
 					FCMdata(ans_eew.eew[i], "cache");
 				}
 			} catch (err) {
@@ -2831,8 +2833,8 @@ function PGAMainbkup() {
 					console.debug(ans_eew.eew[i]);
 					ans_eew.eew[i].replay_timestamp = ans_eew.eew[i].timestamp;
 					ans_eew.eew[i].replay_time = ans_eew.eew[i].time;
-					ans_eew.eew[i].time = Now().getTime() - (ans_eew.eew[i].timestamp - ans_eew.eew[i].time);
-					ans_eew.eew[i].timestamp = Now().getTime();
+					ans_eew.eew[i].time = NOW().getTime() - (ans_eew.eew[i].timestamp - ans_eew.eew[i].time);
+					ans_eew.eew[i].timestamp = NOW().getTime();
 					FCMdata(ans_eew.eew[i], "cache");
 				}
 			} catch (err) {
@@ -3243,6 +3245,10 @@ function handler(Json) {
 					}
 
 				detected_list[station[keys[index]].PGA].time = NOW().getTime();
+				TREM.MapIntensity.trem = true;
+				TREM.MapIntensity.MaxI = intensity;
+				Report = NOW().getTime();
+				ipcMain.emit("ReportGET");
 			}
 		} else if (Object.keys(detection_list).length) {
 			for (let i = 0; i < Object.keys(detection_list).length; i++) {
@@ -3323,6 +3329,10 @@ function handler(Json) {
 
 				if (!win.isFocused()) win.flashFrame(true);
 				intensitytag = max_intensity;
+				TREM.MapIntensity.trem = false;
+				TREM.MapIntensity.MaxI = intensitytag;
+				Report = NOW().getTime();
+				ipcMain.emit("ReportGET");
 			}
 		} else if (NA999 != "Y" && NA0999 != "Y" && intensitytest > -1 && amount < 999) {
 			if (uuid.split("-")[2] == "7735548")
@@ -3379,6 +3389,10 @@ function handler(Json) {
 
 					level_list[uuid] = current_data.v;
 					target_count++;
+					TREM.MapIntensity.trem = true;
+					TREM.MapIntensity.MaxI = intensitytest;
+					Report = NOW().getTime();
+					ipcMain.emit("ReportGET");
 				}
 
 			intensitytag = -1;
@@ -4407,8 +4421,15 @@ function addReport(report, prepend = false, index = 0) {
 		report_detail_container.className = "report-detail-container";
 
 		const report_PAlert = document.createElement("span");
-		report_PAlert.className = "report-PAlert";
-		report_PAlert.innerText = "來源 P-Alert";
+
+		if (TREM.MapIntensity.trem) {
+			report_PAlert.className = "report-PAlert";
+			report_PAlert.innerText = "來源 TREM";
+		} else {
+			report_PAlert.className = "report-PAlert";
+			report_PAlert.innerText = "來源 P-Alert";
+		}
+
 		const report_location = document.createElement("span");
 		report_location.className = "report-location";
 		report_location.innerText = "震源 調查中";
@@ -5806,7 +5827,9 @@ TREM.Earthquake.on("eew", (data) => {
 	}
 
 	if (setting["dev.mode"])
-		if (data.type != "trem-eew" || data.type != "eew-cwb" || data.type != "eew-fjdzj") {
+		if (data.type == "trem-eew" || data.type == "eew-cwb" || data.type == "eew-fjdzj") {
+			console.debug(MaxIntensity);
+		} else {
 			const d = data.depth / 2;
 			const int = TREM.Utils.PGAToIntensity(
 				TREM.Utils.pga(

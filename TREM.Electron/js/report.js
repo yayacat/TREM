@@ -14,6 +14,9 @@ TREM.Report = {
 	report_trem_data    : [],
 	report_station      : {},
 	epicenterIcon       : null,
+	report_circle_trem  : null,
+	report_circle_cwb   : null,
+	report_circle_rf    : null,
 
 	/**
 	 * @type {maplibregl.Marker[]}
@@ -214,6 +217,8 @@ TREM.Report = {
 			case "report-list": {
 				this._clearMap(true);
 				this.loadReports(true);
+				this._focusMap();
+				this._setup_api_key_verify();
 				document.getElementById("report-detail-back").classList.add("hide");
 				document.getElementById("report-detail-refresh").classList.remove("hide");
 				document.getElementById("report-detail-header-number").style.display = "";
@@ -463,6 +468,8 @@ TREM.Report = {
 	refreshList() {
 		this.unloadReports();
 		this.loadReports();
+		this._focusMap();
+		this._setup_api_key_verify();
 	},
 	copyReport(id) {
 		const { clipboard, shell } = require("electron");
@@ -1047,6 +1054,42 @@ TREM.Report = {
 						this._setupzoomPredict();
 					}
 
+				if (res.alert) {
+					if (this.report_circle_trem) this.report_circle_trem.remove();
+					this.report_circle_trem = L.circle([report.epicenterLat, report.epicenterLon], {
+						color     : "grey",
+						fillColor : "transparent",
+						radius    : (res.alert - new Date(report.originTime.replaceAll("/", "-")).getTime()) * 3.5,
+						className : "s_wave",
+						weight    : 1,
+					});
+					this._markers.push(this.report_circle_trem);
+				}
+
+				if (res.eew) {
+					if (this.report_circle_cwb) this.report_circle_cwb.remove();
+					this.report_circle_cwb = L.circle([report.epicenterLat, report.epicenterLon], {
+						color     : "red",
+						fillColor : "transparent",
+						radius    : (res.eew - new Date(report.originTime.replaceAll("/", "-")).getTime()) * 3.5,
+						className : "s_wave",
+						weight    : 1,
+					});
+					this._markers.push(this.report_circle_cwb);
+				}
+
+				if (res.note?.rf) {
+					if (this.report_circle_rf) this.report_circle_rf.remove();
+					this.report_circle_rf = L.circle([report.epicenterLat, report.epicenterLon], {
+						color     : "black",
+						fillColor : "transparent",
+						radius    : (res.note.rf - new Date(report.originTime.replaceAll("/", "-")).getTime()) * 3.5,
+						className : "s_wave",
+						weight    : 1,
+					});
+					this._markers.push(this.report_circle_rf);
+				}
+
 				this._setupzoomPredict();
 			}
 		// console.log(this.report_trem_station);
@@ -1115,7 +1158,10 @@ TREM.on("viewChange", (oldView, newView) => {
 
 	switch (newView) {
 		case "report": {
+			TREM.Report.unloadReports();
 			TREM.Report.loadReports();
+			TREM.Report._focusMap();
+			TREM.Report._setup_api_key_verify();
 
 			if (TREM.Report._filterDateValue == "" && TREM.Report._filterMonthValue == "") {
 				const input = document.getElementById("report-filter-month-value");
@@ -1129,8 +1175,6 @@ TREM.on("viewChange", (oldView, newView) => {
 				TREM.Report._handleFilter("filterMonth", true);
 			}
 
-			TREM.Report._focusMap();
-			TREM.Report._setup_api_key_verify();
 			break;
 		}
 
