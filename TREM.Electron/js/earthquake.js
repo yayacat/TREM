@@ -45,7 +45,7 @@ const speecd_use = setting["audio.tts"] ?? false;
 // #region 變數
 const posturl = "https://exptech.com.tw/api/v1/trem/";
 const geturl = "https://exptech.com.tw/api/v2/trem/rts?time=";
-const getapiurl = "https://api.exptech.com.tw/api/v1/trem/rts";
+const getapiequrl = "https://exptech.com.tw/api/v1/earthquake/info?time=";
 const MapData = {};
 const Timers = {};
 let Stamp = 0;
@@ -2678,7 +2678,9 @@ function PGAMain() {
 
 	if (Timers.rts_clock) clearInterval(Timers.rts_clock);
 
-	if (replayD)
+	if (Timers.eew_clock) clearInterval(Timers.eew_clock);
+
+	if (replayD) {
 		Timers.rts_clock = setInterval(() => {
 			try {
 				const ReplayTimed = replayTemp += 1000;
@@ -2703,7 +2705,64 @@ function PGAMain() {
 				PGAMainbkup();
 			}
 		}, 1_000);
-	else
+	} else {
+		Timers.eew_clock = setInterval(() => {
+			const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
+
+			if (ReplayTime != 0 && TREM.Report.replayHttp) {
+				const _replay_time = Math.round(ReplayTime / 1000);
+				const url1 = getapiequrl + String(_replay_time) + "&type=all";
+				const controller1 = new AbortController();
+				setTimeout(() => {
+					controller1.abort();
+				}, 2500);
+				fetch(url1, { signal: controller1.signal }).then((res2) => {
+					if (res2.ok) {
+						res2.json().then(res3 => {
+							if (controller1.signal.aborted || res3 == undefined) {
+								console.debug("api_eq_undefined");
+							} else {
+								for (let i = 0; i < res3.eew.length; i++) {
+									res3.eew[i].replay_timestamp = res3.eew[i].timestamp;
+									res3.eew[i].replay_time = res3.eew[i].time;
+									res3.eew[i].time = NOW().getTime() - (res3.eew[i].timestamp - res3.eew[i].time);
+									res3.eew[i].timestamp = NOW().getTime();
+									FCMdata(res3.eew[i], "http");
+								}
+							}
+						});
+					} else {
+						console.error(res2);
+
+						switch (res2.status) {
+							case 429: {
+								Ping = `❌ ${res2.status}`;
+								break;
+							}
+
+							case 404: {
+								Ping = `❌ ${res2.status}`;
+								break;
+							}
+
+							case 500: {
+								Ping = `❌ ${res2.status}`;
+								break;
+							}
+
+							default: {
+								Ping = `❌ ${res2.status}`;
+								break;
+							}
+						}
+					}
+				})
+				.catch((err) => {
+					log(err, 3, "PGATimer", "PGAMain");
+					dump({ level: 2, message: err });
+				});
+			}
+		}, 1_000);
 		Timers.rts_clock = setInterval(() => {
 			setTimeout(() => {
 				try {
@@ -2810,6 +2869,7 @@ function PGAMain() {
 				}
 			}, (NOW().getMilliseconds() > 500) ? 1000 - NOW().getMilliseconds() : 500 - NOW().getMilliseconds());
 		}, 500);
+	}
 }
 
 function PGAMainbkup() {
@@ -2818,7 +2878,9 @@ function PGAMainbkup() {
 
 	if (Timers.rts_clock) clearInterval(Timers.rts_clock);
 
-	if (replayD)
+	if (Timers.eew_clock) clearInterval(Timers.eew_clock);
+
+	if (replayD) {
 		Timers.rts_clock = setInterval(() => {
 			try {
 				const ReplayTimed = replayTemp += 1000;
@@ -2843,7 +2905,67 @@ function PGAMainbkup() {
 				PGAMain();
 			}
 		}, 1_000);
-	else
+	} else {
+		Timers.eew_clock = setInterval(() => {
+			const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
+
+			if (ReplayTime != 0 && TREM.Report.replayHttp) {
+				const _replay_time = Math.round(ReplayTime / 1000);
+				const url1 = getapiequrl + String(_replay_time) + "&type=all";
+				const controller1 = new AbortController();
+				setTimeout(() => {
+					controller1.abort();
+				}, 2500);
+				axios({
+					method : "get",
+					url    : url1,
+				}).then((res2) => {
+					if (res2.ok) {
+						res2.json().then(res3 => {
+							if (controller1.signal.aborted || res3 == undefined) {
+								console.debug("bkup_api_eq_undefined");
+							} else {
+								for (let i = 0; i < res3.eew.length; i++) {
+									res3.eew[i].replay_timestamp = res3.eew[i].timestamp;
+									res3.eew[i].replay_time = res3.eew[i].time;
+									res3.eew[i].time = NOW().getTime() - (res3.eew[i].timestamp - res3.eew[i].time);
+									res3.eew[i].timestamp = NOW().getTime();
+									FCMdata(res3.eew[i], "http");
+								}
+							}
+						});
+					} else {
+						console.error(res2);
+
+						switch (res2.status) {
+							case 429: {
+								Ping = `❌ ${res2.status}`;
+								break;
+							}
+
+							case 404: {
+								Ping = `❌ ${res2.status}`;
+								break;
+							}
+
+							case 500: {
+								Ping = `❌ ${res2.status}`;
+								break;
+							}
+
+							default: {
+								Ping = `❌ ${res2.status}`;
+								break;
+							}
+						}
+					}
+				})
+				.catch((err) => {
+					log(err, 3, "PGATimer", "PGAMainbkup");
+					dump({ level: 2, message: err });
+				});
+			}
+		}, 1_000);
 		Timers.rts_clock = setInterval(() => {
 			setTimeout(() => {
 				try {
@@ -2941,6 +3063,7 @@ function PGAMainbkup() {
 				}
 			}, (NOW().getMilliseconds() > 500) ? 1000 - NOW().getMilliseconds() : 500 - NOW().getMilliseconds());
 		}, 500);
+	}
 }
 
 function handler(Json) {
@@ -4569,6 +4692,7 @@ function addReport(report, prepend = false, index = 0) {
 				list = list.concat(report.trem);
 				ipcRenderer.send("testEEW", list);
 			} else {
+				TREM.Report.replayHttp = true;
 				const oldtime = new Date(report.originTime.replace(/-/g, "/")).getTime();
 				ipcRenderer.send("testoldtimeEEW", oldtime);
 			}
@@ -4830,6 +4954,8 @@ const stopReplay = function() {
 		replaydir = 0;
 		replayD = false;
 		clearInterval(Timers.rts_clock);
+		clearInterval(Timers.eew_clock);
+		TREM.Report.replayHttp = false;
 		PGAMain();
 		ipcMain.emit("ReportGET");
 	}

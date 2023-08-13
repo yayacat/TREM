@@ -17,6 +17,7 @@ TREM.Report = {
 	report_circle_trem  : null,
 	report_circle_cwb   : null,
 	report_circle_rf    : null,
+	replayHttp          : false,
 
 	/**
 	 * @type {maplibregl.Marker[]}
@@ -290,6 +291,7 @@ TREM.Report = {
 			list = list.concat(report.trem);
 			ipcRenderer.send("testEEW", list);
 		} else {
+			this.replayHttp = true;
 			const oldtime = new Date(report.originTime.replace(/-/g, "/")).getTime();
 			ipcRenderer.send("testoldtimeEEW", oldtime);
 		}
