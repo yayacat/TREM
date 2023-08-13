@@ -2719,9 +2719,9 @@ function PGAMain() {
 				fetch(url1, { signal: controller1.signal }).then((res2) => {
 					if (res2.ok) {
 						res2.json().then(res3 => {
-							if (controller1.signal.aborted || res3 == undefined) {
+							if (controller1.signal.aborted || res3 == undefined)
 								console.debug("api_eq_undefined");
-							} else {
+							else
 								for (let i = 0; i < res3.eew.length; i++) {
 									res3.eew[i].replay_timestamp = res3.eew[i].timestamp;
 									res3.eew[i].replay_time = res3.eew[i].time;
@@ -2729,7 +2729,6 @@ function PGAMain() {
 									res3.eew[i].timestamp = NOW().getTime();
 									FCMdata(res3.eew[i], "http");
 								}
-							}
 						});
 					} else {
 						console.error(res2);
@@ -2756,8 +2755,7 @@ function PGAMain() {
 							}
 						}
 					}
-				})
-				.catch((err) => {
+				}).catch((err) => {
 					log(err, 3, "PGATimer", "PGAMain");
 					dump({ level: 2, message: err });
 				});
@@ -2922,9 +2920,9 @@ function PGAMainbkup() {
 				}).then((res2) => {
 					if (res2.ok) {
 						res2.json().then(res3 => {
-							if (controller1.signal.aborted || res3 == undefined) {
+							if (controller1.signal.aborted || res3 == undefined)
 								console.debug("bkup_api_eq_undefined");
-							} else {
+							else
 								for (let i = 0; i < res3.eew.length; i++) {
 									res3.eew[i].replay_timestamp = res3.eew[i].timestamp;
 									res3.eew[i].replay_time = res3.eew[i].time;
@@ -2932,7 +2930,6 @@ function PGAMainbkup() {
 									res3.eew[i].timestamp = NOW().getTime();
 									FCMdata(res3.eew[i], "http");
 								}
-							}
 						});
 					} else {
 						console.error(res2);
@@ -2959,8 +2956,7 @@ function PGAMainbkup() {
 							}
 						}
 					}
-				})
-				.catch((err) => {
+				}).catch((err) => {
 					log(err, 3, "PGATimer", "PGAMainbkup");
 					dump({ level: 2, message: err });
 				});
