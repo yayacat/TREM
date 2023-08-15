@@ -438,9 +438,6 @@ function SelectSave(id) {
 				console.debug("Voices changed", TREM.voices[key]);
 			}
 
-	if (id == "map.engine")
-		$("#MEReloadButton").fadeIn(100);
-
 	if (id == "update.time")
 		$("#UDReloadButton").fadeIn(100);
 

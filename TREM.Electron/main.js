@@ -610,12 +610,6 @@ ipcMain.on("config:value", (event, key, value) => {
 			break;
 		}
 
-		case "map.engine": {
-			MainWindow.reload();
-			IntensityWindow.reload();
-			break;
-		}
-
 		case "audio.tts": {
 			MainWindow.reload();
 			break;

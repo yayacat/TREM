@@ -1,9 +1,5 @@
 const Constants = Object.freeze({
 	Default_Configurations: {
-		"map.engine": {
-			type  : "select",
-			value : "leaflet",
-		},
 		"map.jp": {
 			type  : "toggle",
 			value : false,
