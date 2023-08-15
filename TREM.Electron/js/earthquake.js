@@ -5186,23 +5186,8 @@ TREM.Earthquake.on("tsunami", (data) => {
 	if (data.cancel) {
 		if (speecd_use) TREM.speech.speak({ text: "海嘯警報已解除" });
 
-		if (TSUNAMI.E)
-			TSUNAMI.E.remove();
-
-		if (TSUNAMI.EN)
-			TSUNAMI.EN.remove();
-
-		if (TSUNAMI.ES)
-			TSUNAMI.ES.remove();
-
-		if (TSUNAMI.N)
-			TSUNAMI.N.remove();
-
-		if (TSUNAMI.WS)
-			TSUNAMI.WS.remove();
-
-		if (TSUNAMI.W)
-			TSUNAMI.W.remove();
+		if (TSUNAMI.ALL)
+			TSUNAMI.ALL.remove();
 
 		if (TSUNAMI.warnIcon)
 			TSUNAMI.warnIcon.remove();
@@ -5236,6 +5221,7 @@ TREM.Earthquake.on("tsunami", (data) => {
 		// } else {
 		// 	TSUNAMI.warnIcon.setLatLng([+data.lat, +data.lon]);
 		// }
+		const tsunami_level = {};
 
 		for (let i = 0; i < data.area.length; i++) {
 			if (!data.area[i].arrivalTime) continue;
@@ -5250,247 +5236,29 @@ TREM.Earthquake.on("tsunami", (data) => {
 				icon   : "../TREM.ico",
 				silent : win.isFocused(),
 			});
-
-			if (data.area[i].areaName == "東北沿海地區")
-				if (!TSUNAMI.EN) {
-					TSUNAMI.EN = L.geoJson.vt(MapData.EN, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.EN._container, "tsunami");
-				} else {
-					TSUNAMI.EN.remove();
-					TSUNAMI.EN = L.geoJson.vt(MapData.EN, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.EN._container, "tsunami");
-				}
-
-			else if (data.area[i].areaName == "東部沿海地區")
-				if (!TSUNAMI.E) {
-					TSUNAMI.E = L.geoJson.vt(MapData.E, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.E._container, "tsunami");
-				} else {
-					TSUNAMI.E.remove();
-					TSUNAMI.E = L.geoJson.vt(MapData.E, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.E._container, "tsunami");
-				}
-
-			else if (data.area[i].areaName == "東南沿海地區")
-				if (!TSUNAMI.ES) {
-					TSUNAMI.ES = L.geoJson.vt(MapData.ES, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.ES._container, "tsunami");
-				} else {
-					TSUNAMI.ES.remove();
-					TSUNAMI.ES = L.geoJson.vt(MapData.ES, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.ES._container, "tsunami");
-				}
-
-			else if (data.area[i].areaName == "北部沿海地區")
-				if (!TSUNAMI.N) {
-					TSUNAMI.N = L.geoJson.vt(MapData.N, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.N._container, "tsunami");
-				} else {
-					TSUNAMI.N.remove();
-					TSUNAMI.N = L.geoJson.vt(MapData.N, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.N._container, "tsunami");
-				}
-
-			else if (data.area[i].areaName == "海峽沿海地區")
-				if (!TSUNAMI.W) {
-					TSUNAMI.W = L.geoJson.vt(MapData.W, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.W._container, "tsunami");
-				} else {
-					TSUNAMI.W.remove();
-					TSUNAMI.W = L.geoJson.vt(MapData.W, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.W._container, "tsunami");
-				}
-
-			else if (data.area[i].areaName == "西南沿海地區")
-				if (!TSUNAMI.WS) {
-					TSUNAMI.WS = L.geoJson.vt(MapData.WS, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.WS._container, "tsunami");
-				} else {
-					TSUNAMI.WS.remove();
-					TSUNAMI.WS = L.geoJson.vt(MapData.WS, {
-						minZoom   : 4,
-						maxZoom   : 12,
-						tolerance : 20,
-						buffer    : 256,
-						debug     : 0,
-						zIndex    : 5,
-						style     : (args) => ({
-							color       : tsunami_color(data.area[i].waveHeight),
-							weight      : 10,
-							opacity     : 1,
-							fillColor   : "transparent",
-							fillOpacity : 1,
-							fill        : false,
-						}),
-					}).addTo(Maps.main);
-					L.DomUtil.addClass(TSUNAMI.WS._container, "tsunami");
-				}
+			tsunami_level[data.area[i].areaName] = tsunami_color(data.area[i].waveHeight);
 		}
+
+		TSUNAMI.ALL = L.geoJson.vt(MapData.tw_tsunami_area, {
+			minZoom   : 4,
+			maxZoom   : 12,
+			tolerance : 20,
+			buffer    : 256,
+			debug     : 0,
+			zIndex    : 5,
+			style     : (args) => {
+				if (args.properties) args = args.properties;
+				return {
+					color       : tsunami_level[args.AREANAME],
+					weight      : 3,
+					opacity     : 1,
+					fillColor   : "transparent",
+					fillOpacity : 0,
+					fill        : false,
+				};
+			},
+		}).addTo(Maps.main);
+		L.DomUtil.addClass(TSUNAMI.ALL._container, "tsunami");
 	}
 });
 
