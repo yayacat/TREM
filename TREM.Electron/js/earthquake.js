@@ -5211,16 +5211,16 @@ TREM.Earthquake.on("tsunami", (data) => {
 			Mapsmainfocus();
 		}
 
-		// if (!TSUNAMI.warnIcon) {
-		// 	const warnIcon = L.icon({
-		// 		iconUrl   : "../image/warn.png",
-		// 		iconSize  : [30, 30],
-		// 		className : "tsunami",
-		// 	});
-		// 	TSUNAMI.warnIcon = L.marker([+data.lat, +data.lon], { icon: warnIcon }).addTo(Maps.main);
-		// } else {
-		// 	TSUNAMI.warnIcon.setLatLng([+data.lat, +data.lon]);
-		// }
+		if (!TSUNAMI.warnIcon) {
+			const warnIcon = L.icon({
+				iconUrl   : "../image/warn.png",
+				iconSize  : [30, 30],
+				className : "tsunami",
+			});
+			TSUNAMI.warnIcon = L.marker([+data.lat, +data.lon], { icon: warnIcon }).addTo(Maps.main);
+		} else {
+			TSUNAMI.warnIcon.setLatLng([+data.lat, +data.lon]);
+		}
 		const tsunami_level = {};
 
 		for (let i = 0; i < data.area.length; i++) {
@@ -5242,7 +5242,7 @@ TREM.Earthquake.on("tsunami", (data) => {
 		TSUNAMI.ALL = L.geoJson.vt(MapData.tw_tsunami_area, {
 			minZoom   : 4,
 			maxZoom   : 12,
-			tolerance : 20,
+			tolerance : 30,
 			buffer    : 256,
 			debug     : 0,
 			zIndex    : 5,
@@ -5251,10 +5251,8 @@ TREM.Earthquake.on("tsunami", (data) => {
 				return {
 					color       : tsunami_level[args.AREANAME],
 					weight      : 3,
-					opacity     : 1,
 					fillColor   : "transparent",
 					fillOpacity : 0,
-					fill        : false,
 				};
 			},
 		}).addTo(Maps.main);
