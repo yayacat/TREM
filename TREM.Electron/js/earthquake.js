@@ -1009,21 +1009,17 @@ async function init() {
 
 				if (setting["p2p.mode"]) {
 					try {
-						if (!service_status.websocket.status) Warn += "4";
-
-						if (!service_status.p2p.status) Warn += "5";
+						if (!info.server.length) Warn += "5";
 					} catch (e) {
-						Warn += "4";
 						Warn += "5";
 					}
 				} else {
-					Warn += "4";
 					Warn += "5";
 				}
 
 				Warn = ((Warn == "") ? "" : ` | 📛 ${Warn}`);
 
-				if (Warn == "") Warn = ` | ⬆: ${service_status.p2p.upstream} ⬇: ${service_status.p2p.downstream}`;
+				if (Warn == "") Warn = ` | ⬆: ${info.in.length} ⬇: ${info.out.length}`;
 
 				if (type_Unit == "http") GetDataState += "🟩 Http";
 

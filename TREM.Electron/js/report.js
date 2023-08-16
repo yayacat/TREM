@@ -871,6 +871,52 @@ TREM.Report = {
 							dump({ level: 2, message: err });
 							this._setupzoomPredict();
 						});
+				else if (!this.report_trem_data[report.trem[0]].trem || !this.report_trem_data[report.trem[0]].eew || !this.report_trem_data[report.trem[0]].note?.rf)
+					fetch(`https://exptech.com.tw/api/v1/file?path=/trem_report/${report.trem[0]}.json`)
+						.then((res) => {
+							if (res.ok) {
+								console.debug(res);
+
+								res.json().then(res1 => {
+									console.debug(res1);
+									this._report_trem_data[report.trem[0]] = res1;
+									this.report_trem_data[report.trem[0]] = this._report_trem_data[report.trem[0]];
+									storage.setItem("report_trem_data", this._report_trem_data);
+									this._setuptremmarker(report);
+								});
+							} else {
+								console.error(res);
+
+								switch (res.status) {
+									case 429: {
+										log(res.status, 3, "report_trem", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									case 404: {
+										log(res.status, 3, "report_trem", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									case 500: {
+										log(res.status, 3, "report_trem", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									default: break;
+								}
+
+								this._setupzoomPredict();
+							}
+						}).catch(err => {
+							console.log(err.message);
+							log(err, 3, "report_trem", "Report");
+							dump({ level: 2, message: err });
+							this._setupzoomPredict();
+						});
 				else
 					this._setuptremmarker(report);
 			} else {
