@@ -1,7 +1,6 @@
 const { ipcRenderer } = require("electron");
 const EventEmitter = require("node:events");
 const TREM = new EventEmitter();
-const event = new EventEmitter();
 
 document.addEventListener("keydown", (event) => {
 	if (event.key == "F11")

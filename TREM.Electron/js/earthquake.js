@@ -1007,15 +1007,14 @@ async function init() {
 
 				if (!FCM) Warn += "3";
 
-				if (setting["p2p.mode"]) {
+				if (setting["p2p.mode"])
 					try {
 						if (!info.server.length) Warn += "5";
 					} catch (e) {
 						Warn += "5";
 					}
-				} else {
+				else
 					Warn += "5";
-				}
 
 				Warn = ((Warn == "") ? "" : ` | 📛 ${Warn}`);
 
