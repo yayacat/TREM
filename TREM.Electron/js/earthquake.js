@@ -3783,6 +3783,11 @@ ipcMain.on("report-Notification", (event, report) => {
 							value  : (report.data.length != 0) ? report.data[0].areaName : "",
 							inline : false,
 						},
+						{
+							name   : "地圖",
+							value  : "https://www.google.com/maps/search/?api=1&query=" + report.epicenterLat + "," + report.epicenterLon,
+							inline : true,
+						},
 					],
 					color: report.location.startsWith("地震資訊") ? 9807270 : report.earthquakeNo % 1000 ? 15158332 : 3066993,
 				},
