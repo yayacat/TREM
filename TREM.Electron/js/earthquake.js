@@ -4451,6 +4451,7 @@ TREM.Earthquake.on("eew", (data) => {
 		epicenterIconTW : null,
 	};
 	else if (EarthquakeList[data.id].number == data.number) return;
+	else if (EarthquakeList[data.id].number > data.number) return;
 
 	EarthquakeList[data.id].epicenter = [+data.lon, +data.lat];
 	EarthquakeList[data.id].Time = data.time;
