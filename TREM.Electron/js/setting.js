@@ -1546,6 +1546,121 @@ const stepUnlockRange = (e) => {
 		$("input[type=range]")[0].step = 0.01;
 };
 
+ipcMain.on("p2p", (event, data, server_ips) => {
+	// console.log(data);
+	// console.log(server_ips);
+	const p2p_server = document.getElementById("p2p_server");
+	const p2p_server_num = document.getElementById("p2p_server_num");
+	const p2p_in = document.getElementById("p2p_in");
+	const p2p_in_num = document.getElementById("p2p_in_num");
+	const p2p_out = document.getElementById("p2p_out");
+	const p2p_out_num = document.getElementById("p2p_out_num");
+	p2p_server.innerText = "";
+	p2p_server_num.innerText = "";
+	p2p_in.innerText = "";
+	p2p_in_num.innerText = "";
+	p2p_out.innerText = "";
+	p2p_out_num.innerText = "";
+	p2p_server.style.width = "75%";
+	p2p_in.style.width = "75%";
+	p2p_out.style.width = "75%";
+
+	for (let i = 0; i < data.server.length; i++) {
+		// console.log(data.server[i]);
+		const p2p_server_list = document.createElement("span");
+		p2p_server_list.style.display = "flex";
+		p2p_server_list.style.justifycontent = "flex-end";
+		p2p_server_list.style.flexWrap = "wrap";
+		p2p_server_list.style.color = "white";
+		p2p_server_list.style.textAlign = "right";
+		let p2p_server_time = 0;
+		let p2p_server_name = "";
+
+		for (let index = 0, keys = Object.keys(data.time.server), n = keys.length; index < n; index++)
+			if (data.server[i] == keys[index])
+				p2p_server_time = data.time.server[keys[index]];
+
+		for (let index = 0, keys = Object.keys(server_ips), n = keys.length; index < n; index++) {
+			const server_ip = data.server[i].split(":");
+
+			if (server_ip[0] == server_ips[keys[index]]) {
+				const server_url = keys[index].split(".");
+				p2p_server_name = server_url[0];
+			}
+		}
+
+		const now = new Date(p2p_server_time);
+		const Now = now.getFullYear()
+			+ "-" + (now.getMonth() + 1)
+			+ "-" + now.getDate()
+			+ " " + now.getHours()
+			+ ":" + now.getMinutes()
+			+ ":" + now.getSeconds();
+		p2p_server_list.innerText = `${p2p_server_name} (最後連接時間 : ${Now})`;
+		p2p_server.append(p2p_server_list);
+	}
+
+	const p2p_server_num_span = document.createElement("span");
+	p2p_server_num_span.innerText = `P2P伺服器在線數 : ${data.server.length}`;
+	p2p_server_num.append(p2p_server_num_span);
+
+	for (let i = 0; i < data.in.length; i++) {
+		// console.log(data.in[i]);
+		const p2p_in_list = document.createElement("span");
+		p2p_in_list.style.display = "flex";
+		p2p_in_list.style.flexWrap = "wrap";
+		p2p_in_list.style.color = "white";
+		p2p_in_list.style.textAlign = "right";
+		let p2p_in_time = 0;
+
+		for (let index = 0, keys = Object.keys(data.time.in), n = keys.length; index < n; index++)
+			if (data.in[i] == keys[index])
+				p2p_in_time = data.time.in[keys[index]];
+
+		const now = new Date(p2p_in_time);
+		const Now = now.getFullYear()
+			+ "-" + (now.getMonth() + 1)
+			+ "-" + now.getDate()
+			+ " " + now.getHours()
+			+ ":" + now.getMinutes()
+			+ ":" + now.getSeconds();
+		p2p_in_list.innerText = `${data.in[i]} (最後連接時間 : ${Now})`;
+		p2p_in.append(p2p_in_list);
+	}
+
+	const p2p_in_num_span = document.createElement("span");
+	p2p_in_num_span.innerText = `P2P接收連接數 : ${data.in.length}`;
+	p2p_in_num.append(p2p_in_num_span);
+
+	for (let i = 0; i < data.out.length; i++) {
+		// console.log(data.out[i]);
+		const p2p_out_list = document.createElement("span");
+		p2p_out_list.style.display = "flex";
+		p2p_out_list.style.flexWrap = "wrap";
+		p2p_out_list.style.color = "white";
+		p2p_out_list.style.textAlign = "right";
+		let p2p_out_time = 0;
+
+		for (let index = 0, keys = Object.keys(data.time.out), n = keys.length; index < n; index++)
+			if (data.out[i] == keys[index])
+				p2p_out_time = data.time.out[keys[index]];
+
+		const now = new Date(p2p_out_time);
+		const Now = now.getFullYear()
+			+ "-" + (now.getMonth() + 1)
+			+ "-" + now.getDate()
+			+ " " + now.getHours()
+			+ ":" + now.getMinutes()
+			+ ":" + now.getSeconds();
+		p2p_out_list.innerText = `${data.out[i]} (最後連接時間 : ${Now})`;
+		p2p_out.append(p2p_out_list);
+	}
+
+	const p2p_out_num_span = document.createElement("span");
+	p2p_out_num_span.innerText = `P2P發送連接數 : ${data.out.length}`;
+	p2p_out_num.append(p2p_out_num_span);
+});
+
 /*
 // register the handler
 document.addEventListener("keydown", stepLockRange, false);
