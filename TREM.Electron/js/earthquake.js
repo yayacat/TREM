@@ -1024,6 +1024,8 @@ async function init() {
 
 				else if (type_Unit == "p2p") GetDataState += "🟦 P2P";
 
+				else if (type_Unit == "p2pv6") GetDataState += "🟦 P2Pv6";
+
 				else if (type_Unit == "websocket") GetDataState += "⬜ WS";
 
 				else if (type_Unit == "websocket2") GetDataState += "⬜ WS2";
