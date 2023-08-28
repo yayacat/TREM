@@ -1574,7 +1574,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 		p2p_server_list.style.color = "white";
 		p2p_server_list.style.textAlign = "right";
 		let p2p_server_time = 0;
-		let p2p_server_name = "";
+		let p2p_server_name = "未知";
 
 		for (let index = 0, keys = Object.keys(data.time.server), n = keys.length; index < n; index++)
 			if (data.server[i] == keys[index])
@@ -1689,7 +1689,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 		p2p_server_list.style.color = "white";
 		p2p_server_list.style.textAlign = "right";
 		let p2p_server_time = 0;
-		let p2p_server_name = "";
+		let p2p_server_name = "未知";
 
 		for (let index = 0, keys = Object.keys(data.time.server), n = keys.length; index < n; index++)
 			if (data.server[i] == keys[index])
