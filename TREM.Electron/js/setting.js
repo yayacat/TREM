@@ -1575,6 +1575,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 		p2p_server_list.style.textAlign = "right";
 		let p2p_server_time = 0;
 		let p2p_server_name = "未知";
+		let p2p_server_lag = 0;
 
 		for (let index = 0, keys = Object.keys(data.time.server), n = keys.length; index < n; index++)
 			if (data.server[i] == keys[index])
@@ -1589,6 +1590,10 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 			}
 		}
 
+		for (let index = 0, keys = Object.keys(data.lag.server), n = keys.length; index < n; index++)
+			if (data.server[i] == keys[index])
+				p2p_server_lag = data.lag.server[keys[index]];
+
 		const now = new Date(p2p_server_time);
 		const Now = now.getFullYear()
 			+ "-" + (now.getMonth() + 1)
@@ -1596,7 +1601,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_server_list.innerText = `${p2p_server_name} (最後連接時間 : ${Now})`;
+		p2p_server_list.innerText = `${p2p_server_name} (最後連接時間 : ${Now})延遲 : ${p2p_server_lag}ms`;
 		p2p_server.append(p2p_server_list);
 	}
 
@@ -1612,10 +1617,15 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 		p2p_in_list.style.color = "white";
 		p2p_in_list.style.textAlign = "right";
 		let p2p_in_time = 0;
+		let p2p_in_lag = 0;
 
 		for (let index = 0, keys = Object.keys(data.time.in), n = keys.length; index < n; index++)
 			if (data.in[i] == keys[index])
 				p2p_in_time = data.time.in[keys[index]];
+
+		for (let index = 0, keys = Object.keys(data.lag.in), n = keys.length; index < n; index++)
+			if (data.in[i] == keys[index])
+				p2p_in_lag = data.lag.in[keys[index]];
 
 		const now = new Date(p2p_in_time);
 		const Now = now.getFullYear()
@@ -1624,7 +1634,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_in_list.innerText = `${data.in[i]} (最後連接時間 : ${Now})`;
+		p2p_in_list.innerText = `${data.in[i]} (最後連接時間 : ${Now})延遲 : ${p2p_in_lag}ms`;
 		p2p_in.append(p2p_in_list);
 	}
 
@@ -1640,10 +1650,15 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 		p2p_out_list.style.color = "white";
 		p2p_out_list.style.textAlign = "right";
 		let p2p_out_time = 0;
+		let p2p_out_lag = 0;
 
 		for (let index = 0, keys = Object.keys(data.time.out), n = keys.length; index < n; index++)
 			if (data.out[i] == keys[index])
 				p2p_out_time = data.time.out[keys[index]];
+
+		for (let index = 0, keys = Object.keys(data.lag.out), n = keys.length; index < n; index++)
+			if (data.out[i] == keys[index])
+				p2p_out_lag = data.lag.out[keys[index]];
 
 		const now = new Date(p2p_out_time);
 		const Now = now.getFullYear()
@@ -1652,7 +1667,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_out_list.innerText = `${data.out[i]} (最後連接時間 : ${Now})`;
+		p2p_out_list.innerText = `${data.out[i]} (最後連接時間 : ${Now})延遲 : ${p2p_out_lag}ms`;
 		p2p_out.append(p2p_out_list);
 	}
 
@@ -1690,6 +1705,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 		p2p_server_list.style.textAlign = "right";
 		let p2p_server_time = 0;
 		let p2p_server_name = "未知";
+		let p2p_server_lag = 0;
 
 		for (let index = 0, keys = Object.keys(data.time.server), n = keys.length; index < n; index++)
 			if (data.server[i] == keys[index])
@@ -1704,6 +1720,10 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 			}
 		}
 
+		for (let index = 0, keys = Object.keys(data.time.server), n = keys.length; index < n; index++)
+			if (data.server[i] == keys[index])
+				p2p_server_lag = data.lag.server[keys[index]];
+
 		const now = new Date(p2p_server_time);
 		const Now = now.getFullYear()
 			+ "-" + (now.getMonth() + 1)
@@ -1711,7 +1731,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_server_list.innerText = `${p2p_server_name} (最後連接時間 : ${Now})`;
+		p2p_server_list.innerText = `${p2p_server_name} (最後連接時間 : ${Now})延遲 : ${p2p_server_lag}ms`;
 		p2p_server.append(p2p_server_list);
 	}
 
@@ -1727,10 +1747,15 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 		p2p_in_list.style.color = "white";
 		p2p_in_list.style.textAlign = "right";
 		let p2p_in_time = 0;
+		let p2p_in_lag = 0;
 
 		for (let index = 0, keys = Object.keys(data.time.in), n = keys.length; index < n; index++)
 			if (data.in[i] == keys[index])
 				p2p_in_time = data.time.in[keys[index]];
+
+		for (let index = 0, keys = Object.keys(data.lag.in), n = keys.length; index < n; index++)
+			if (data.in[i] == keys[index])
+				p2p_in_lag = data.lag.in[keys[index]];
 
 		const now = new Date(p2p_in_time);
 		const Now = now.getFullYear()
@@ -1739,7 +1764,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_in_list.innerText = `${data.in[i]} (最後連接時間 : ${Now})`;
+		p2p_in_list.innerText = `${data.in[i]} (最後連接時間 : ${Now})延遲 : ${p2p_in_lag}ms`;
 		p2p_in.append(p2p_in_list);
 	}
 
@@ -1755,10 +1780,15 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 		p2p_out_list.style.color = "white";
 		p2p_out_list.style.textAlign = "right";
 		let p2p_out_time = 0;
+		let p2p_out_lag = 0;
 
 		for (let index = 0, keys = Object.keys(data.time.out), n = keys.length; index < n; index++)
 			if (data.out[i] == keys[index])
 				p2p_out_time = data.time.out[keys[index]];
+
+		for (let index = 0, keys = Object.keys(data.lag.out), n = keys.length; index < n; index++)
+			if (data.out[i] == keys[index])
+				p2p_out_lag = data.lag.out[keys[index]];
 
 		const now = new Date(p2p_out_time);
 		const Now = now.getFullYear()
@@ -1767,7 +1797,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_out_list.innerText = `${data.out[i]} (最後連接時間 : ${Now})`;
+		p2p_out_list.innerText = `${data.out[i]} (最後連接時間 : ${Now})延遲 : ${p2p_out_lag}ms`;
 		p2p_out.append(p2p_out_list);
 	}
 
