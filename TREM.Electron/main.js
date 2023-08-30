@@ -547,6 +547,12 @@ ipcMain.on("restart", () => {
 	restart();
 });
 
+ipcMain.on("hide", () => {
+	const currentWindow = BrowserWindow.getFocusedWindow();
+	if (currentWindow == MainWindow) MainWindow.hide();
+	if (currentWindow == IntensityWindow) IntensityWindow.hide();
+});
+
 ipcMain.on("openreleases", () => {
 	shell.openExternal(`https://github.com/yayacat/TREM/releases/tag/v${TREM.getVersion()}`);
 });

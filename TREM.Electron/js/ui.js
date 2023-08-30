@@ -9,6 +9,8 @@ document.addEventListener("keydown", (event) => {
 	if (event.key == "F10")
 		ipcRenderer.send("openDevtoolF10");
 
+	if (event.key == "Escape") ipcRenderer.send("hide");
+
 	if (event.ctrlKey && event.shiftKey && event.key.toLocaleLowerCase() == "i")
 		ipcRenderer.send("openDevtool");
 
