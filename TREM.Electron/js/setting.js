@@ -1637,7 +1637,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_in_list.innerText = `${data.in[i]} (延遲 : ${p2p_in_lag})最後連接時間 : ${Now}`;
+		p2p_in_list.innerText = `${data.in[i]} (延遲 : ${p2p_in_lag})時間 : ${Now}`;
 		p2p_in.append(p2p_in_list);
 	}
 
@@ -1673,7 +1673,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_out_list.innerText = `${data.out[i]} (延遲 : ${p2p_out_lag})最後連接時間 : ${Now}`;
+		p2p_out_list.innerText = `${data.out[i]} (延遲 : ${p2p_out_lag})時間 : ${Now}`;
 		p2p_out.append(p2p_out_list);
 	}
 
@@ -1773,7 +1773,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_in_list.innerText = `${data.in[i]} (延遲 : ${p2p_in_lag})最後連接時間 : ${Now}`;
+		p2p_in_list.innerText = `${data.in[i]} (延遲 : ${p2p_in_lag})\n時間 : ${Now}`;
 		p2p_in.append(p2p_in_list);
 	}
 
@@ -1809,7 +1809,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_out_list.innerText = `${data.out[i]} (延遲 : ${p2p_out_lag})最後連接時間 : ${Now}`;
+		p2p_out_list.innerText = `${data.out[i]} (延遲 : ${p2p_out_lag})\n時間 : ${Now}`;
 		p2p_out.append(p2p_out_list);
 	}
 
