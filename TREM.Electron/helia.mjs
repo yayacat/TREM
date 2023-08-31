@@ -9,8 +9,8 @@ export async function create_Helia () {
   return await createHelia();
 }
 
-export function helia_unixfs () {
-  return unixfs();
+export function helia_unixfs (heliaInstance) {
+  return unixfs(heliaInstance);
 }
 
 export function multiformats_CID () {
