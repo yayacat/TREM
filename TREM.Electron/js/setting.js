@@ -1617,7 +1617,8 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 		p2p_in_list.style.color = "white";
 		p2p_in_list.style.textAlign = "right";
 		let p2p_in_time = 0;
-		let p2p_in_lag = 0;
+		let p2p_in_lag = "不支援";
+		let p2p_in_ver = "不支援";
 
 		for (let index = 0, keys = Object.keys(data.time.in), n = keys.length; index < n; index++)
 			if (data.in[i] == keys[index])
@@ -1625,10 +1626,12 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 
 		for (let index = 0, keys = Object.keys(data.lag.in), n = keys.length; index < n; index++)
 			if (data.in[i] == keys[index])
-				if (data.lag.in[keys[index]] == -1)
-					p2p_in_lag = "不支援";
-				else
+				if (data.lag.in[keys[index]] != -1)
 					p2p_in_lag = `${data.lag.in[keys[index]]}ms`;
+
+		for (let index = 0, keys = Object.keys(data.ver.in), n = keys.length; index < n; index++)
+			if (data.in[i] == keys[index])
+				p2p_in_ver = data.ver.in[keys[index]];
 
 		const now = new Date(p2p_in_time);
 		const Now = now.getFullYear()
@@ -1637,7 +1640,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_in_list.innerText = `${data.in[i]} (延遲 : ${p2p_in_lag})時間 : ${Now}`;
+		p2p_in_list.innerText = `${data.in[i]} (延遲 : ${p2p_in_lag})時間 : ${Now}\n(版本 : ${p2p_in_ver})`;
 		p2p_in.append(p2p_in_list);
 	}
 
@@ -1653,7 +1656,8 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 		p2p_out_list.style.color = "white";
 		p2p_out_list.style.textAlign = "right";
 		let p2p_out_time = 0;
-		let p2p_out_lag = 0;
+		let p2p_out_lag = "不支援";
+		let p2p_out_ver = "不支援";
 
 		for (let index = 0, keys = Object.keys(data.time.out), n = keys.length; index < n; index++)
 			if (data.out[i] == keys[index])
@@ -1661,10 +1665,12 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 
 		for (let index = 0, keys = Object.keys(data.lag.out), n = keys.length; index < n; index++)
 			if (data.out[i] == keys[index])
-				if (data.lag.out[keys[index]] == -1)
-					p2p_out_lag = "不支援";
-				else
+				if (data.lag.out[keys[index]] != -1)
 					p2p_out_lag = `${data.lag.out[keys[index]]}ms`;
+
+		for (let index = 0, keys = Object.keys(data.ver.out), n = keys.length; index < n; index++)
+			if (data.out[i] == keys[index])
+				p2p_out_ver = data.ver.out[keys[index]];
 
 		const now = new Date(p2p_out_time);
 		const Now = now.getFullYear()
@@ -1673,7 +1679,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_out_list.innerText = `${data.out[i]} (延遲 : ${p2p_out_lag})時間 : ${Now}`;
+		p2p_out_list.innerText = `${data.out[i]} (延遲 : ${p2p_out_lag})時間 : ${Now}\n(版本 : ${p2p_out_ver})`;
 		p2p_out.append(p2p_out_list);
 	}
 
@@ -1754,6 +1760,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 		p2p_in_list.style.textAlign = "right";
 		let p2p_in_time = 0;
 		let p2p_in_lag = 0;
+		let p2p_in_ver = "不支援";
 
 		for (let index = 0, keys = Object.keys(data.time.in), n = keys.length; index < n; index++)
 			if (data.in[i] == keys[index])
@@ -1766,6 +1773,10 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 				else
 					p2p_in_lag = `${data.lag.in[keys[index]]}ms`;
 
+		for (let index = 0, keys = Object.keys(data.ver.in), n = keys.length; index < n; index++)
+			if (data.in[i] == keys[index])
+				p2p_in_ver = data.ver.in[keys[index]];
+		
 		const now = new Date(p2p_in_time);
 		const Now = now.getFullYear()
 			+ "-" + (now.getMonth() + 1)
@@ -1773,7 +1784,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_in_list.innerText = `${data.in[i]} (延遲 : ${p2p_in_lag})\n時間 : ${Now}`;
+		p2p_in_list.innerText = `${data.in[i]} (延遲 : ${p2p_in_lag})\n時間 : ${Now}(版本 : ${p2p_in_ver})`;
 		p2p_in.append(p2p_in_list);
 	}
 
@@ -1789,7 +1800,8 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 		p2p_out_list.style.color = "white";
 		p2p_out_list.style.textAlign = "right";
 		let p2p_out_time = 0;
-		let p2p_out_lag = 0;
+		let p2p_out_lag = "不支援";
+		let p2p_out_ver = "不支援";
 
 		for (let index = 0, keys = Object.keys(data.time.out), n = keys.length; index < n; index++)
 			if (data.out[i] == keys[index])
@@ -1797,10 +1809,12 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 
 		for (let index = 0, keys = Object.keys(data.lag.out), n = keys.length; index < n; index++)
 			if (data.out[i] == keys[index])
-				if (data.lag.out[keys[index]] == -1)
-					p2p_out_lag = "不支援";
-				else
+				if (data.lag.out[keys[index]] != -1)
 					p2p_out_lag = `${data.lag.out[keys[index]]}ms`;
+
+		for (let index = 0, keys = Object.keys(data.ver.out), n = keys.length; index < n; index++)
+			if (data.out[i] == keys[index])
+				p2p_out_ver = data.ver.out[keys[index]];
 
 		const now = new Date(p2p_out_time);
 		const Now = now.getFullYear()
@@ -1809,7 +1823,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 			+ " " + now.getHours()
 			+ ":" + now.getMinutes()
 			+ ":" + now.getSeconds();
-		p2p_out_list.innerText = `${data.out[i]} (延遲 : ${p2p_out_lag})\n時間 : ${Now}`;
+		p2p_out_list.innerText = `${data.out[i]} (延遲 : ${p2p_out_lag})\n時間 : ${Now}(版本 : ${p2p_out_ver})`;
 		p2p_out.append(p2p_out_list);
 	}
 
