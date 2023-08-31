@@ -1776,7 +1776,7 @@ ipcMain.on("p2p6", (event, data, server_ips) => {
 		for (let index = 0, keys = Object.keys(data.ver.in), n = keys.length; index < n; index++)
 			if (data.in[i] == keys[index])
 				p2p_in_ver = data.ver.in[keys[index]];
-		
+
 		const now = new Date(p2p_in_time);
 		const Now = now.getFullYear()
 			+ "-" + (now.getMonth() + 1)
