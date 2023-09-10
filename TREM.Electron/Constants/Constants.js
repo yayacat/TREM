@@ -4,10 +4,6 @@ const Constants = Object.freeze({
 			type  : "toggle",
 			value : false,
 		},
-		"map.faults": {
-			type  : "toggle",
-			value : false,
-		},
 		"map.jp": {
 			type  : "toggle",
 			value : false,
