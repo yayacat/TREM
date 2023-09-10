@@ -593,6 +593,8 @@ TREM.Configuration.on("error", (error) => {
 
 ipcMain.on("config:value", (event, key, value) => {
 	switch (key) {
+		case "map.tw_fault":
+		case "map.faults":
 		case "map.cn":
 		case "map.jp":
 		case "map.sk":

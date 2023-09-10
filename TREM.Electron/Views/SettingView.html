@@ -473,7 +473,7 @@
                                                 <span lang="kr">?</span>
                                                 <span lang="ru">?</span>
                                                 <span lang="zh-CN">?</span>
-                                                <span lang="zh-TW">NSSPE(無震源參數推算)</span>
+                                                <span lang="zh-TW">TREM EEW</span>
                                                 <span class="option-label-id">accept.eew.trem</span>
                                             </span>
                                             <span class="option-label-description">
@@ -482,7 +482,8 @@
                                                 <span lang="kr">?</span>
                                                 <span lang="ru">?</span>
                                                 <span lang="zh-CN">?</span>
-                                                <span lang="zh-TW">接收NSSPE(無震源參數推算)地震即時警報。</span>
+                                                <span lang="zh-TW">接收 TREM EEW 是利用 TREM-Net觀測網 計算的 地震預警 訊息，
+                                                    即時資料 為非公開(付費功能)，一般用戶在開啟後可在 重播(震後5分鐘)中看到效果。</span>
                                             </span>
                                         </div>
                                         <label class="md3 switch">
@@ -1251,6 +1252,60 @@
                                     <span lang="zh-TW">地圖圖層</span>
                                 </div>
                                 <div id="map-layer-container" class="control-container">
+                                    <div class="option-container">
+                                        <div class="option-label">
+                                            <span class="option-label-title">
+                                                <span lang="en">Taiwan Main Island Fault</span>
+                                                <span lang="ja">台湾本島断層</span>
+                                                <span lang="kr">Taiwan Main Island Fault</span>
+                                                <span lang="ru">Taiwan Main Island Fault</span>
+                                                <span lang="zh-CN">台湾岛 断层</span>
+                                                <span lang="zh-TW">臺灣本島 斷層</span>
+                                                <span class="option-label-id">map.tw_fault</span>
+                                            </span>
+                                            <span class="option-label-description">
+                                                <span lang="en">Display the distribution of faults on the main island of Taiwan on the map.</span>
+                                                <span lang="ja">台湾本島の断層の分布を地図上に表示します。</span>
+                                                <span lang="kr">Display the distribution of faults on the main island of Taiwan on the map.</span>
+                                                <span lang="ru">Display the distribution of faults on the main island of Taiwan on the map.</span>
+                                                <span lang="zh-CN">在地图上显示 台湾岛 断层分布。</span>
+                                                <span lang="zh-TW">在地圖上顯示 臺灣本島 斷層分布。</span>
+                                            </span>
+                                        </div>
+                                        <div class="control">
+                                            <label class="md3 checkbox">
+                                                <input type="checkbox" id="map.tw_fault" onclick="CheckSave('map.tw_fault')">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="option-container">
+                                        <div class="option-label">
+                                            <span class="option-label-title">
+                                                <span lang="en">Global fault</span>
+                                                <span lang="ja">グローバルフォールト</span>
+                                                <span lang="kr">Global fault</span>
+                                                <span lang="ru">Global fault</span>
+                                                <span lang="zh-CN">全球断层</span>
+                                                <span lang="zh-TW">全球斷層</span>
+                                                <span class="option-label-id">map.faults</span>
+                                            </span>
+                                            <span class="option-label-description">
+                                                <span lang="en">Display global fault distribution on a map.</span>
+                                                <span lang="ja">世界の断層の分布を地図上に表示します。</span>
+                                                <span lang="kr">Display global fault distribution on a map.</span>
+                                                <span lang="ru">Display global fault distribution on a map.</span>
+                                                <span lang="zh-CN">在地图上显示 全球 断层分布。</span>
+                                                <span lang="zh-TW">在地圖上顯示 全球 斷層分布。</span>
+                                            </span>
+                                        </div>
+                                        <div class="control">
+                                            <label class="md3 checkbox">
+                                                <input type="checkbox" id="map.faults" onclick="CheckSave('map.faults')">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div class="option-container">
                                         <div class="option-label">
                                             <span class="option-label-title">

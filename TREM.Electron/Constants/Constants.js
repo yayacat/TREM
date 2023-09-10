@@ -1,5 +1,13 @@
 const Constants = Object.freeze({
 	Default_Configurations: {
+		"map.tw_fault": {
+			type  : "toggle",
+			value : false,
+		},
+		"map.faults": {
+			type  : "toggle",
+			value : false,
+		},
 		"map.jp": {
 			type  : "toggle",
 			value : false,

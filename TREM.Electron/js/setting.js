@@ -644,7 +644,9 @@ function CheckSave(id) {
 		ipcRenderer.send("Mainreloadpage");
 
 	if (
-		id == "map.jp"
+		id == "map.tw_fault"
+		|| id == "map.faults"
+		|| id == "map.jp"
 		|| id == "map.cn"
 		|| id == "map.sk"
 		|| id == "map.nk"

@@ -1278,6 +1278,40 @@ async function init() {
 					fillOpacity : 0.5,
 				},
 			}).addTo(Maps.main));
+
+			if (setting["map.tw_fault"])
+				MapBases.main.push("tw_fault",
+					L.geoJson.vt(MapData.tw_fault, {
+						edgeBufferTiles : 2,
+						minZoom         : 4,
+						maxZoom         : 15,
+						tolerance       : 20,
+						buffer          : 256,
+						debug           : 0,
+						style           : {
+							weight      : 1.8,
+							color       : "red",
+							fillColor   : TREM.Colors.surfaceVariant,
+							fillOpacity : 3,
+						},
+					}).addTo(Maps.main));
+
+			if (setting["map.faults"])
+				MapBases.main.push("faults",
+					L.geoJson.vt(MapData.faults, {
+						edgeBufferTiles : 2,
+						minZoom         : 4,
+						maxZoom         : 15,
+						tolerance       : 20,
+						buffer          : 256,
+						debug           : 0,
+						style           : {
+							weight      : 1.8,
+							color       : "red",
+							fillColor   : TREM.Colors.surfaceVariant,
+							fillOpacity : 3,
+						},
+					}).addTo(Maps.main));
 		}
 
 		if (!MapBases.mini.length)
@@ -1346,6 +1380,38 @@ async function init() {
 						fillOpacity : 1,
 					},
 				}).addTo(Maps.report));
+
+			if (setting["map.tw_fault"])
+				MapBases.report.push("tw_fault",
+					L.geoJson.vt(MapData.tw_fault, {
+						minZoom   : 1,
+						maxZoom   : 12,
+						tolerance : 20,
+						buffer    : 256,
+						debug     : 0,
+						style     : {
+							weight      : 1.8,
+							color       : "red",
+							fillColor   : TREM.Colors.surfaceVariant,
+							fillOpacity : 3,
+						},
+					}).addTo(Maps.report));
+
+			if (setting["map.faults"])
+				MapBases.report.push("faults",
+					L.geoJson.vt(MapData.faults, {
+						minZoom   : 1,
+						maxZoom   : 12,
+						tolerance : 20,
+						buffer    : 256,
+						debug     : 0,
+						style     : {
+							weight      : 1.8,
+							color       : "red",
+							fillColor   : TREM.Colors.surfaceVariant,
+							fillOpacity : 3,
+						},
+					}).addTo(Maps.report));
 		}
 	})().catch(e => {
 		log(e, 3, "Colors&Map", "init");
@@ -4373,7 +4439,7 @@ function FCMdata(json, Unit) {
 	} else if (json.type.startsWith("eew") || json.type == "trem-eew") {
 		if (replay != 0 && !json.replay_timestamp) return;
 
-		if (json.type == "trem-eew" && !api_key_verify) return;
+		if (json.type == "trem-eew" && !api_key_verify && replay == 0) return;
 
 		if (
 			(json.type == "eew-scdzj" && !setting["accept.eew.SCDZJ"])
