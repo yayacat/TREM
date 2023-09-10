@@ -645,7 +645,6 @@ function CheckSave(id) {
 
 	if (
 		id == "map.tw_fault"
-		|| id == "map.faults"
 		|| id == "map.jp"
 		|| id == "map.cn"
 		|| id == "map.sk"
