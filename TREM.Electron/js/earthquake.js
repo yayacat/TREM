@@ -1073,6 +1073,7 @@ async function init() {
 					if (NOW().getTime() - Report > 600_000) {
 						investigation = false;
 						roll.removeChild(roll.children[0]);
+
 						if (!replay) Report = 0;
 
 						if (TREM.MapIntensity.isTriggered && TREM.MapIntensity.intensities.size != undefined)
@@ -1691,7 +1692,7 @@ function PGAMain() {
 								Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
 								log("PGA timer time out 10s", 2, "PGATimer", "PGAMain");
 								dump({ level: 1, message: "PGA timer time out 10s", origin: "PGATimer" });
-								setTimeout(function() {
+								setTimeout(() => {
 									reconnect();
 									PGAMainbkup();
 								}, 3000);
@@ -1896,7 +1897,7 @@ function PGAMainbkup() {
 								Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
 								log("PGA timer backup time out 10s", 2, "PGATimer", "PGAMainbkup");
 								dump({ level: 1, message: "PGA timer backup time out 10s", origin: "PGATimer" });
-								setTimeout(function() {
+								setTimeout(() => {
 									reconnect();
 									PGAMain();
 								}, 3000);
