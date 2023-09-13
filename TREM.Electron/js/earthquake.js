@@ -1691,8 +1691,12 @@ function PGAMain() {
 								Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
 								log("PGA timer time out 10s", 2, "PGATimer", "PGAMain");
 								dump({ level: 1, message: "PGA timer time out 10s", origin: "PGATimer" });
-								reconnect();
-								PGAMainbkup();
+								setTimeout(function() {
+									reconnect();
+									PGAMainbkup();
+								}, 3000);
+
+								if (Timers.rts_clock) clearInterval(Timers.rts_clock);
 							} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
 								stationnow = 0;
 								Response = {};
@@ -1892,8 +1896,12 @@ function PGAMainbkup() {
 								Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
 								log("PGA timer backup time out 10s", 2, "PGATimer", "PGAMainbkup");
 								dump({ level: 1, message: "PGA timer backup time out 10s", origin: "PGATimer" });
-								reconnect();
-								PGAMain();
+								setTimeout(function() {
+									reconnect();
+									PGAMain();
+								}, 3000);
+
+								if (Timers.rts_clock) clearInterval(Timers.rts_clock);
 							} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
 								stationnow = 0;
 								Response = {};
