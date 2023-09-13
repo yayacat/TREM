@@ -1073,7 +1073,7 @@ async function init() {
 					if (NOW().getTime() - Report > 600_000) {
 						investigation = false;
 						roll.removeChild(roll.children[0]);
-						Report = 0;
+						if (!replay) Report = 0;
 
 						if (TREM.MapIntensity.isTriggered && TREM.MapIntensity.intensities.size != undefined)
 							TREM.MapIntensity.clear();
@@ -2309,6 +2309,11 @@ function handler(Json) {
 					}
 
 				if (!win.isFocused()) win.flashFrame(true);
+
+				TREM.MapIntensity.trem = false;
+				TREM.MapIntensity.MaxI = max_intensity;
+				Report = Json.Time;
+				ipcMain.emit("ReportGET");
 				intensitytag = max_intensity;
 			}
 		} else if (NA999 != "Y" && NA0999 != "Y" && intensitytest > -1 && amount < 999) {
@@ -3659,6 +3664,7 @@ const stopReplay = function() {
 	if (Object.keys(detected_list).length != 0) PGACancel = true;
 
 	if (replay != 0 || Report != 0 || replayTemp != 0 || replayT != 0 || replaydir != 0 || replayD) {
+		intensitytag = -1;
 		replay = 0;
 		Report = 0;
 		replayTemp = 0;
