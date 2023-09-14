@@ -4269,8 +4269,8 @@ function FCMdata(json, Unit) {
 	}
 
 	type_Unit = Unit;
-	log(`Latency: ${NOW().getTime() - json.timestamp}ms`, 1, "API", "FCMdata");
-	dump({ level: 0, message: `Latency: ${NOW().getTime() - json.timestamp}ms`, origin: "API" });
+	log(`Latency: ${NOW().getTime() - json.timestamp}ms | Form: ${Unit}`, 1, "API", "FCMdata");
+	dump({ level: 0, message: `Latency: ${NOW().getTime() - json.timestamp}ms | Form: ${Unit}`, origin: "API" });
 	console.debug(json);
 
 	if (json.type == "tsunami-info") {
@@ -4585,11 +4585,10 @@ TREM.Earthquake.on("eew", (data) => {
 		if (data.type == "trem-eew" || data.type == "eew-cwb" || data.type == "eew-fjdzj") {
 			console.debug(MaxIntensity);
 		} else {
-			const d = data.depth / 2;
 			const int = TREM.Utils.PGAToIntensity(
 				TREM.Utils.pga(
 					data.scale,
-					d,
+					data.depth,
 					1,
 				),
 			);
