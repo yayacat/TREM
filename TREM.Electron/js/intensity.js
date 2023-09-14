@@ -202,7 +202,7 @@ TREM.Intensity = {
 
 			if (this._raw != null) this.clear();
 
-			if (unit == "cwb") unit = "CWB";
+			if (unit == "cwb") unit = "CWA";
 
 			if (unit == "palert") unit = "P-Alert";
 
@@ -376,7 +376,7 @@ TREM.Intensity = {
 
 			if (this._raw != null) this.clear();
 
-			if (unit == "cwb") unit = "CWB";
+			if (unit == "cwb") unit = "CWA";
 
 			if (unit == "palert") unit = "P-Alert";
 
@@ -662,7 +662,7 @@ TREM.Old_database = {
 		let unit = Olddatabase.unit ? Olddatabase.unit : Olddatabase.type;
 		let scale = "?";
 
-		if (unit == "cwb") unit = "CWB";
+		if (unit == "cwb") unit = "CWA";
 
 		if (unit == "palert") unit = "P-Alert";
 

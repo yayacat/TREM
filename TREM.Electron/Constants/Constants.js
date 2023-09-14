@@ -84,6 +84,10 @@ const Constants = Object.freeze({
 			type  : "toggle",
 			value : true,
 		},
+		"accept.eew.CWA": {
+			type  : "toggle",
+			value : true,
+		},
 		"accept.eew.NIED": {
 			type  : "toggle",
 			value : false,
@@ -292,6 +296,10 @@ const Constants = Object.freeze({
 			type  : "toggle",
 			value : false,
 		},
+		"report.onlycwachangeView": {
+			type  : "toggle",
+			value : false,
+		},
 		"report.getInfo": {
 			type  : "toggle",
 			value : false,
@@ -497,6 +505,10 @@ const Constants = Object.freeze({
 			value : true,
 		},
 		"intensity.cwb": {
+			type  : "string",
+			value : "",
+		},
+		"intensity.cwa": {
 			type  : "string",
 			value : "",
 		},

@@ -933,6 +933,8 @@ function send() {
 
 	if (testtext_value == "中央氣象局") Unit_type = "eew-cwb";
 
+	if (testtext_value == "中央氣象署") Unit_type = "eew-cwb";
+
 	if (testtext_value == "防災科学技術研究所") Unit_type = "eew-nied";
 
 	if (testtext_value == "日本氣象廳") Unit_type = "eew-jma";

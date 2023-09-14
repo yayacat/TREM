@@ -1578,6 +1578,11 @@ async function init() {
 			console.debug("複製成功");
 		});
 	});
+
+	ipcRenderer.send("config:value", "accept.eew.CWA", setting["accept.eew.CWB"]);
+	ipcRenderer.send("config:value", "report.onlycwachangeView", setting["report.onlycwbchangeView"]);
+	ipcRenderer.send("config:value", "intensity.cwa", setting["intensity.cwb"]);
+
 	globalgc();
 }
 // #endregion
@@ -3568,8 +3573,8 @@ ipcMain.once("start", () => {
 				`• TREM 進階功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請所有使用者理解並謹慎使用。\n
 				• 強震即時警報是利用少數幾個地震測站快速演算之結果，與最終地震報告可能存有若干差異，請所有使用者理解並謹慎使用。\n
 				• 本軟體使用P2P的連線技術傳遞資料，您的電腦將會把收到的地震資訊轉傳給其他人的電腦，如此才能降低伺服器負荷與維持費用，也才能免費地提供服務給大家使用。若您開始使用本軟體則代表您已同意使用P2P連線技術將收到的資料轉傳給其他電腦。\n
-				• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
-				• Powered by ExpTech | 2023/06/22`,
+				• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
+				• Powered by ExpTech | 2023/09/15`,
 				0,
 				"warning",
 				() => {
@@ -3586,8 +3591,8 @@ ipcMain.once("start", () => {
 								• 禁止違反法律法規或違反公共秩序和道德的行為\n
 								• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
 								• TREM 使用 P2P 技術傳遞資訊\n
-								• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
-								• Powered by ExpTech | 2023/05/03`,
+								• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
+								• Powered by ExpTech | 2023/09/15`,
 								0,
 								"warning",
 								() => {
@@ -3619,8 +3624,8 @@ ipcMain.once("start", () => {
 						• 禁止違反法律法規或違反公共秩序和道德的行為\n
 						• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
 						• TREM 使用 P2P 技術傳遞資訊\n
-						• 任何資訊均以 中央氣象局(CWB) 發布之內容為準\n
-						• Powered by ExpTech | 2023/05/03`,
+						• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
+						• Powered by ExpTech | 2023/09/15`,
 						0,
 						"warning",
 						() => {
@@ -3649,6 +3654,7 @@ ipcMain.once("start", () => {
 				FCMdata(DATA, ServerType);
 			}
 		}, 0);
+
 		log(`Initializing ServerCore >> ${ServerVer}`, 1, "Initialization", "start");
 		dump({ level: 0, message: `Initializing ServerCore >> ${ServerVer}`, origin: "Initialization" });
 	} catch (error) {
@@ -4438,7 +4444,7 @@ function FCMdata(json, Unit) {
 				: (json.type == "eew-nied") ? "防災科学技術研究所 (NIED)"
 					: (json.type == "eew-kma") ? "기상청(KMA)"
 						: (json.type == "eew-jma") ? "気象庁(JMA)"
-							: (json.type == "eew-cwb") ? "中央氣象局 (CWB)"
+							: (json.type == "eew-cwb") ? "中央氣象署 (CWA)"
 								: (json.type == "eew-fjdzj") ? "福建省地震局 (FJDZJ)"
 									: (json.type == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
 										: (json.type == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
@@ -4460,7 +4466,7 @@ ipcMain.on("Olddatabase_eew", (event, json) => {
 			: (json.type == "eew-nied") ? "防災科学技術研究所 (NIED)"
 				: (json.type == "eew-kma") ? "기상청(KMA)"
 					: (json.type == "eew-jma") ? "気象庁(JMA)"
-						: (json.type == "eew-cwb") ? "中央氣象局 (CWB)"
+						: (json.type == "eew-cwb") ? "中央氣象署 (CWA)"
 							: (json.type == "eew-fjdzj") ? "福建省地震局 (FJDZJ)"
 								: (json.type == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
 									: (json.type == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
@@ -4661,12 +4667,12 @@ TREM.Earthquake.on("eew", (data) => {
 
 			if (data.location.includes("海") && Number(data.depth) <= 35)
 				if (Number(speecd_scale) >= 7 && speecd_number == 1)
-					TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象局是否發布，海嘯警報" });
+					TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象署是否發布，海嘯警報" });
 				else if (Number(speecd_scale) >= 6 && speecd_number == 1)
 					TREM.speech.speak({ text: "沿岸地區應慎防海水位突變" });
 				else if (INFO[find0]?.alert_magnitude != speecd_scale)
 					if (Number(speecd_scale) >= 7)
-						TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象局是否發布，海嘯警報" });
+						TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象署是否發布，海嘯警報" });
 					else if (Number(speecd_scale) >= 6)
 						TREM.speech.speak({ text: "沿岸地區應慎防海水位突變" });
 		}
@@ -5004,7 +5010,7 @@ TREM.Earthquake.on("eew", (data) => {
 				msg = msg.replace("%Depth%", data.depth == null ? "?" : data.depth).replaceAll("%NorthLatitude%", data.lat).replace("%Time%", showtime).replaceAll("%EastLongitude%", data.lon).replace("%location%", data.location).replace("%Scale%", data.scale == null ? "?" : data.scale).replace("%Number%", data.number).replace("%Final%", (data.final) ? "(最終報)" : "");
 
 				if (data.type == "eew-cwb")
-					msg = msg.replace("%Provider%", "中央氣象局 (CWB)");
+					msg = msg.replace("%Provider%", "中央氣象署 (CWA)");
 				else if (data.type == "eew-scdzj")
 					msg = msg.replace("%Provider%", "四川省地震局 (SCDZJ)");
 				else if (data.type == "eew-fjdzj")
@@ -5052,7 +5058,7 @@ TREM.Earthquake.on("eew", (data) => {
 				msg = msg.replace("%Depth%", data.depth == null ? "?" : data.depth).replaceAll("%NorthLatitude%", data.lat).replace("%Time%", showtime).replaceAll("%EastLongitude%", data.lon).replace("%location%", data.location).replace("%Scale%", data.scale == null ? "?" : data.scale).replace("%Number%", data.number).replace("%Final%", (data.final) ? "(最終報)" : "");
 
 				if (data.type == "eew-cwb")
-					msg = msg.replace("%Provider%", "中央氣象局 (CWB)");
+					msg = msg.replace("%Provider%", "中央氣象署 (CWA)");
 				else if (data.type == "eew-scdzj")
 					msg = msg.replace("%Provider%", "四川省地震局 (SCDZJ)");
 				else if (data.type == "eew-fjdzj")
