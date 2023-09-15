@@ -140,7 +140,7 @@ TREM.Report = {
 			const element1 = document.getElementById("report-label-filter-intensity");
 			element1.classList.add("hide");
 			element1.style.display = "none";
-			const element2 = document.getElementById("report-label-filter-CWB");
+			const element2 = document.getElementById("report-label-filter-CWA");
 			element2.classList.add("hide");
 			element2.style.display = "none";
 			this._filterHasNumber = false;
@@ -153,11 +153,11 @@ TREM.Report = {
 			const element1 = document.getElementById("report-label-filter-intensity");
 			element1.classList.remove("hide");
 			element1.style.display = "block";
-			const element2 = document.getElementById("report-label-filter-CWB");
+			const element2 = document.getElementById("report-label-filter-CWA");
 			element2.classList.remove("hide");
 			element2.style.display = "block";
 			this._filterCWA = true;
-			const element3 = document.getElementById("report-filter-CWB");
+			const element3 = document.getElementById("report-filter-CWA");
 			element3.checked = true;
 			const element5 = document.getElementById("report-filter-hasNumber");
 			element5.checked = false;
