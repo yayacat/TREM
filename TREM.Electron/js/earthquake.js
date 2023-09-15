@@ -4427,6 +4427,8 @@ function FCMdata(json, Unit) {
 	} else if (json.type.startsWith("eew") || json.type == "trem-eew") {
 		if (replay != 0 && !json.replay_timestamp) return;
 
+		if (Now().getTime() - json.time > 240_000) return;
+
 		if (json.type == "trem-eew" && !api_key_verify && replay == 0) return;
 
 		if (
