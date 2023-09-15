@@ -4275,8 +4275,8 @@ function FCMdata(json, Unit) {
 	}
 
 	type_Unit = Unit;
-	log(`Latency: ${NOW().getTime() - json.timestamp}ms | Form: ${Unit}`, 1, "API", "FCMdata");
-	dump({ level: 0, message: `Latency: ${NOW().getTime() - json.timestamp}ms | Form: ${Unit}`, origin: "API" });
+	log(`Latency: ${NOW().getTime() - json.timestamp}ms | Form: ${Unit} | Type: ${json.type}`, 1, "API", "FCMdata");
+	dump({ level: 0, message: `Latency: ${NOW().getTime() - json.timestamp}ms | Form: ${Unit} | Type: ${json.type}`, origin: "API" });
 	console.debug(json);
 
 	if (json.type == "tsunami-info") {
@@ -4920,7 +4920,7 @@ TREM.Earthquake.on("eew", (data) => {
 					if (TINFO + 1 >= INFO.length)
 						TINFO = 0;
 					else TINFO++;
-				}, 5000);
+				}, 9000);
 		}, 1000);
 
 	EEWshot = NOW().getTime() - 28500;

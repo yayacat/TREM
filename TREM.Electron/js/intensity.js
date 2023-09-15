@@ -140,7 +140,7 @@ TREM.Intensity = {
 	alertTime   : 0,
 	intensities : new Map(),
 	geojson     : null,
-	cwb         : {},
+	cwa         : {},
 	palert      : {},
 	trem        : {},
 	timer       : {},
@@ -194,7 +194,7 @@ TREM.Intensity = {
 			}
 
 			if (unit == "cwb")
-				TREM.Intensity.cwb = rawIntensityData;
+				TREM.Intensity.cwa = rawIntensityData;
 			else if (unit == "palert")
 				TREM.Intensity.palert = rawIntensityData;
 			else if (unit == "trem")
@@ -723,7 +723,7 @@ ipcMain.on("TREMIntensityload", (event, json) => {
 	const unit = json.unit;
 
 	if (unit == "cwb")
-		TREM.Intensity.cwb = json;
+		TREM.Intensity.cwa = json;
 	else if (unit == "palert")
 		TREM.Intensity.palert = json;
 	else if (unit == "trem")
