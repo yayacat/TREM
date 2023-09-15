@@ -2880,7 +2880,10 @@ function ReportGET() {
 
 		if (_report_data.length != 0 && !setting["report.getInfo"]) {
 			for (let i = 0; i < _report_data.length; i++)
-				if (_report_data[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
+				if (_report_data[i].identifier.startsWith("CWB")) {
+					_report_data_temp[j] = _report_data[i];
+					j += 1;
+				} else if (_report_data[i].identifier.startsWith("CWA")) {
 					_report_data_temp[j] = _report_data[i];
 					j += 1;
 				}
@@ -2953,7 +2956,10 @@ function ReportGET() {
 							let k = 0;
 
 							for (let i = 0; i < _report_data.length; i++)
-								if (_report_data[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
+								if (_report_data[i].identifier.startsWith("CWB")) {
+									_report_data_POST_temp[k] = _report_data[i];
+									k += 1;
+								} else if (_report_data[i].identifier.startsWith("CWA")) {
 									_report_data_POST_temp[k] = _report_data[i];
 									k += 1;
 								}
