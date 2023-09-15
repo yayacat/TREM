@@ -2880,7 +2880,7 @@ function ReportGET() {
 
 		if (_report_data.length != 0 && !setting["report.getInfo"]) {
 			for (let i = 0; i < _report_data.length; i++)
-				if (_report_data[i].identifier.startsWith("CWB")) {
+				if (_report_data[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
 					_report_data_temp[j] = _report_data[i];
 					j += 1;
 				}
@@ -2953,7 +2953,7 @@ function ReportGET() {
 							let k = 0;
 
 							for (let i = 0; i < _report_data.length; i++)
-								if (_report_data[i].identifier.startsWith("CWB")) {
+								if (_report_data[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
 									_report_data_POST_temp[k] = _report_data[i];
 									k += 1;
 								}
@@ -3099,7 +3099,7 @@ ipcMain.on("ReportGET", () => {
 
 	if (_report_data_GET.length != 0 && !setting["report.getInfo"]) {
 		for (let i = 0; i < _report_data_GET.length; i++)
-			if (_report_data_GET[i].identifier.startsWith("CWB")) {
+			if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
 				_report_data_GET_temp[j] = _report_data_GET[i];
 				j += 1;
 			}
@@ -3115,7 +3115,7 @@ ipcMain.on("ReportGET", () => {
 			else if (getInfo) cacheReport(_report_data_GET);
 		} else {
 			for (let i = 0; i < _report_data_GET.length; i++)
-				if (_report_data_GET[i].identifier.startsWith("CWB")) {
+				if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
 					_report_data_GET_temp[j] = _report_data_GET[i];
 					j += 1;
 				}
@@ -3439,7 +3439,7 @@ function addReport(report, prepend = false, index = 0) {
 
 			TREM.Report.cache.set(report.identifier, report);
 
-			if (report.identifier.startsWith("CWB") && setting["report.onlycwachangeView"]) {
+			if ((report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) && setting["report.onlycwachangeView"]) {
 				TREM.Report.setView("eq-report-overview", report);
 				changeView("report", "#reportView_btn");
 				ReportTag = NOW().getTime();
@@ -4358,7 +4358,7 @@ function FCMdata(json, Unit) {
 		const report = json.raw;
 		const location = json.location.match(/(?<=位於).+(?=\))/);
 
-		if (report.identifier.startsWith("CWB") && setting["report.onlycwachangeView"]) {
+		if ((report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) && setting["report.onlycwachangeView"]) {
 			if (!win.isFocused())
 				new Notification("地震報告",
 					{
@@ -4401,7 +4401,7 @@ function FCMdata(json, Unit) {
 						Shot     : 1,
 					});
 				}, 5000);
-			} else if (report.identifier.startsWith("CWB")) {
+			} else if (report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) {
 				if (!win.isFocused())
 					new Notification("地震報告",
 						{
