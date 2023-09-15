@@ -108,12 +108,12 @@ async function init() {
 	document.getElementById("view").addEventListener("transitionend", resizeHandler);
 
 	try {
-		if (setting["intensity.cwb"] != "") {
-			const json_cwb = require(path.resolve(folder, `${setting["intensity.cwb"]}.json`));
+		if (setting["intensity.cwa"] != "") {
+			const json_cwb = require(path.resolve(folder, `${setting["intensity.cwa"]}.json`));
 			ipcRenderer.send("TREMIntensityload", json_cwb);
 		}
 	} catch (err) {
-		console.error(`解析檔案 ${setting["intensity.cwb"]}.json 時發生錯誤:`, err);
+		console.error(`解析檔案 ${setting["intensity.cwa"]}.json 時發生錯誤:`, err);
 	}
 
 	try {

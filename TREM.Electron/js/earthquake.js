@@ -3439,7 +3439,7 @@ function addReport(report, prepend = false, index = 0) {
 
 			TREM.Report.cache.set(report.identifier, report);
 
-			if (report.identifier.startsWith("CWB") && setting["report.onlycwbchangeView"]) {
+			if (report.identifier.startsWith("CWB") && setting["report.onlycwachangeView"]) {
 				TREM.Report.setView("eq-report-overview", report);
 				changeView("report", "#reportView_btn");
 				ReportTag = NOW().getTime();
@@ -4316,7 +4316,7 @@ function FCMdata(json, Unit) {
 		}, 1250);
 
 		if (json.unit == "cwb")
-			ipcRenderer.send("config:value", "intensity.cwb", filename.toString());
+			ipcRenderer.send("config:value", "intensity.cwa", filename.toString());
 		else if (json.unit == "palert")
 			ipcRenderer.send("config:value", "intensity.palert", filename.toString());
 		else if (json.unit == "trem")
@@ -4358,7 +4358,7 @@ function FCMdata(json, Unit) {
 		const report = json.raw;
 		const location = json.location.match(/(?<=位於).+(?=\))/);
 
-		if (report.identifier.startsWith("CWB") && setting["report.onlycwbchangeView"]) {
+		if (report.identifier.startsWith("CWB") && setting["report.onlycwachangeView"]) {
 			if (!win.isFocused())
 				new Notification("地震報告",
 					{
@@ -4379,7 +4379,7 @@ function FCMdata(json, Unit) {
 					Shot     : 1,
 				});
 			}, 5000);
-		} else if (!setting["report.onlycwbchangeView"]) {
+		} else if (!setting["report.onlycwachangeView"]) {
 			if (report.location.startsWith("地震資訊") && api_key_verify) {
 				// if (!win.isFocused())
 				// 	new Notification("地震報告",
@@ -4434,7 +4434,7 @@ function FCMdata(json, Unit) {
 			|| (json.type == "eew-nied" && !setting["accept.eew.NIED"])
 			|| (json.type == "eew-jma" && !setting["accept.eew.JMA"])
 			|| (json.type == "eew-kma" && !setting["accept.eew.KMA"])
-			|| (json.type == "eew-cwb" && !setting["accept.eew.CWB"])
+			|| (json.type == "eew-cwb" && !setting["accept.eew.CWA"])
 			|| (json.type == "eew-fjdzj" && !setting["accept.eew.FJDZJ"])
 			|| (json.type == "trem-eew" && !setting["accept.eew.trem"])
 		) return;

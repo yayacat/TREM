@@ -33,7 +33,7 @@ TREM.Report = {
 	_filterIntensity      : false,
 	_filterIntensityValue : 4,
 	_filterTREM           : false,
-	_filterCWB            : true,
+	_filterCWA            : true,
 	_filterDate           : false,
 	_filterDateValue      : "",
 	_filterMonth          : false,
@@ -60,7 +60,7 @@ TREM.Report = {
 				.filter(v => this._filterMagnitude ? this._filterMagnitudeValue == -1 ? v.magnitudeValue == 0.0 : this._filterMagnitudeValue == 0 ? v.magnitudeValue < 1.0 : this._filterMagnitudeValue == 1 ? v.magnitudeValue < 2.0 : this._filterMagnitudeValue == 2 ? v.magnitudeValue < 3.0 : this._filterMagnitudeValue == 3 ? v.magnitudeValue < 4.0 : this._filterMagnitudeValue == 45 ? v.magnitudeValue < 4.5 : v.magnitudeValue >= 4.5 : true)
 				.filter(v => this._filterIntensity ? v.data[0]?.areaIntensity == this._filterIntensityValue : true)
 				.filter(v => this._filterTREM ? v.location.startsWith("地震資訊") : true)
-				.filter(v => this._filterCWB ? v.identifier.startsWith("CWB") : true)
+				.filter(v => this._filterCWA ? (v.identifier.startsWith("CWA") || v.identifier.startsWith("CWB")) : true)
 				.filter(v => this._filterDate ? v.originTime.split(" ")[0] == this._filterDateValue : true)
 				.filter(v => this._filterMonth ? (v.originTime.split(" ")[0].split("/")[0] + "/" + v.originTime.split(" ")[0].split("/")[1]) == this._filterMonthValue : true);
 
@@ -74,7 +74,7 @@ TREM.Report = {
 					|| (this._filterMagnitude && !(this._filterMagnitudeValue == -1 ? report.magnitudeValue == 0.0 : this._filterMagnitudeValue == 0 ? report.magnitudeValue < 1.0 : this._filterMagnitudeValue == 1 ? report.magnitudeValue < 2.0 : this._filterMagnitudeValue == 2 ? report.magnitudeValue < 3.0 : this._filterMagnitudeValue == 3 ? report.magnitudeValue < 4.0 : this._filterMagnitudeValue == 45 ? report.magnitudeValue < 4.5 : report.magnitudeValue >= 4.5))
 					|| (this._filterIntensity && !(report.data[0]?.areaIntensity == this._filterIntensityValue))
 					|| (this._filterTREM && !(report.location.startsWith("地震資訊")))
-					|| (this._filterCWB && !(report.identifier.startsWith("CWB")))
+					|| (this._filterCWA && !(report.identifier.startsWith("CWA") || report.identifier.startsWith("CWB")))
 					|| (this._filterDate && !(report.originTime.split(" ")[0] == this._filterDateValue))
 					|| (this._filterMonth && !((report.originTime.split(" ")[0].split("/")[0] + "/" + report.originTime.split(" ")[0].split("/")[1]) == this._filterMonthValue))) {
 					element.classList.add("hide");
@@ -145,7 +145,7 @@ TREM.Report = {
 			element2.style.display = "none";
 			this._filterHasNumber = false;
 			this._filterIntensity = false;
-			this._filterCWB = false;
+			this._filterCWA = false;
 		} else if (key == "filterTREM" && !value) {
 			const element = document.getElementById("report-label-filter-hasNumber");
 			element.classList.remove("hide");
@@ -156,7 +156,7 @@ TREM.Report = {
 			const element2 = document.getElementById("report-label-filter-CWB");
 			element2.classList.remove("hide");
 			element2.style.display = "block";
-			this._filterCWB = true;
+			this._filterCWA = true;
 			const element3 = document.getElementById("report-filter-CWB");
 			element3.checked = true;
 			const element5 = document.getElementById("report-filter-hasNumber");
@@ -181,7 +181,7 @@ TREM.Report = {
 			.filter(v => this._filterMagnitude ? this._filterMagnitudeValue == -1 ? v.magnitudeValue == 0.0 : this._filterMagnitudeValue == 0 ? v.magnitudeValue < 1.0 : this._filterMagnitudeValue == 1 ? v.magnitudeValue < 2.0 : this._filterMagnitudeValue == 2 ? v.magnitudeValue < 3.0 : this._filterMagnitudeValue == 3 ? v.magnitudeValue < 4.0 : this._filterMagnitudeValue == 45 ? v.magnitudeValue < 4.5 : v.magnitudeValue >= 4.5 : true)
 			.filter(v => this._filterIntensity ? v.data[0]?.areaIntensity == this._filterIntensityValue : true)
 			.filter(v => this._filterTREM ? v.location.startsWith("地震資訊") : true)
-			.filter(v => this._filterCWB ? v.identifier.startsWith("CWB") : true)
+			.filter(v => this._filterCWA ? (v.identifier.startsWith("CWA") || v.identifier.startsWith("CWB")) : true)
 			.filter(v => this._filterDate ? v.originTime.split(" ")[0] == this._filterDateValue : true)
 			.filter(v => this._filterMonth ? (v.originTime.split(" ")[0].split("/")[0] + "/" + v.originTime.split(" ")[0].split("/")[1]) == this._filterMonthValue : true);
 

@@ -562,9 +562,9 @@ function stream_mode(value) {
 		document.getElementById("report.changeView").checked = false;
 		document.getElementById("report.changeView").disabled = true;
 		ipcRenderer.send("config:value", "report.changeView", false);
-		document.getElementById("report.onlycwbchangeView").checked = true;
-		document.getElementById("report.onlycwbchangeView").disabled = true;
-		ipcRenderer.send("config:value", "report.onlycwbchangeView", true);
+		document.getElementById("report.onlycwachangeView").checked = true;
+		document.getElementById("report.onlycwachangeView").disabled = true;
+		ipcRenderer.send("config:value", "report.onlycwachangeView", true);
 		document.getElementById("report.getInfo").checked = false;
 		document.getElementById("report.getInfo").disabled = true;
 		ipcRenderer.send("config:value", "report.getInfo", false);
@@ -582,7 +582,7 @@ function stream_mode(value) {
 		ipcRenderer.send("config:value", "accept.eew.trem", false);
 	} else if (!value) {
 		document.getElementById("report.changeView").disabled = false;
-		document.getElementById("report.onlycwbchangeView").disabled = false;
+		document.getElementById("report.onlycwachangeView").disabled = false;
 		document.getElementById("report.getInfo").disabled = false;
 		document.getElementById("report.trem").disabled = false;
 		document.getElementById("Real-time.alert").disabled = false;
@@ -618,14 +618,14 @@ function CheckSave(id) {
 	if (id == "sleep.mode" && !value)
 		ipcRenderer.send("sleep", value);
 
-	if (id == "report.onlycwbchangeView" && value) {
+	if (id == "report.onlycwachangeView" && value) {
 		document.getElementById("report.changeView").checked = false;
 		ipcRenderer.send("config:value", "report.changeView", false);
 	}
 
 	if (id == "report.changeView" && value) {
-		document.getElementById("report.onlycwbchangeView").checked = false;
-		ipcRenderer.send("config:value", "report.onlycwbchangeView", false);
+		document.getElementById("report.onlycwachangeView").checked = false;
+		ipcRenderer.send("config:value", "report.onlycwachangeView", false);
 	}
 
 	if (id == "trem-eq.alert.Notification") {
