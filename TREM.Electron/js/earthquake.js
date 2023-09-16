@@ -4342,25 +4342,6 @@ function FCMdata(json, Unit) {
 		ipcMain.emit("ReportGET");
 		stopReplaybtn();
 	} else if (json.type == "report") {
-		if (TREM.MapIntensity.isTriggered)
-			TREM.MapIntensity.clear();
-
-		if (TREM.MapArea2.isTriggered)
-			TREM.MapArea2.clear();
-
-		if (setting["audio.report"]) audioPlay("../audio/Report.wav");
-		log("Got Earthquake Report", 1, "API", "FCMdata");
-		dump({ level: 0, message: "Got Earthquake Report", origin: "API" });
-
-		if (setting["report.show"]) win.showInactive();
-
-		if (setting["report.cover"])
-			if (!win.isFullScreen()) {
-				win.setAlwaysOnTop(true);
-				win.focus();
-				win.setAlwaysOnTop(false);
-			}
-
 		const report = json.raw;
 		const location = json.location.match(/(?<=位於).+(?=\))/);
 
@@ -4385,6 +4366,23 @@ function FCMdata(json, Unit) {
 					Shot     : 1,
 				});
 			}, 5000);
+
+			if (TREM.MapIntensity.isTriggered)
+				TREM.MapIntensity.clear();
+
+			if (TREM.MapArea2.isTriggered)
+				TREM.MapArea2.clear();
+
+			if (setting["audio.report"]) audioPlay("../audio/Report.wav");
+
+			if (setting["report.show"]) win.showInactive();
+
+			if (setting["report.cover"])
+				if (!win.isFullScreen()) {
+					win.setAlwaysOnTop(true);
+					win.focus();
+					win.setAlwaysOnTop(false);
+				}
 		} else if (!setting["report.onlycwachangeView"]) {
 			if (report.location.startsWith("地震資訊")) {
 				if (api_key_verify && setting["report.getInfo"]) {
@@ -4408,6 +4406,23 @@ function FCMdata(json, Unit) {
 							Shot     : 1,
 						});
 					}, 5000);
+
+					if (TREM.MapIntensity.isTriggered)
+						TREM.MapIntensity.clear();
+
+					if (TREM.MapArea2.isTriggered)
+						TREM.MapArea2.clear();
+
+					if (setting["audio.report"]) audioPlay("../audio/Report.wav");
+
+					if (setting["report.show"]) win.showInactive();
+
+					if (setting["report.cover"])
+						if (!win.isFullScreen()) {
+							win.setAlwaysOnTop(true);
+							win.focus();
+							win.setAlwaysOnTop(false);
+						}
 				}
 			} else if (report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) {
 				if (!win.isFocused())
@@ -4430,8 +4445,28 @@ function FCMdata(json, Unit) {
 						Shot     : 1,
 					});
 				}, 5000);
+
+				if (TREM.MapIntensity.isTriggered)
+					TREM.MapIntensity.clear();
+
+				if (TREM.MapArea2.isTriggered)
+					TREM.MapArea2.clear();
+
+				if (setting["audio.report"]) audioPlay("../audio/Report.wav");
+
+				if (setting["report.show"]) win.showInactive();
+
+				if (setting["report.cover"])
+					if (!win.isFullScreen()) {
+						win.setAlwaysOnTop(true);
+						win.focus();
+						win.setAlwaysOnTop(false);
+					}
 			}
 		}
+
+		log("Got Earthquake Report", 1, "API", "FCMdata");
+		dump({ level: 0, message: "Got Earthquake Report", origin: "API" });
 	} else if (json.type.startsWith("eew") || json.type == "trem-eew") {
 		if (replay != 0 && !json.replay_timestamp) return;
 
