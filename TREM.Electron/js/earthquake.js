@@ -4386,27 +4386,29 @@ function FCMdata(json, Unit) {
 				});
 			}, 5000);
 		} else if (!setting["report.onlycwachangeView"]) {
-			if (report.location.startsWith("地震資訊") && api_key_verify) {
-				// if (!win.isFocused())
-				// 	new Notification("地震報告",
-				// 		{
-				// 			body   : `${location}發生規模 ${report.magnitudeValue.toFixed(1)} 有感地震，最大震度${report.data[0].areaName}${report.data[0].eqStation[0].stationName}${TREM.Constants.intensities[report.data[0].eqStation[0].stationIntensity].text}。`,
-				// 			icon   : "../TREM.ico",
-				// 			silent : win.isFocused(),
-				// 		});
+			if (report.location.startsWith("地震資訊")) {
+				if (api_key_verify && setting["report.getInfo"]) {
+					// if (!win.isFocused())
+					// 	new Notification("地震報告",
+					// 		{
+					// 			body   : `${location}發生規模 ${report.magnitudeValue.toFixed(1)} 有感地震，最大震度${report.data[0].areaName}${report.data[0].eqStation[0].stationName}${TREM.Constants.intensities[report.data[0].eqStation[0].stationIntensity].text}。`,
+					// 			icon   : "../TREM.ico",
+					// 			silent : win.isFocused(),
+					// 		});
 
-				addReport(report, true);
-				ipcRenderer.send("report-Notification", report);
+					addReport(report, true);
+					ipcRenderer.send("report-Notification", report);
 
-				setTimeout(() => {
-					ipcRenderer.send("screenshotEEW", {
-						Function : "report",
-						ID       : json.earthquakeNo,
-						Version  : 1,
-						Time     : NOW().getTime(),
-						Shot     : 1,
-					});
-				}, 5000);
+					setTimeout(() => {
+						ipcRenderer.send("screenshotEEW", {
+							Function : "report",
+							ID       : json.earthquakeNo,
+							Version  : 1,
+							Time     : NOW().getTime(),
+							Shot     : 1,
+						});
+					}, 5000);
+				}
 			} else if (report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) {
 				if (!win.isFocused())
 					new Notification("地震報告",
