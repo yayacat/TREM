@@ -969,6 +969,9 @@ TREM.Report = {
 			if (res.trem)
 				for (let index0 = 0; index0 < res.trem.eew.length; index0++) {
 					const trem_eew = res.trem.eew[index0];
+					const latlng = L.latLng(trem_eew.lat, trem_eew.lon);
+					const latlng1 = L.latLng(report.epicenterLat, report.epicenterLon);
+					const distance = latlng.distanceTo(latlng1);
 					const trem_epicenterIcon = L.marker(
 						[trem_eew.lat, trem_eew.lon],
 						{
@@ -978,7 +981,7 @@ TREM.Report = {
 								className : "epicenterIcon",
 							}),
 							zIndexOffset: 5000,
-						}).bindTooltip(`<div class="report_station_box"><div>報數: 第 ${index0 + 1} 報</div><div>位置: ${trem_eew.location} | ${trem_eew.lat}°N  ${trem_eew.lon} °E</div><div>類型: ${trem_eew.model}</div><div>規模: M ${trem_eew.scale}</div><div>深度: ${trem_eew.depth} km</div><div>預估最大震度: ${IntensityI(trem_eew.max)}</div></div>`, {
+						}).bindTooltip(`<div class="report_station_box"><div>報數: 第 ${index0 + 1} 報</div><div>位置: ${trem_eew.location} | ${trem_eew.lat}°N  ${trem_eew.lon} °E</div><div>類型: ${trem_eew.model}</div><div>規模: M ${trem_eew.scale}</div><div>深度: ${trem_eew.depth} km</div><div>預估最大震度: ${IntensityI(trem_eew.max)}</div><div>與CWA震央距: ${(distance / 1000).toFixed(2)} km</div></div>`, {
 						offset    : [8, 0],
 						permanent : false,
 						className : "report-cursor-tooltip",
