@@ -3703,6 +3703,8 @@ const stopReplay = function() {
 
 	stationnow = 0;
 
+	if (TREM.speech.speaking()) TREM.speech.cancel();
+
 	// if (setting["p2p.mode"])
 	// 	try {
 	// 		if (service_status.websocket.status)
