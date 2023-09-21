@@ -5311,14 +5311,15 @@ TREM.Earthquake.on("tsunami", (data) => {
 
 		const tsunami_level = {};
 
+		const now = new Date(data.time);
+		const Now3 = now.getFullYear()
+			+ "/" + (now.getMonth() + 1)
+			+ "/" + now.getDate()
+			+ " " + now.getHours()
+			+ ":" + now.getMinutes();
+
 		for (let i = 0; i < data.area.length; i++) {
 			if (!data.area[i].arrivalTime) continue;
-			const now = new Date(data.area[i].arrivalTime);
-			const Now3 = now.getFullYear()
-				+ "/" + (now.getMonth() + 1)
-				+ "/" + now.getDate()
-				+ " " + now.getHours()
-				+ ":" + now.getMinutes();
 			new Notification("海嘯警報", {
 				body   : `${Now3} 發生地震\n請${data.area[i].areaName}迅速疏散至避難場所`,
 				icon   : "../TREM.ico",
@@ -5327,6 +5328,8 @@ TREM.Earthquake.on("tsunami", (data) => {
 			tsunami_level[data.area[i].areaName] = tsunami_color(data.area[i].waveHeight);
 		}
 
+		if (TSUNAMI.ALL)
+			TSUNAMI.ALL.remove();
 		TSUNAMI.ALL = L.geoJson.vt(MapData.tw_tsunami_area, {
 			minZoom   : 4,
 			maxZoom   : 12,
