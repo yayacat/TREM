@@ -12,6 +12,7 @@ TREM.Report = {
 	report_trem         : false,
 	report_trem_station : {},
 	report_trem_data    : [],
+	report_eew_data     : [],
 	report_station      : {},
 	epicenterIcon       : null,
 	report_circle_trem  : null,
@@ -40,6 +41,7 @@ TREM.Report = {
 	_filterMonthValue     : "",
 	_reportItemTemplate   : document.getElementById("template-report-list-item"),
 	_report_trem_data     : storage.getItem("report_trem_data") ?? [],
+	_report_eew_data     : storage.getItem("report_eew_data") ?? [],
 	_report_Temp          : null,
 	get _mapPaddingLeft() {
 		return document.getElementById("map-report").offsetWidth / 2;
@@ -772,8 +774,90 @@ TREM.Report = {
 		this._markers.push(this.epicenterIcon);
 
 		this.report_trem_data = this._report_trem_data;
+		this.report_eew_data = this._report_eew_data;
 		this._report_Temp = report;
 		this._setuptremget(report);
+		this._setupeewget(report);
+	},
+	_setupeewget(report) {
+		if (report.ID.length != 0)
+			if (!this.report_eew_data[report.ID[0]])
+					fetch(`https://exptech.com.tw/api/v1/earthquake/eew-info/${report.ID[0]}`)
+						.then((res) => {
+							if (res.ok) {
+								console.debug(res);
+
+								res.json().then(res1 => {
+									console.debug(res1);
+									this._report_eew_data[report.ID[0]] = res1;
+									this.report_eew_data[report.ID[0]] = this._report_eew_data[report.ID[0]];
+									storage.setItem("report_eew_data", this._report_eew_data);
+									this._setupeewmarker(report);
+								});
+							} else {
+								console.error(res);
+
+								switch (res.status) {
+									case 429: {
+										log(res.status, 3, "report_trem_info", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									case 404: {
+										log(res.status, 3, "report_trem_info", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									case 500: {
+										log(res.status, 3, "report_trem_info", "Report");
+										dump({ level: 2, message: res.status });
+										break;
+									}
+
+									default: break;
+								}
+
+								this._setupzoomPredict();
+							}
+						}).catch(err => {
+							console.log(err.message);
+							log(err, 3, "report_eew", "Report");
+							dump({ level: 2, message: err });
+							this._setupzoomPredict();
+						});
+			else
+				this._setupeewmarker(report);
+	},
+	_setupeewmarker(report) {
+		if (this.report_eew_data[report.ID[0]]) {
+			const res = this.report_eew_data[report.ID[0]];
+
+			for (let i = 0; i < res.length; i++) {
+				const eew = res[i].eq;
+				const latlng = L.latLng(eew.lat, eew.lon);
+				const latlng1 = L.latLng(report.epicenterLat, report.epicenterLon);
+				const distance = latlng.distanceTo(latlng1);
+				const eew_epicenterIcon = L.marker(
+					[eew.lat, eew.lon],
+					{
+						icon: L.divIcon({
+							html      : TREM.Resources.icon.oldcross,
+							iconSize  : [16, 16],
+							className : "epicenterIcon",
+						}),
+						zIndexOffset: 5000,
+					}).bindTooltip(`<div class="report_station_box">CWA EEW<div>報數: 第 ${eew.no} 報</div><div>位置: ${eew.loc} | ${eew.lat}°N  ${eew.lon} °E</div><div>規模: M ${eew.scale}</div><div>深度: ${eew.depth} km</div><div>預估最大震度: ${IntensityI(eew.max)}</div><div>與CWA震央距: ${(distance / 1000).toFixed(2)} km</div></div>`, {
+					offset    : [8, 0],
+					permanent : false,
+					className : "report-cursor-tooltip",
+					opacity   : 1,
+				});
+				this._markers.push(eew_epicenterIcon);
+				this._setupzoomPredict();
+			}
+		}
 	},
 	_setuptremget(report) {
 		if (this.report_trem)
