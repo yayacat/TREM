@@ -5,7 +5,7 @@
 臺灣即時地震監測
 <a href="https://github.com/yayacat/TREM/actions/workflows/github_actions.yml"><img alt="GitHub Workflow Status" align="right" src="https://github.com/yayacat/TREM/actions/workflows/github_actions.yml/badge.svg"></a>
 <a href="https://discord.gg/5dbHqV8ees"><img alt="TREM Discord" align="right" src="https://img.shields.io/discord/926545182407688273?color=%237289DA&logo=discord&logoColor=white"></a>
-<a href=""><img alt="TREM Discord" align="right" src="https://img.shields.io/github/downloads/yayacat/TREM/total"></a>\
+<a href="https://github.com/yayacat/TREM/releases"><img alt="TREM Discord" align="right" src="https://img.shields.io/github/downloads/yayacat/TREM/total"></a>\
 &nbsp;
 
 <div style="display: grid; grid-template-columns: 1fr 1fr;">
