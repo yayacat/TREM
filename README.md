@@ -38,8 +38,9 @@ TREM 是一款開源地震速報軟體，提供給您即時的地震資訊，利
 ## 安裝
 ### 官方 | 官方推出的版本 較為穩定
 #### Windows
-到我們的 [Release](https://github.com/ExpTechTW/TREM/releases/latest) 頁面下載 TREM.Setup\
-下載完成後執行，就會開始安裝，安裝完成後會自動開啟 TREM
+
+> **Warning**  
+> 此項目當前已不再維護 請參考替代方案 [TREM-Lite](https://github.com/ExpTechTW/TREM-Lite)
 
 #### MacOS
 目前還沒有提供 MacOS 支援，敬請期待 :3
