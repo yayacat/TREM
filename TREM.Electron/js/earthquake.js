@@ -75,6 +75,7 @@ let PGALimit = 0;
 let PGAtag = -1;
 let intensitytag = -1;
 let MAXPGA = { pga: 0, station: "NA", level: 0 };
+let IMAXdata = {};
 let level_list = {};
 let Info = { Notify: [], Warn: [], Focus: [] };
 const Focus = [
@@ -2515,6 +2516,7 @@ function handler(Json) {
 	if (!All.length) {
 		PGAtag = -1;
 		PGALimit = 0;
+		IMAXdata = {};
 	} else {
 		for (let index = 0; index < All.length; index++) {
 			if (station[All[index].uuid] == undefined) continue;
@@ -2568,10 +2570,15 @@ function handler(Json) {
 				if (All[Index].loc == undefined) continue;
 
 				if (count >= 8) break;
+
+				if (!IMAXdata[All[Index].uuid.split("-")[2]]) IMAXdata[All[Index].uuid.split("-")[2]] = {};
+
+				if (!IMAXdata[All[Index].uuid.split("-")[2]].pga) IMAXdata[All[Index].uuid.split("-")[2]].pga = Json[All[Index].uuid.split("-")[2]].v;
+				else if (IMAXdata[All[Index].uuid.split("-")[2]].pga < Json[All[Index].uuid.split("-")[2]].v) IMAXdata[All[Index].uuid.split("-")[2]].pga = Json[All[Index].uuid.split("-")[2]].v;
 				const container = document.createElement("DIV");
 				container.className = IntensityToClassString(All[Index].intensity);
 				const location = document.createElement("span");
-				location.innerText = `${All[Index].loc}\n${Json[All[Index].uuid.split("-")[2]].v} gal`;
+				location.innerText = `${All[Index].loc}\n${IMAXdata[All[Index].uuid.split("-")[2]].pga} gal`;
 				container.appendChild(document.createElement("span"));
 				container.appendChild(location);
 				list.push(container);
@@ -2588,7 +2595,11 @@ function handler(Json) {
 
 				if (Json[All[Index].uuid.split("-")[2]]?.v > CPGA) {
 					if (Idata[city] == undefined) Idata[city] = {};
-					Idata[city].pga = Json[All[Index].uuid.split("-")[2]].v;
+
+					if (!IMAXdata[city]) IMAXdata[city] = {};
+
+					if (!IMAXdata[city].pga) IMAXdata[city].pga = Json[All[Index].uuid.split("-")[2]].v;
+					else if (IMAXdata[city].pga < Json[All[Index].uuid.split("-")[2]].v) IMAXdata[city].pga = Json[All[Index].uuid.split("-")[2]].v;
 					Idata[city].intensity = All[Index].intensity;
 				}
 			}
@@ -2597,7 +2608,7 @@ function handler(Json) {
 				const container = document.createElement("DIV");
 				container.className = IntensityToClassString(Idata[Object.keys(Idata)[index]].intensity);
 				const location = document.createElement("span");
-				location.innerText = `${Object.keys(Idata)[index]}\n${Idata[Object.keys(Idata)[index]].pga} gal`;
+				location.innerText = `${Object.keys(Idata)[index]}\n${IMAXdata[Object.keys(Idata)[index]].pga} gal`;
 				container.appendChild(document.createElement("span"));
 				container.appendChild(location);
 				list.push(container);
