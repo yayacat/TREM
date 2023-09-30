@@ -41,7 +41,7 @@ TREM.Report = {
 	_filterMonthValue     : "",
 	_reportItemTemplate   : document.getElementById("template-report-list-item"),
 	_report_trem_data     : storage.getItem("report_trem_data") ?? [],
-	_report_eew_data     : storage.getItem("report_eew_data") ?? [],
+	_report_eew_data      : storage.getItem("report_eew_data") ?? [],
 	_report_Temp          : null,
 	get _mapPaddingLeft() {
 		return document.getElementById("map-report").offsetWidth / 2;
@@ -782,51 +782,51 @@ TREM.Report = {
 	_setupeewget(report) {
 		if (report.ID.length != 0)
 			if (!this.report_eew_data[report.ID[0]])
-					fetch(`https://exptech.com.tw/api/v1/earthquake/eew-info/${report.ID[0]}`)
-						.then((res) => {
-							if (res.ok) {
-								console.debug(res);
+				fetch(`https://exptech.com.tw/api/v1/earthquake/eew-info/${report.ID[0]}`)
+					.then((res) => {
+						if (res.ok) {
+							console.debug(res);
 
-								res.json().then(res1 => {
-									console.debug(res1);
-									this._report_eew_data[report.ID[0]] = res1;
-									this.report_eew_data[report.ID[0]] = this._report_eew_data[report.ID[0]];
-									storage.setItem("report_eew_data", this._report_eew_data);
-									this._setupeewmarker(report);
-								});
-							} else {
-								console.error(res);
+							res.json().then(res1 => {
+								console.debug(res1);
+								this._report_eew_data[report.ID[0]] = res1;
+								this.report_eew_data[report.ID[0]] = this._report_eew_data[report.ID[0]];
+								storage.setItem("report_eew_data", this._report_eew_data);
+								this._setupeewmarker(report);
+							});
+						} else {
+							console.error(res);
 
-								switch (res.status) {
-									case 429: {
-										log(res.status, 3, "report_trem_info", "Report");
-										dump({ level: 2, message: res.status });
-										break;
-									}
-
-									case 404: {
-										log(res.status, 3, "report_trem_info", "Report");
-										dump({ level: 2, message: res.status });
-										break;
-									}
-
-									case 500: {
-										log(res.status, 3, "report_trem_info", "Report");
-										dump({ level: 2, message: res.status });
-										break;
-									}
-
-									default: break;
+							switch (res.status) {
+								case 429: {
+									log(res.status, 3, "report_trem_info", "Report");
+									dump({ level: 2, message: res.status });
+									break;
 								}
 
-								this._setupzoomPredict();
+								case 404: {
+									log(res.status, 3, "report_trem_info", "Report");
+									dump({ level: 2, message: res.status });
+									break;
+								}
+
+								case 500: {
+									log(res.status, 3, "report_trem_info", "Report");
+									dump({ level: 2, message: res.status });
+									break;
+								}
+
+								default: break;
 							}
-						}).catch(err => {
-							console.log(err.message);
-							log(err, 3, "report_eew", "Report");
-							dump({ level: 2, message: err });
+
 							this._setupzoomPredict();
-						});
+						}
+					}).catch(err => {
+						console.log(err.message);
+						log(err, 3, "report_eew", "Report");
+						dump({ level: 2, message: err });
+						this._setupzoomPredict();
+					});
 			else
 				this._setupeewmarker(report);
 	},
