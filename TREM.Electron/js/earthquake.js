@@ -2131,7 +2131,7 @@ function handler(Json) {
 		if (current_data != undefined || (api_key_verify && !setting["sleep.mode"]) || replay != 0) {
 			if (!Station[keys[index]] && (!rts_remove_eew || Alert))
 				Station[keys[index]] = L.marker(
-					[station[keys[index]].Lat, station[keys[index]].Long],
+					[station[keys[index]].Lat, keys[index].startsWith("H") ? station[keys[index]].Long + 0.0001 : station[keys[index]].Long],
 					{
 						icon: L.divIcon({
 							iconSize  : [size, size],
@@ -4931,9 +4931,9 @@ TREM.Earthquake.on("eew", (data) => {
 		alert_intensity : (data.type == "trem-eew") ? data.max ?? 0 : MaxIntensity.value,
 		alert_location  : data.location ?? "未知區域",
 		alert_time      : time,
-		alert_sTime     : (data.type == "trem-eew") ? null : Math.floor(data.time + _speed(data.depth, distance).Stime * 1000),
-		alert_pTime     : (data.type == "trem-eew") ? null : Math.floor(data.time + _speed(data.depth, distance).Ptime * 1000),
-		alert_local     : (data.type == "trem-eew") ? "na" : level.value,
+		alert_sTime     : Math.floor(data.time + _speed(data.depth, distance).Stime * 1000),
+		alert_pTime     : Math.floor(data.time + _speed(data.depth, distance).Ptime * 1000),
+		alert_local     : level.value,
 		alert_magnitude : data.scale ?? "?",
 		alert_depth     : data.depth ?? "?",
 		alert_provider  : (data.final) ? data.Unit + "(最終報)" : data.Unit,
