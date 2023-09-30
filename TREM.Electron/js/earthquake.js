@@ -1091,6 +1091,7 @@ async function init() {
 				if (ReportTag != 0 && NOW().getTime() - ReportTag > 30_000) {
 					console.debug("ReportTag end: ", NOW().getTime());
 					ReportTag = 0;
+					console.debug("ReportTag: ", ReportTag);
 					TREM.Report.setView("report-list");
 					changeView("main", "#mainView_btn");
 					stopReplay();
@@ -3751,6 +3752,7 @@ function stopReplaybtn() {
 TREM.backindexButton = () => {
 	TREM.set_report_overview = 0;
 	ReportTag = 0;
+	console.debug("ReportTag: ", ReportTag);
 	changeView("main", "#mainView_btn");
 };
 
@@ -3774,6 +3776,7 @@ ipcMain.on("testoldtime", (event, oldtime) => {
 	replayT = NOW().getTime();
 	replaydir = replay / 1000;
 	ReportTag = 0;
+	console.debug("ReportTag: ", ReportTag);
 	ipcMain.emit("ReportGET");
 	stopReplaybtn();
 	PGAMain();
@@ -3787,6 +3790,7 @@ ipcMain.on("testreplaytime", (event, oldtime) => {
 	replayT = NOW().getTime();
 	replaydir = replay / 1000;
 	ReportTag = 0;
+	console.debug("ReportTag: ", ReportTag);
 	ipcMain.emit("ReportGET");
 	stopReplaybtn();
 	PGAMain();
@@ -4097,6 +4101,8 @@ ipcMain.on("testEEW", (event, list = []) => {
 	toggleNav(false);
 	stopReplaybtn();
 	replaytestEEW = NOW().getTime();
+	ReportTag = 0;
+	console.debug("ReportTag: ", ReportTag);
 
 	if (TREM.MapIntensity.isTriggered)
 		TREM.MapIntensity.clear();
