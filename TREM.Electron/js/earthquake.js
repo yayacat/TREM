@@ -2869,10 +2869,10 @@ function playNextAudio1() {
 // #region Report Data
 function ReportGET() {
 	try {
-		const controller = new AbortController();
-		setTimeout(() => {
-			controller.abort();
-		}, 2500);
+		// const controller = new AbortController();
+		// setTimeout(() => {
+		// 	controller.abort();
+		// }, 2500);
 
 		if (!localStorage.fixReportGET_0) {
 			localStorage.fixReportGET_0 = 1;
@@ -2886,7 +2886,7 @@ function ReportGET() {
 
 		if (_report_data == null) _report_data = [];
 
-		const list = {};
+		// const list = {};
 		let _report_data_temp = [];
 		let j = 0;
 
@@ -2903,178 +2903,194 @@ function ReportGET() {
 			_report_data = _report_data_temp;
 		}
 
-		if (_report_data.length != 0)
-			for (let i = 0; i < 50; i++) {
-				const md5 = crypto.createHash("md5");
-				list[_report_data[i].identifier] = md5.update(JSON.stringify(_report_data[i])).digest("hex");
-			}
+		// if (_report_data.length != 0)
+		// 	for (let i = 0; i < 50; i++) {
+		// 		const md5 = crypto.createHash("md5");
+		// 		list[_report_data[i].identifier] = md5.update(JSON.stringify(_report_data[i])).digest("hex");
+		// 	}
 
-		let bodyInfo;
+		// let bodyInfo;
 
-		if (setting["report.getInfo"])
-			bodyInfo = JSON.stringify({ list, key: setting["api.key"] != "" ? setting["api.key"] : "" });
-		else if (setting["api.key"] != "")
-			bodyInfo = JSON.stringify({ list, key: setting["api.key"] });
-		else
-			bodyInfo = JSON.stringify({ list });
+		// if (setting["report.getInfo"])
+		// 	bodyInfo = JSON.stringify({ list, key: setting["api.key"] != "" ? setting["api.key"] : "" });
+		// else if (setting["api.key"] != "")
+		// 	bodyInfo = JSON.stringify({ list, key: setting["api.key"] });
+		// else
+		// 	bodyInfo = JSON.stringify({ list });
 
-		fetch("https://exptech.com.tw/api/v3/earthquake/reports", {
-			method  : "post",
-			headers : {
-				Accept         : "application/json",
-				"Content-Type" : "application/json",
-			},
-			body   : bodyInfo,
-			signal : controller.signal })
-			.then((ans0) => {
-				if (ans0.ok) {
-					console.debug(ans0);
-					ans0.json().then((ans) => {
-						console.debug(ans);
+		// fetch("https://exptech.com.tw/api/v3/earthquake/reports", {
+		// 	method  : "post",
+		// 	headers : {
+		// 		Accept         : "application/json",
+		// 		"Content-Type" : "application/json",
+		// 	},
+		// 	body   : bodyInfo,
+		// 	signal : controller.signal })
+		// 	.then((ans0) => {
+		// 		if (ans0.ok) {
+		// 			console.debug(ans0);
+		// 			ans0.json().then((ans) => {
+		// 				console.debug(ans);
 
-						if (ans.length != 0) {
-							for (let i = 0; i < ans.length; i++) {
-								const id = ans[i].identifier;
+		// 				if (ans.length != 0) {
+		// 					for (let i = 0; i < ans.length; i++) {
+		// 						const id = ans[i].identifier;
 
-								for (let _i = 0; _i < _report_data.length; _i++)
-									if (_report_data[_i].identifier == id) {
-										_report_data.splice(_i, 1);
-										break;
-									}
-							}
+		// 						for (let _i = 0; _i < _report_data.length; _i++)
+		// 							if (_report_data[_i].identifier == id) {
+		// 								_report_data.splice(_i, 1);
+		// 								break;
+		// 							}
+		// 					}
 
-							for (let i = 0; i < ans.length; i++)
-								_report_data.push(ans[i]);
+		// 					for (let i = 0; i < ans.length; i++)
+		// 						_report_data.push(ans[i]);
 
-							for (let i = 0; i < _report_data.length - 1; i++)
-								for (let _i = 0; _i < _report_data.length - 1; _i++)
-									if (new Date(_report_data[_i].originTime.replaceAll("/", "-")).getTime() < new Date(_report_data[_i + 1].originTime.replaceAll("/", "-")).getTime()) {
-										const temp = _report_data[_i + 1];
-										_report_data[_i + 1] = _report_data[_i];
-										_report_data[_i] = temp;
-									}
+		// 					for (let i = 0; i < _report_data.length - 1; i++)
+		// 						for (let _i = 0; _i < _report_data.length - 1; _i++)
+		// 							if (new Date(_report_data[_i].originTime.replaceAll("/", "-")).getTime() < new Date(_report_data[_i + 1].originTime.replaceAll("/", "-")).getTime()) {
+		// 								const temp = _report_data[_i + 1];
+		// 								_report_data[_i + 1] = _report_data[_i];
+		// 								_report_data[_i] = temp;
+		// 							}
 
-							if (!_report_data) return setTimeout(ReportGET, 10_000);
+		// 					if (!_report_data) return setTimeout(ReportGET, 10_000);
 
-							storage.setItem("report_data", _report_data);
-						}
+		// 					storage.setItem("report_data", _report_data);
+		// 				}
 
-						if (api_key_verify && setting["report.getInfo"]) {
-							log("Reports fetched (api key verify)", 1, "EQReportFetcher", "ReportGET");
-							dump({ level: 0, message: "Reports fetched (api key verify)", origin: "EQReportFetcher" });
-							cacheReport(_report_data);
-						} else {
-							const _report_data_POST_temp = [];
-							let k = 0;
+		// 				if (api_key_verify && setting["report.getInfo"]) {
+		// 					log("Reports fetched (api key verify)", 1, "EQReportFetcher", "ReportGET");
+		// 					dump({ level: 0, message: "Reports fetched (api key verify)", origin: "EQReportFetcher" });
+		// 					cacheReport(_report_data);
+		// 				} else {
+		// 					const _report_data_POST_temp = [];
+		// 					let k = 0;
 
-							for (let i = 0; i < _report_data.length; i++)
-								if (_report_data[i].identifier.startsWith("CWB")) {
-									_report_data_POST_temp[k] = _report_data[i];
-									k += 1;
-								} else if (_report_data[i].identifier.startsWith("CWA")) {
-									_report_data_POST_temp[k] = _report_data[i];
-									k += 1;
-								}
+		// 					for (let i = 0; i < _report_data.length; i++)
+		// 						if (_report_data[i].identifier.startsWith("CWB")) {
+		// 							_report_data_POST_temp[k] = _report_data[i];
+		// 							k += 1;
+		// 						} else if (_report_data[i].identifier.startsWith("CWA")) {
+		// 							_report_data_POST_temp[k] = _report_data[i];
+		// 							k += 1;
+		// 						}
 
-							log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
-							dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
-							cacheReport(_report_data_POST_temp);
-						}
-					});
-				} else {
-					console.error(ans0);
+		// 					log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
+		// 					dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
+		// 					cacheReport(_report_data_POST_temp);
+		// 				}
+		// 			});
+		// 		} else {
+		// 			console.error(ans0);
 
-					switch (ans0.status) {
-						case 429: {
-							log("Error fetching reports (fetch) 429", 3, "EQReportFetcher", "ReportGET");
-							log(ans0, 3, "EQReportFetcher", "ReportGET");
-							dump({ level: 2, message: "Error fetching reports (fetch) 429", origin: "EQReportFetcher" });
-							dump({ level: 2, message: ans0, origin: "EQReportFetcher" });
+		// 			switch (ans0.status) {
+		// 				case 429: {
+		// 					log("Error fetching reports (fetch) 429", 3, "EQReportFetcher", "ReportGET");
+		// 					log(ans0, 3, "EQReportFetcher", "ReportGET");
+		// 					dump({ level: 2, message: "Error fetching reports (fetch) 429", origin: "EQReportFetcher" });
+		// 					dump({ level: 2, message: ans0, origin: "EQReportFetcher" });
 
-							if (_report_data.length > setting["cache.report"]) {
-								_report_data_temp = [];
-								for (let i = 0; i < setting["cache.report"]; i++)
-									_report_data_temp[i] = _report_data[i];
-								TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
-								ReportList(_report_data_temp);
-							} else {
-								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
-								ReportList(_report_data);
-							}
+		// 					if (_report_data.length > setting["cache.report"]) {
+		// 						_report_data_temp = [];
+		// 						for (let i = 0; i < setting["cache.report"]; i++)
+		// 							_report_data_temp[i] = _report_data[i];
+		// 						TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+		// 						ReportList(_report_data_temp);
+		// 					} else {
+		// 						TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+		// 						ReportList(_report_data);
+		// 					}
 
-							return setTimeout(() => {
-								ReportGET();
-							}, 30_000);
-						}
+		// 					return setTimeout(() => {
+		// 						ReportGET();
+		// 					}, 30_000);
+		// 				}
 
-						case 404: {
-							log("Error fetching reports (fetch) 404", 3, "EQReportFetcher", "ReportGET");
-							log(ans0, 3, "EQReportFetcher", "ReportGET");
-							dump({ level: 2, message: "Error fetching reports (fetch) 404", origin: "EQReportFetcher" });
-							dump({ level: 2, message: ans0, origin: "EQReportFetcher" });
+		// 				case 404: {
+		// 					log("Error fetching reports (fetch) 404", 3, "EQReportFetcher", "ReportGET");
+		// 					log(ans0, 3, "EQReportFetcher", "ReportGET");
+		// 					dump({ level: 2, message: "Error fetching reports (fetch) 404", origin: "EQReportFetcher" });
+		// 					dump({ level: 2, message: ans0, origin: "EQReportFetcher" });
 
-							if (_report_data.length > setting["cache.report"]) {
-								_report_data_temp = [];
-								for (let i = 0; i < setting["cache.report"]; i++)
-									_report_data_temp[i] = _report_data[i];
-								TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
-								ReportList(_report_data_temp);
-							} else {
-								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
-								ReportList(_report_data);
-							}
+		// 					if (_report_data.length > setting["cache.report"]) {
+		// 						_report_data_temp = [];
+		// 						for (let i = 0; i < setting["cache.report"]; i++)
+		// 							_report_data_temp[i] = _report_data[i];
+		// 						TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+		// 						ReportList(_report_data_temp);
+		// 					} else {
+		// 						TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+		// 						ReportList(_report_data);
+		// 					}
 
-							return setTimeout(() => {
-								ReportGET();
-							}, 30_000);
-						}
+		// 					return setTimeout(() => {
+		// 						ReportGET();
+		// 					}, 30_000);
+		// 				}
 
-						case 500: {
-							log("Error fetching reports (fetch) 500", 3, "EQReportFetcher", "ReportGET");
-							log(ans0, 3, "EQReportFetcher", "ReportGET");
-							dump({ level: 2, message: "Error fetching reports (fetch) 500", origin: "EQReportFetcher" });
-							dump({ level: 2, message: ans0, origin: "EQReportFetcher" });
+		// 				case 500: {
+		// 					log("Error fetching reports (fetch) 500", 3, "EQReportFetcher", "ReportGET");
+		// 					log(ans0, 3, "EQReportFetcher", "ReportGET");
+		// 					dump({ level: 2, message: "Error fetching reports (fetch) 500", origin: "EQReportFetcher" });
+		// 					dump({ level: 2, message: ans0, origin: "EQReportFetcher" });
 
-							if (_report_data.length > setting["cache.report"]) {
-								_report_data_temp = [];
-								for (let i = 0; i < setting["cache.report"]; i++)
-									_report_data_temp[i] = _report_data[i];
-								TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
-								ReportList(_report_data_temp);
-							} else {
-								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
-								ReportList(_report_data);
-							}
+		// 					if (_report_data.length > setting["cache.report"]) {
+		// 						_report_data_temp = [];
+		// 						for (let i = 0; i < setting["cache.report"]; i++)
+		// 							_report_data_temp[i] = _report_data[i];
+		// 						TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+		// 						ReportList(_report_data_temp);
+		// 					} else {
+		// 						TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+		// 						ReportList(_report_data);
+		// 					}
 
-							return setTimeout(() => {
-								ReportGET();
-							}, 30_000);
-						}
+		// 					return setTimeout(() => {
+		// 						ReportGET();
+		// 					}, 30_000);
+		// 				}
 
-						default: break;
-					}
-				}
-			}).catch((err) => {
-				log("Error fetching reports (fetch)", 3, "EQReportFetcher", "ReportGET");
-				log(err, 3, "EQReportFetcher", "ReportGET");
-				dump({ level: 2, message: "Error fetching reports (fetch)", origin: "EQReportFetcher" });
-				dump({ level: 2, message: err, origin: "EQReportFetcher" });
+		// 				default: break;
+		// 			}
+		// 		}
+		// 	}).catch((err) => {
+		// 		log("Error fetching reports (fetch)", 3, "EQReportFetcher", "ReportGET");
+		// 		log(err, 3, "EQReportFetcher", "ReportGET");
+		// 		dump({ level: 2, message: "Error fetching reports (fetch)", origin: "EQReportFetcher" });
+		// 		dump({ level: 2, message: err, origin: "EQReportFetcher" });
 
-				if (_report_data.length > setting["cache.report"]) {
-					_report_data_temp = [];
-					for (let i = 0; i < setting["cache.report"]; i++)
-						_report_data_temp[i] = _report_data[i];
-					TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
-					ReportList(_report_data_temp);
-				} else {
-					TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
-					ReportList(_report_data);
-				}
+		// 		if (_report_data.length > setting["cache.report"]) {
+		// 			_report_data_temp = [];
+		// 			for (let i = 0; i < setting["cache.report"]; i++)
+		// 				_report_data_temp[i] = _report_data[i];
+		// 			TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+		// 			ReportList(_report_data_temp);
+		// 		} else {
+		// 			TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+		// 			ReportList(_report_data);
+		// 		}
 
-				return setTimeout(() => {
-					ReportGET();
-				}, 60_000);
-			});
+		// 		return setTimeout(() => {
+		// 			ReportGET();
+		// 		}, 60_000);
+		// 	});
+
+		if (api_key_verify && setting["report.getInfo"]) {
+			log("Reports fetched (api key verify)", 1, "EQReportFetcher", "ReportGET");
+			dump({ level: 0, message: "Reports fetched (api key verify)", origin: "EQReportFetcher" });
+			cacheReport(_report_data);
+		} else if (_report_data.length > setting["cache.report"]) {
+			_report_data_temp = [];
+			for (let i = 0; i < setting["cache.report"]; i++)
+				_report_data_temp[i] = _report_data[i];
+			TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+			ReportList(_report_data_temp);
+		} else {
+			TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+			ReportList(_report_data);
+		}
+
 		report_get_timestamp = Date.now();
 	} catch (error) {
 		log("Error fetching reports (try)", 3, "EQReportFetcher", "ReportGET");
@@ -3110,7 +3126,7 @@ ipcMain.on("ReportGET", () => {
 	let _report_data_GET = [];
 	const _report_data_GET_temp = [];
 	let j = 0;
-	let getInfo = false;
+	// let getInfo = false;
 	_report_data_GET = storage.getItem("report_data");
 
 	if (typeof _report_data_GET != "object") _report_data_GET = [];
@@ -3125,12 +3141,13 @@ ipcMain.on("ReportGET", () => {
 		cacheReport(_report_data_GET_temp);
 	} else if (_report_data_GET.length != 0 && setting["report.getInfo"]) {
 		if (api_key_verify) {
-			for (let i = 0; i < _report_data_GET.length; i++)
-				if (_report_data_GET[i].location.startsWith("地震資訊"))
-					getInfo = true;
+			// for (let i = 0; i < _report_data_GET.length; i++)
+			// 	if (_report_data_GET[i].location.startsWith("地震資訊"))
+			// 		getInfo = true;
 
-			if (!getInfo) ReportGET();
-			else if (getInfo) cacheReport(_report_data_GET);
+			// if (!getInfo) ReportGET();
+			// else if (getInfo) cacheReport(_report_data_GET);
+			cacheReport(_report_data_GET);
 		} else {
 			for (let i = 0; i < _report_data_GET.length; i++)
 				if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
@@ -3138,8 +3155,9 @@ ipcMain.on("ReportGET", () => {
 					j += 1;
 				}
 
-			if (setting["api.key"] != "") ReportGET();
-			else cacheReport(_report_data_GET_temp);
+			// if (setting["api.key"] != "") ReportGET();
+			// else cacheReport(_report_data_GET_temp);
+			cacheReport(_report_data_GET_temp);
 		}
 	}
 });
@@ -3468,6 +3486,25 @@ function addReport(report, prepend = false, index = 0) {
 				ReportTag = NOW().getTime();
 				console.debug("ReportTag: ", ReportTag);
 			}
+
+			let _report_data = [];
+			_report_data = storage.getItem("report_data");
+
+			if (typeof _report_data != "object") _report_data = [];
+
+			if (_report_data == null) _report_data = [];
+
+			_report_data.push(report);
+
+			for (let i = 0; i < _report_data.length - 1; i++)
+				for (let _i = 0; _i < _report_data.length - 1; _i++)
+					if (new Date(_report_data[_i].originTime.replaceAll("/", "-")).getTime() < new Date(_report_data[_i + 1].originTime.replaceAll("/", "-")).getTime()) {
+						const temp = _report_data[_i + 1];
+						_report_data[_i + 1] = _report_data[_i];
+						_report_data[_i] = temp;
+					}
+
+			storage.setItem("report_data", _report_data);
 		} else {
 			roll.append(Div);
 		}
@@ -3581,6 +3618,8 @@ TREM.color = function color(Intensity) {
 };
 // #endregion
 
+let rts_clock = null;
+
 // #region IPC
 ipcMain.once("start", () => {
 	try {
@@ -3663,15 +3702,36 @@ ipcMain.once("start", () => {
 		}
 
 		setInterval(() => {
-			ipcMain.emit("apikey");
-		}, 9_000);
-
-		setInterval(() => {
 			if (DATAstamp != 0 && Stamp != DATAstamp) {
 				Stamp = DATAstamp;
 				FCMdata(DATA, ServerType);
 			}
 		}, 0);
+
+		if (!api_key_verify) {
+			if (rts_clock) {
+				clearInterval(rts_clock);
+				rts_clock = null;
+			}
+
+			rts_clock = setInterval(async () => {
+				try {
+					const controller = new AbortController();
+					const timer = setTimeout(() => controller.abort(), 900);
+					const res = await fetch("https://exptech.com.tw/api/v2/trem/rts", { signal: controller.signal });
+					clearTimeout(timer);
+
+					if (!res.ok) throw new Error("server error");
+
+					const ans = await res.json();
+					rts_ws_timestamp = new Date().getTime();
+					ans.Time = rts_ws_timestamp;
+					rts_response = ans;
+				} catch (err) {
+					log(err, 3, "server", "rts-clock");
+				}
+			}, 1000);
+		}
 
 		log(`Initializing ServerCore >> ${ServerVer}`, 1, "Initialization", "start");
 		dump({ level: 0, message: `Initializing ServerCore >> ${ServerVer}`, origin: "Initialization" });

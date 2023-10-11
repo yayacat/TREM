@@ -1,6 +1,6 @@
 {
   "name": "trem",
-  "version": "6.1.40",
+  "version": "6.1.41",
   "description": "Taiwan Real-time Earthquake Monitoring ( 臺灣即時地震監測 )",
   "main": "main.js",
   "homepage": "https://exptech.com.tw/",
@@ -69,9 +69,9 @@
   "keywords": [],
   "license": "AGPL-3.0",
   "devDependencies": {
-    "electron": "^26.2.3",
+    "electron": "^27.0.0",
     "electron-builder": "^24.6.4",
-    "eslint": "^8.50.0"
+    "eslint": "^8.51.0"
   },
   "dependencies": {
     "@electron/remote": "^2.0.11",
