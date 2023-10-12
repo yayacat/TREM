@@ -4927,8 +4927,6 @@ TREM.Earthquake.on("eew", (data) => {
 		}
 
 		if (data.type == "eew-cwb") {
-			audioPlay("../audio/cwbeew.wav");
-
 			if (data.location.includes("海") && Number(data.depth) <= 35)
 				if (Number(speecd_scale) >= 7 && speecd_number == 1)
 					TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象署是否發布，海嘯警報" });
