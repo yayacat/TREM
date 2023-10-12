@@ -1083,7 +1083,7 @@ async function init() {
 						globalgc();
 					}
 				} else
-					if (Date.now() - report_get_timestamp > 300_000) {
+					if (Date.now() - report_get_timestamp > 3600_000) {
 						ReportGET();
 						globalgc();
 					}
