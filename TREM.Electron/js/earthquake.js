@@ -1688,7 +1688,8 @@ function PGAMain() {
 						if (rts_ws_timestamp) {
 							const t0 = Math.abs(rts_response.Time - NOW().getTime());
 
-							if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
+							if (!api_key_verify) Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
+							else if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
 							else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
 							else Ping = `⚠️ ${(t0 / 1000).toFixed(1)}s`;
 
@@ -1893,7 +1894,8 @@ function PGAMainbkup() {
 						if (rts_ws_timestamp) {
 							const t1 = Math.abs(rts_response.Time - NOW().getTime());
 
-							if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
+							if (!api_key_verify) Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
+							else if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
 							else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
 							else Ping = `⚠️ ${(t1 / 1000).toFixed(1)}s`;
 
