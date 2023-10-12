@@ -44,7 +44,7 @@ const speecd_use = setting["audio.tts"] ?? false;
 // #region 變數
 const posturl = "https://exptech.com.tw/api/v1/trem/";
 const geturl = "https://exptech.com.tw/api/v2/trem/rts?time=";
-const getapiequrl = "https://exptech.com.tw/api/v1/earthquake/info?time=";
+const getapiequrl = "https://api.exptech.com.tw/api/v1/trem/rts/";
 const MapData = {};
 const Timers = {};
 let Stamp = 0;
@@ -1627,8 +1627,15 @@ function PGAMain() {
 			const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
 
 			if (ReplayTime != 0 && TREM.Report.replayHttp) {
-				const _replay_time = Math.round(ReplayTime / 1000);
-				const url1 = getapiequrl + String(_replay_time) + "&type=all";
+				const now = new Date(ReplayTime);
+				const YYYY = now.getFullYear();
+				const MM = (now.getMonth() + 1).toString().padStart(2, "0");
+				const DD = now.getDate().toString().padStart(2, "0");
+				const hh = now.getHours().toString().padStart(2, "0");
+				const mm = now.getMinutes().toString().padStart(2, "0");
+				const ss = now.getSeconds().toString().padStart(2, "0");
+				const t = `${YYYY}${MM}${DD}${hh}${mm}${ss}`;
+				const url1 = getapiequrl + t;
 				const controller1 = new AbortController();
 				setTimeout(() => {
 					controller1.abort();
@@ -1688,7 +1695,7 @@ function PGAMain() {
 						if (rts_ws_timestamp) {
 							const t0 = Math.abs(rts_response.Time - NOW().getTime());
 
-							if (!api_key_verify) Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
+							if (!rts_key_verify) Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
 							else if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
 							else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
 							else Ping = `⚠️ ${(t0 / 1000).toFixed(1)}s`;
@@ -1830,8 +1837,15 @@ function PGAMainbkup() {
 			const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
 
 			if (ReplayTime != 0 && TREM.Report.replayHttp) {
-				const _replay_time = Math.round(ReplayTime / 1000);
-				const url1 = getapiequrl + String(_replay_time) + "&type=all";
+				const now = new Date(ReplayTime);
+				const YYYY = now.getFullYear();
+				const MM = (now.getMonth() + 1).toString().padStart(2, "0");
+				const DD = now.getDate().toString().padStart(2, "0");
+				const hh = now.getHours().toString().padStart(2, "0");
+				const mm = now.getMinutes().toString().padStart(2, "0");
+				const ss = now.getSeconds().toString().padStart(2, "0");
+				const t = `${YYYY}${MM}${DD}${hh}${mm}${ss}`;
+				const url1 = getapiequrl + t;
 				const controller1 = new AbortController();
 				setTimeout(() => {
 					controller1.abort();
@@ -1894,7 +1908,7 @@ function PGAMainbkup() {
 						if (rts_ws_timestamp) {
 							const t1 = Math.abs(rts_response.Time - NOW().getTime());
 
-							if (!api_key_verify) Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
+							if (!rts_key_verify) Ping = `🔒 ${(t1 / 1000).toFixed(1)}s`;
 							else if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
 							else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
 							else Ping = `⚠️ ${(t1 / 1000).toFixed(1)}s`;
@@ -2132,7 +2146,7 @@ function handler(Json) {
 			station_tooltip = `<div>${keys[index]}</div><div>${station[keys[index]].Loc}</div><div>${amount}</div><div>${current_data.i}</div>`;
 		}
 
-		if (current_data != undefined || (api_key_verify && !setting["sleep.mode"]) || replay != 0) {
+		if (current_data != undefined || (rts_key_verify && !setting["sleep.mode"]) || replay != 0) {
 			if (!Station[keys[index]] && (!rts_remove_eew || Alert))
 				Station[keys[index]] = L.marker(
 					[station[keys[index]].Lat, keys[index].startsWith("H") ? station[keys[index]].Long + 0.0001 : station[keys[index]].Long],
@@ -2333,7 +2347,7 @@ function handler(Json) {
 				current_station_data.PGA = 13379360;
 
 			if ((detected_list[current_station_data.PGA]?.intensity ?? -1) < intensitytest)
-				if (setting["Real-time.alert"] && api_key_verify) {
+				if (setting["Real-time.alert"] && rts_key_verify) {
 					detected_list[current_station_data.PGA] ??= {
 						intensity : intensitytest,
 						time      : NOW().getTime(),
@@ -3625,7 +3639,7 @@ let rts_clock = null;
 // #region IPC
 ipcMain.once("start", () => {
 	try {
-		if (!(api_key_verify ? storage.getItem("disclaimer_off") : false) && !api_key_verify) {
+		if (!(rts_key_verify ? storage.getItem("disclaimer_off") : false) && !rts_key_verify) {
 			showDialog(
 				"warn",
 				"免責聲明",
@@ -3710,7 +3724,7 @@ ipcMain.once("start", () => {
 			}
 		}, 0);
 
-		if (!api_key_verify) {
+		if (!rts_key_verify) {
 			if (rts_clock) {
 				clearInterval(rts_clock);
 				rts_clock = null;
@@ -4561,7 +4575,7 @@ function FCMdata(json, Unit) {
 
 		if (NOW().getTime() - json.time > 240_000) return;
 
-		if (json.type == "trem-eew" && !api_key_verify && replay == 0) return;
+		if (json.type == "trem-eew" && !eew_key_verify && replay == 0) return;
 
 		if (
 			(json.type == "eew-scdzj" && !setting["accept.eew.SCDZJ"])

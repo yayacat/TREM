@@ -333,14 +333,22 @@ TREM.Report = {
 					},
 				};
 				const gettime = time / 1000;
-				fetch(`https://exptech.com.tw/api/v2/trem/rts?time=${time}`)
+				const now = new Date(time);
+				const YYYY = now.getFullYear();
+				const MM = (now.getMonth() + 1).toString().padStart(2, "0");
+				const DD = now.getDate().toString().padStart(2, "0");
+				const hh = now.getHours().toString().padStart(2, "0");
+				const mm = now.getMinutes().toString().padStart(2, "0");
+				const ss = now.getSeconds().toString().padStart(2, "0");
+				const t = `${YYYY}${MM}${DD}${hh}${mm}${ss}`;
+				fetch(`https://api.exptech.com.tw/api/v1/trem/rts/${t}`)
 					.then((res) => {
 						if (res.ok) {
 							// console.debug(res);
 							res.json().then(res1 => {
 								// console.debug(res1);
 								result.rts = res1;
-								fetch(`https://exptech.com.tw/api/v1/earthquake/info?time=${gettime}&type=all`)
+								fetch(`https://api.exptech.com.tw/api/v1/eq/eew/${t}?type=all`)
 									.then((res0) => {
 										if (res0.ok) {
 											// console.debug(res);
