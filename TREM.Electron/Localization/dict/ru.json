@@ -45,6 +45,7 @@
     "Setting_Open": "Открыть настройки",
     "general_locale": "Язык дисплея",
     "check_For_Updates": null,
+    "open_Devtool_F10": null,
     "Notification_No_Update_Title": null,
     "Notification_No_Update_Body": null,
     "Tray_Reload": null

@@ -903,6 +903,13 @@ function trayIcon() {
 					click : () => {
 						checkForUpdates();
 					}
+				},
+				{
+					label : TREM.Localization.getString("open_Devtool_F10"),
+					type  : "normal",
+					click : () => {
+						MainWindow.webContents.openDevTools({ mode: "detach" });
+					}
 				}
 			]
 		},

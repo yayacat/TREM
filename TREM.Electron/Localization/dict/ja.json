@@ -45,6 +45,7 @@
     "Setting_Open": "設定を開く",
     "general_locale": "表示言語",
     "check_For_Updates": "アップデートを確認",
+    "open_Devtool_F10": null,
     "Notification_No_Update_Title": "アップデートはありません",
     "Notification_No_Update_Body": "現在のv{0}\n最新のv{1}",
     "Tray_Reload": "リロード"
