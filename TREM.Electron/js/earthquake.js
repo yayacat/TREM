@@ -3011,6 +3011,8 @@ function ReportGET() {
 								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
 								ReportList(_report_data);
 							}
+
+							break;
 						}
 
 						case 404: {
@@ -3029,6 +3031,8 @@ function ReportGET() {
 								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
 								ReportList(_report_data);
 							}
+
+							break;
 						}
 
 						case 500: {
@@ -3047,6 +3051,8 @@ function ReportGET() {
 								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
 								ReportList(_report_data);
 							}
+
+							break;
 						}
 
 						default: break;
