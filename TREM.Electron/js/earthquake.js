@@ -2970,8 +2970,6 @@ function ReportGET() {
 										_report_data[_i] = temp;
 									}
 
-							if (!_report_data) return setTimeout(ReportGET, 10_000);
-
 							storage.setItem("report_data", _report_data);
 						}
 
@@ -3013,10 +3011,6 @@ function ReportGET() {
 								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
 								ReportList(_report_data);
 							}
-
-							return setTimeout(() => {
-								ReportGET();
-							}, 30_000);
 						}
 
 						case 404: {
@@ -3035,10 +3029,6 @@ function ReportGET() {
 								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
 								ReportList(_report_data);
 							}
-
-							return setTimeout(() => {
-								ReportGET();
-							}, 30_000);
 						}
 
 						case 500: {
@@ -3057,10 +3047,6 @@ function ReportGET() {
 								TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
 								ReportList(_report_data);
 							}
-
-							return setTimeout(() => {
-								ReportGET();
-							}, 30_000);
 						}
 
 						default: break;
@@ -3082,10 +3068,6 @@ function ReportGET() {
 					TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
 					ReportList(_report_data);
 				}
-
-				return setTimeout(() => {
-					ReportGET();
-				}, 60_000);
 			});
 
 		const controller1 = new AbortController();
@@ -3221,10 +3203,6 @@ function ReportGET() {
 						TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
 						ReportList(_report_data);
 					}
-
-					return setTimeout(() => {
-						ReportGET();
-					}, 60_000);
 				});
 
 		report_get_timestamp = Date.now();
@@ -4507,6 +4485,8 @@ function FCMdata(json, Unit) {
 	log(`Latency: ${NOW().getTime() - json.timestamp}ms | Form: ${Unit} | Type: ${json.type}`, 1, "API", "FCMdata");
 	dump({ level: 0, message: `Latency: ${NOW().getTime() - json.timestamp}ms | Form: ${Unit} | Type: ${json.type}`, origin: "API" });
 	console.debug(json);
+
+	if (json.type == undefined) return;
 
 	if (json.type == "tsunami-info") {
 		const now = new Date(json.time);

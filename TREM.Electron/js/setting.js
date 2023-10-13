@@ -728,9 +728,7 @@ function TextSave(id) {
 		if (value.length <= 0)
 			return;
 		else
-			setTimeout(() => {
-				ipcRenderer.send("apikey");
-			}, 1_000);
+			ipcRenderer.send("apikey");
 	ipcRenderer.send("config:value", id, value);
 }
 
