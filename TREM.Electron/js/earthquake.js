@@ -4118,6 +4118,8 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 
 	description += "\n";
 
+	if (intensity.unit == "cwb") intensity.unit = "cwa";
+
 	if (speecd_use && intensity.unit != "palert") {
 		const now = timeconvert(new Date(info.time != 0 ? info.time : intensity.timestamp)).format("YYYY/MM/DD HH:mm:ss");
 		let description0 = "";
