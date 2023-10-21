@@ -2983,6 +2983,11 @@ function ReportGET() {
 							dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
 							cacheReport(_report_data_POST_temp);
 						}
+					}).catch((err) => {
+						log("Error fetching reports (fetch) json", 3, "EQReportFetcher", "ReportGET");
+						log(err, 3, "EQReportFetcher", "ReportGET");
+						dump({ level: 2, message: "Error fetching reports (fetch) json", origin: "EQReportFetcher" });
+						dump({ level: 2, message: err, origin: "EQReportFetcher" });
 					});
 				} else {
 					console.error(ans0);
