@@ -729,7 +729,7 @@ function TextSave(id) {
 			ipcRenderer.send("apikey");
 			ipcRenderer.send("config:value", id, value);
 		} else {
-			return;
+			return 0;
 		}
 	else
 		ipcRenderer.send("config:value", id, value);
