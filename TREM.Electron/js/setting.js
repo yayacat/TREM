@@ -725,11 +725,14 @@ function TextSave(id) {
 	dump({ level: 0, message: `Value Changed ${id}: ${setting[id]} -> ${value}`, origin: "Setting" });
 
 	if (id == "api.key")
-		if (value.length <= 0)
-			return;
-		else
+		if (value.length == 30) {
 			ipcRenderer.send("apikey");
-	ipcRenderer.send("config:value", id, value);
+			ipcRenderer.send("config:value", id, value);
+		} else {
+			return;
+		}
+	else
+		ipcRenderer.send("config:value", id, value);
 }
 
 function KeyTextSave(id) {
