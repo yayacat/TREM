@@ -668,6 +668,8 @@ TREM.Old_database = {
 
 		if (unit == "trem") unit = "TREM";
 
+		if (unit == "eew-cwb") unit = "eew-cwa";
+
 		if (Olddatabase.raw)
 			if (Olddatabase.raw.info?.scale == 0) scale = "0.0";
 			else if (Olddatabase.raw.info?.scale) scale = Olddatabase.raw.info.scale.toFixed(1);
