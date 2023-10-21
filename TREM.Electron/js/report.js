@@ -266,22 +266,22 @@ TREM.Report = {
 		if (replay != 0) return;
 		changeView("main", "#mainView_btn");
 
-		let list = [];
+		// let list = [];
 
 		if (report.download) {
 			const oldtime = new Date(report.originTime.replace(/-/g, "/")).getTime();
 			ipcRenderer.send("testoldtime", oldtime);
 		}
 
-		if (report.ID.length) {
-			list = list.concat(report.ID);
-			ipcRenderer.send("testEEW", list);
-		}
+		// if (report.ID.length) {
+		// 	list = list.concat(report.ID);
+		// 	ipcRenderer.send("testEEW", list);
+		// }
 
-		if (report.trem.length) {
-			list = list.concat(report.trem);
-			ipcRenderer.send("testEEW", list);
-		}
+		// if (report.trem.length) {
+		// 	list = list.concat(report.trem);
+		// 	ipcRenderer.send("testEEW", list);
+		// }
 
 		if (!report.download || !report.ID.length || !report.trem.length) {
 			this.replayHttp = true;

@@ -2917,7 +2917,7 @@ function ReportGET() {
 		const controller = new AbortController();
 		setTimeout(() => {
 			controller.abort();
-		}, 2500);
+		}, 5_000);
 
 		if (_report_data.length != 0)
 			for (let i = 0; i < 50; i++) {
@@ -2934,14 +2934,7 @@ function ReportGET() {
 		else
 			bodyInfo = JSON.stringify({ list });
 
-		fetch("http://p2p-3.yayaneko.eu.org/api/v3/earthquake/reports", {
-			method  : "post",
-			headers : {
-				Accept         : "application/json",
-				"Content-Type" : "application/json",
-			},
-			body   : bodyInfo,
-			signal : controller.signal })
+		fetch("https://exptech.com.tw/api/v1/earthquake/reports?limit=50", { signal: controller.signal })
 			.then((ans0) => {
 				if (ans0.ok) {
 					console.debug(ans0);
@@ -3079,9 +3072,9 @@ function ReportGET() {
 		const controller1 = new AbortController();
 		setTimeout(() => {
 			controller1.abort();
-		}, 2500);
+		}, 5_000);
 
-		if (api_key_verify && setting["report.getInfo"])
+		if (api_key_verify && setting["report.getInfo"]) {
 			fetch(`https://exptech.com.tw/api/v1/earthquake/reports?limit=50&key=${setting["api.key"]}`, { signal: controller1.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
@@ -3210,6 +3203,23 @@ function ReportGET() {
 						ReportList(_report_data);
 					}
 				});
+		} else {
+			const _report_data_POST_temp = [];
+			let k = 0;
+
+			for (let i = 0; i < _report_data.length; i++)
+				if (_report_data[i].identifier.startsWith("CWB")) {
+					_report_data_POST_temp[k] = _report_data[i];
+					k += 1;
+				} else if (_report_data[i].identifier.startsWith("CWA")) {
+					_report_data_POST_temp[k] = _report_data[i];
+					k += 1;
+				}
+
+			log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
+			dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
+			cacheReport(_report_data_POST_temp);
+		}
 
 		report_get_timestamp = Date.now();
 	} catch (error) {
@@ -3556,25 +3566,7 @@ function addReport(report, prepend = false, index = 0) {
 		Div.addEventListener("contextmenu", () => {
 			if (replay != 0) return;
 
-			let list = [];
-
-			const reportD = TREM.Report.cache.get(report.identifier);
-			console.debug(reportD);
-
-			if (reportD.download) {
-				const oldtime = new Date(report.originTime.replace(/-/g, "/")).getTime();
-				ipcRenderer.send("testoldtime", oldtime);
-			} else if (report.ID.length) {
-				list = list.concat(report.ID);
-				ipcRenderer.send("testEEW", list);
-			} else if (report.trem.length) {
-				list = list.concat(report.trem);
-				ipcRenderer.send("testEEW", list);
-			} else {
-				TREM.Report.replayHttp = true;
-				const oldtime = new Date(report.originTime.replace(/-/g, "/")).getTime();
-				ipcRenderer.send("testoldtimeEEW", oldtime);
-			}
+			TREM.Report.replay(report.identifier);
 		});
 
 		if (prepend) {
