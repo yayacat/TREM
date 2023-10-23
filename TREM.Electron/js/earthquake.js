@@ -44,7 +44,7 @@ const speecd_use = setting["audio.tts"] ?? false;
 // #region 變數
 const posturl = "https://exptech.com.tw/api/v1/trem/";
 const geturl = "https://exptech.com.tw/api/v2/trem/rts?time=";
-const getapiequrl = "https://api.exptech.com.tw/api/v1/trem/rts/";
+const getapiequrl = "https://api.exptech.com.tw/api/v1/eq/eew/";
 const MapData = {};
 const Timers = {};
 let Stamp = 0;
@@ -1635,7 +1635,7 @@ function PGAMain() {
 				const mm = now.getMinutes().toString().padStart(2, "0");
 				const ss = now.getSeconds().toString().padStart(2, "0");
 				const t = `${YYYY}${MM}${DD}${hh}${mm}${ss}`;
-				const url1 = getapiequrl + t;
+				const url1 = getapiequrl + t + "?type=all";
 				const controller1 = new AbortController();
 				setTimeout(() => {
 					controller1.abort();
@@ -1845,7 +1845,7 @@ function PGAMainbkup() {
 				const mm = now.getMinutes().toString().padStart(2, "0");
 				const ss = now.getSeconds().toString().padStart(2, "0");
 				const t = `${YYYY}${MM}${DD}${hh}${mm}${ss}`;
-				const url1 = getapiequrl + t;
+				const url1 = getapiequrl + t + "?type=all";
 				const controller1 = new AbortController();
 				setTimeout(() => {
 					controller1.abort();
@@ -3940,6 +3940,15 @@ TREM.backindexButton = () => {
 	console.debug("ReportTag: ", ReportTag);
 	changeView("main", "#mainView_btn");
 };
+
+ipcMain.on("testoldEEW", (event) => {
+	const report_data = storage.getItem("report_data");
+	TREM.Report.replayHttp = true;
+	replay = new Date(report_data[0].originTime.replace(/-/g, "/")).getTime() - 25000;
+	replayT = NOW().getTime();
+	ipcMain.emit("ReportGET");
+	stopReplaybtn();
+});
 
 ipcMain.on("testoldtimeEEW", (event, oldtime) => {
 	replay = oldtime - 25000;

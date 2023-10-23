@@ -1232,7 +1232,7 @@ function resend() {
 }
 
 function testEEW() {
-	ipcRenderer.send("testEEW");
+	ipcRenderer.send("testoldEEW");
 	ipcRenderer.send("closeChildWindow");
 }
 
