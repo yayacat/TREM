@@ -77,7 +77,7 @@
     "@electron/remote": "^2.0.12",
     "@material/material-color-utilities": "^0.2.0",
     "@turf/circle": "^6.5.0",
-    "axios": "^1.0.0",
+    "axios": "^1.6.0",
     "bytenode": "^1.5.2",
     "chokidar": "^3.5.3",
     "discord.js": "14.13.0",
