@@ -1,7 +1,7 @@
 {
-  "name": "trem",
-  "version": "6.1.50",
-  "description": "Taiwan Real-time Earthquake Monitoring ( 臺灣即時地震監測 )",
+  "name": "tremv",
+  "version": "6.1.51",
+  "description": "Taiwan Real-time Earthquake Monitoring Variety ( 臺灣即時地震監測變體 )",
   "main": "main.js",
   "homepage": "https://exptech.com.tw/",
   "author": "ExpTechTW <ExpTech.tw@gmail.com>",
@@ -12,8 +12,8 @@
     "lint": "eslint --ext .js js/"
   },
   "build": {
-    "productName": "TREM",
-    "appId": "tw.exptech.trem",
+    "productName": "TREMV",
+    "appId": "tw.exptech.tremv",
     "asar": true,
     "asarUnpack": [
       "./audio",

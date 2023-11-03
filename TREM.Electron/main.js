@@ -97,7 +97,7 @@ let IntensityWindow = TREM.Window.get("Intensity");
 TREM.setLoginItemSettings({
 	openAtLogin : TREM.Configuration.data["windows.startup"],
 	// path		: runExe,
-	name        : "TREM",
+	name        : "TREMV",
 	args        : TREM.Configuration.data["windows.minimize"] ? ["--start"] : [],
 });
 
@@ -134,7 +134,7 @@ function createWindow() {
 	});
 	pushReceiver.setup(MainWindow.webContents);
 	if (process.platform === "win32")
-		TREM.setAppUserModelId("TREM | 臺灣即時地震監測");
+		TREM.setAppUserModelId("TREMV | 臺灣即時地震監測變體");
 	MainWindow.on("resize", () => {
 		MainWindow.webContents.invalidate();
 	});
@@ -819,10 +819,10 @@ function trayIcon() {
 	});
 	const contextMenu = Menu.buildFromTemplate([
 		{
-			label : `TREM v${TREM.getVersion()}`,
+			label : `TREMV v${TREM.getVersion()}`,
 			type  : "normal",
 			click : () => {
-				shell.openExternal("https://github.com/ExpTechTW/TREM");
+				shell.openExternal("https://github.com/yayacat/TREM");
 			},
 		},
 		{

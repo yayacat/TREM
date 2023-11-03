@@ -1,8 +1,8 @@
 <img alt="Logo" src="https://upload.cc/i1/2022/08/11/DOqzZM.png" width="128px" height="128px" align="left"/>
 
 
-# Taiwan Real-time Earthquake Monitoring
-臺灣即時地震監測
+# Taiwan Real-time Earthquake Monitoring Variety
+臺灣即時地震監測變體
 <a href="https://github.com/yayacat/TREM/actions/workflows/github_actions.yml"><img alt="GitHub Workflow Status" align="right" src="https://github.com/yayacat/TREM/actions/workflows/github_actions.yml/badge.svg"></a>
 <a href="https://discord.gg/5dbHqV8ees"><img alt="TREM Discord" align="right" src="https://img.shields.io/discord/926545182407688273?color=%237289DA&logo=discord&logoColor=white"></a>
 <a href="https://github.com/yayacat/TREM/releases"><img alt="TREM Discord" align="right" src="https://img.shields.io/github/downloads/yayacat/TREM/total"></a>\
@@ -22,9 +22,9 @@
 </div>
 即時測站效果 https://youtu.be/gcaStCv-be8
 
-## 關於 TREM
+## 關於 TREMV
 
-TREM 是一款開源地震速報軟體，提供給您即時的地震資訊，利用自製的測站，顯示各地的即時震度，在地震發生的第一時間取得各管道發布的強震即時警報訊息
+TREMV 是一款開源地震速報軟體，提供給您即時的地震資訊，利用自製的測站，顯示各地的即時震度，在地震發生的第一時間取得各管道發布的強震即時警報訊息
  
 ## 功能
 * 即時地震資訊
@@ -45,7 +45,7 @@ TREM 是一款開源地震速報軟體，提供給您即時的地震資訊，利
 #### MacOS
 目前還沒有提供 MacOS 支援，敬請期待 :3
 
-### 社區 | 由開源社區維護的版本 適合嘗鮮
+### 變體 | 由開源變體維護的版本 適合嘗鮮
 - [yayacat](https://github.com/yayacat/TREM/releases)
 
 ## 文檔
@@ -79,7 +79,7 @@ TREM 是一款開源地震速報軟體，提供給您即時的地震資訊，利
 - yayacat `簡體中文翻譯` `社區`
 - eggrollpvp `資料處理` `文檔`
 - M789 `圖形設計`
-- JQuake `音效`
+- JQuake - PeP `音效`
 - 地牛Wake Up! `音效`
 - pisces_ `設備提供`
 

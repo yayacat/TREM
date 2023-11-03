@@ -1033,7 +1033,7 @@ function send() {
 				Function      : "Send",
 				Type          : "test",
 				FormatVersion : 1,
-				UUID          : `rts-TREM-${localStorage.UUID_rts}`,
+				UUID          : `rts-TREMV-${localStorage.UUID_rts}`,
 				Value         : {
 					Function      : "earthquake",
 					Type          : "data",
@@ -1108,7 +1108,7 @@ function send() {
 				Function      : "Send",
 				Type          : "test",
 				FormatVersion : 1,
-				UUID          : `rts-TREM-${localStorage.UUID_rts}`,
+				UUID          : `rts-TREMV-${localStorage.UUID_rts}`,
 				Value         : {
 					Function      : "earthquake",
 					Type          : "data",
@@ -1479,7 +1479,7 @@ const testAudio = (audioString, el) => {
 const testAudioTTS = () => {
 	const speecd_use = setting["audio.tts"] ?? false;
 
-	if (speecd_use) TREM.speech.speak({ text: "This is a test voice sent by TREM" });
+	if (speecd_use) TREM.speech.speak({ text: "This is a test voice sent by Taiwan Real-time Earthquake Monitoring Variety" });
 };
 
 const webhook = async () => {
@@ -1503,14 +1503,14 @@ const webhook = async () => {
 
 	const embeds = [
 		new EmbedBuilder()
-			.setDescription("這是一則由 TREM 發送的測試訊息")
+			.setDescription("這是一則由 TREMV 發送的測試訊息")
 			.setColor("Blue")
 			.setFooter({ text: "ExpTech Studio", iconURL: "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png" })
 			.setTimestamp(),
 	];
 
 	await new WebhookClient({ url: setting["webhook.url"] })
-		.send({ embeds, username: "TREM | 臺灣即時地震監測", avatarURL: "https://cdn.discordapp.com/attachments/976452418114048051/976469802644291584/received_1354357138388018.webp", content: setting["tts.Notification"] ? "這是一則由 TREM 發送的測試訊息" : "", tts: setting["tts.Notification"] })
+		.send({ embeds, username: "TREMV | 臺灣即時地震監測變體", avatarURL: "https://cdn.discordapp.com/attachments/976452418114048051/976469802644291584/received_1354357138388018.webp", content: setting["tts.Notification"] ? "這是一則由 TREMV 發送的測試訊息" : "", tts: setting["tts.Notification"] })
 		.then(m => {
 			showDialog("success",
 				TREM.Localization.getString("Webhook_Dialog_Title"),

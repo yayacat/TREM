@@ -250,7 +250,7 @@ TREM.MapIntensity = {
 					// console.log(this.description);
 					const now = timeconvert(new Date(rawPalertData.time)).format("YYYY/MM/DD HH:mm:ss");
 					const msg = {
-						username   : "TREM | 臺灣即時地震監測",
+						username   : "TREMV | 臺灣即時地震監測變體",
 						avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 						content    : setting["tts.Notification"] ? ((rawPalertData.final ? "PAlert最終報" : "PAlert") + "時間" + now + "觸發測站" + rawPalertData.tiggered + "台" + this.description) : "PAlert",
 						tts        : setting["tts.Notification"],
@@ -3744,33 +3744,33 @@ ipcMain.once("start", () => {
 			showDialog(
 				"warn",
 				"免責聲明",
-				`• TREM 進階功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請所有使用者理解並謹慎使用。\n
+				`• TREMV 進階功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請所有使用者理解並謹慎使用。\n
 				• 強震即時警報是利用少數幾個地震測站快速演算之結果，與最終地震報告可能存有若干差異，請所有使用者理解並謹慎使用。\n
 				• 本軟體使用P2P的連線技術傳遞資料，您的電腦將會把收到的地震資訊轉傳給其他人的電腦，如此才能降低伺服器負荷與維持費用，也才能免費地提供服務給大家使用。若您開始使用本軟體則代表您已同意使用P2P連線技術將收到的資料轉傳給其他電腦。\n
 				• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
-				• Powered by ExpTech | 2023/09/15`,
+				• Powered by ExpTech | 2023/11/03`,
 				0,
 				"warning",
 				() => {
 					if (setting["p2p.mode"]) serverinit();
 					setTimeout(() => {
-						if (localStorage.TOS_v1_1 == undefined)
+						if (localStorage.TOS_v1_2 == undefined)
 							showDialog(
 								"warn",
-								"TOS 服務條款 1.1",
+								"TOS 服務條款 1.2",
 								`• 使用本服務應視為用戶同意使用條款\n
-								• TREM 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
-								• 禁止在未經允許的情況下二次分發 TREM 軟體內的任何資訊\n
-								• 禁止轉售 TREM 提供之資訊\n
+								• TREMV 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
+								• 禁止在未經允許的情況下二次分發 TREMV 軟體內的任何資訊\n
+								• 禁止轉售 TREMV 提供之資訊\n
 								• 禁止違反法律法規或違反公共秩序和道德的行為\n
 								• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
-								• TREM 使用 P2P 技術傳遞資訊\n
+								• TREMV 使用 P2P 技術傳遞資訊\n
 								• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
-								• Powered by ExpTech | 2023/09/15`,
+								• Powered by ExpTech | 2023/11/03`,
 								0,
 								"warning",
 								() => {
-									localStorage.TOS_v1_1 = true;
+									localStorage.TOS_v1_2 = true;
 								},
 								"我已詳細閱讀 並同意上述條款",
 								"",
@@ -3787,23 +3787,23 @@ ipcMain.once("start", () => {
 		} else {
 			if (setting["p2p.mode"]) serverinit();
 			setTimeout(() => {
-				if (localStorage.TOS_v1_1 == undefined)
+				if (localStorage.TOS_v1_2 == undefined)
 					showDialog(
 						"warn",
-						"TOS 服務條款 1.1",
+						"TOS 服務條款 1.2",
 						`• 使用本服務應視為用戶同意使用條款\n
-						• TREM 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
-						• 禁止在未經允許的情況下二次分發 TREM 軟體內的任何資訊\n
-						• 禁止轉售 TREM 提供之資訊\n
+						• TREMV 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
+						• 禁止在未經允許的情況下二次分發 TREMV 軟體內的任何資訊\n
+						• 禁止轉售 TREMV 提供之資訊\n
 						• 禁止違反法律法規或違反公共秩序和道德的行為\n
 						• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
-						• TREM 使用 P2P 技術傳遞資訊\n
+						• TREMV 使用 P2P 技術傳遞資訊\n
 						• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
-						• Powered by ExpTech | 2023/09/15`,
+						• Powered by ExpTech | 2023/11/03`,
 						0,
 						"warning",
 						() => {
-							localStorage.TOS_v1_1 = true;
+							localStorage.TOS_v1_2 = true;
 						},
 						"我已詳細閱讀 並同意上述條款",
 						"",
@@ -4007,7 +4007,7 @@ ipcMain.on("report-Notification", (event, report) => {
 		log("Posting Notification report Webhook", 1, "Webhook", "report-Notification");
 		dump({ level: 0, message: "Posting Notification report Webhook", origin: "Webhook" });
 		const msg = {
-			username   : "TREM | 臺灣即時地震監測",
+			username   : "TREMV | 臺灣即時地震監測變體",
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ("地震報告"
 			+ ((report.data.length != 0) ? "發生規模" + report.magnitudeValue + "有感地震，最大震度" + report.data[0].areaName + report.data[0].eqStation[0].stationName + IntensityI(report.data[0].areaIntensity) + "級。" : "發生規模" + report.magnitudeValue + "有感地震 ")
@@ -4166,7 +4166,7 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 		log("Posting Notification intensity Webhook", 1, "Webhook", "intensity-Notification");
 		dump({ level: 0, message: "Posting Notification intensity Webhook", origin: "Webhook" });
 		const msg = {
-			username   : "TREM | 臺灣即時地震監測",
+			username   : "TREMV | 臺灣即時地震監測變體",
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ("震度速報"
 			+ "資料來源" + intensity.unit
@@ -4235,11 +4235,11 @@ ipcMain.on("update-available-Notification", (version, getVersion, info) => {
 			dump({ level: 0, message: "Posting Notification Update Webhook", origin: "Webhook" });
 			const getVersionbody = TREM.Localization.getString("Notification_Update_Body").format(getVersion, version) + `\nhttps://github.com/yayacat/TREM/releases/tag/v${version}`;
 			const msg = {
-				username   : "TREM | 臺灣即時地震監測",
+				username   : "TREMV | 臺灣即時地震監測變體",
 				avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 				embeds     : [
 					{
-						author      : { name: "TREM | 臺灣即時地震監測" },
+						author      : { name: "TREMV | 臺灣即時地震監測變體" },
 						title       : "",
 						description : "",
 						color       : 4629503,
@@ -4270,11 +4270,11 @@ ipcMain.on("update-not-available-Notification", (version, getVersion) => {
 			dump({ level: 0, message: "Posting Notification No Update Webhook", origin: "Webhook" });
 			const getVersionbody = TREM.Localization.getString("Notification_No_Update_Body").format(getVersion, version);
 			const msg = {
-				username   : "TREM | 臺灣即時地震監測",
+				username   : "TREMV | 臺灣即時地震監測變體",
 				avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 				embeds     : [
 					{
-						author      : { name: "TREM | 臺灣即時地震監測" },
+						author      : { name: "TREMV | 臺灣即時地震監測變體" },
 						title       : "",
 						description : "",
 						color       : 4629503,
@@ -5286,7 +5286,7 @@ TREM.Earthquake.on("eew", (data) => {
 					msg = msg.replace("%Provider%", data.Unit);
 
 				msg = JSON.parse(msg);
-				msg.username = "TREM | 臺灣即時地震監測";
+				msg.username = "TREMV | 臺灣即時地震監測變體";
 
 				msg.embeds[0].image.url = "";
 				msg.embeds[0].footer = {
@@ -5332,7 +5332,7 @@ TREM.Earthquake.on("eew", (data) => {
 					msg = msg.replace("%Provider%", data.Unit);
 
 				msg = JSON.parse(msg);
-				msg.username = "TREM | 臺灣即時地震監測";
+				msg.username = "TREMV | 臺灣即時地震監測變體";
 
 				msg.embeds[0].image.url = "";
 				msg.embeds[0].footer = {
@@ -5396,7 +5396,7 @@ TREM.Earthquake.on("trem-eq", (data) => {
 		description += `現在時間 > ${_Now}\n`;
 		// console.log(description);
 		const msg = {
-			username   : "TREM | 臺灣即時地震監測",
+			username   : "TREMV | 臺灣即時地震監測變體",
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ((data.final ? "地震檢知(最終報)" : "地震檢知") + description) : "地震檢知",
 			tts        : setting["tts.Notification"],
@@ -5448,7 +5448,7 @@ TREM.Earthquake.on("trem-eq", (data) => {
 		description += `現在時間 > ${_Now}\n`;
 		// console.log(description);
 		const msg = {
-			username   : "TREM | 臺灣即時地震監測",
+			username   : "TREMV | 臺灣即時地震監測變體",
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ((data.final ? "地震檢知(最終報)" : "地震檢知") + description) : "地震檢知",
 			tts        : setting["tts.Notification"],

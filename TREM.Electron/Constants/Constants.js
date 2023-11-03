@@ -359,12 +359,12 @@ const Constants = Object.freeze({
 		"webhook.body": {
 			type  : "string",
 			value : JSON.stringify({
-				username   : "TREM | 臺灣即時地震監測",
+				username   : "TREMV | 臺灣即時地震監測變體",
 				avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 				embeds     : [
 					{
 						author: {
-							name: "TREM | 臺灣即時地震監測",
+							name: "TREMV | 臺灣即時地震監測變體",
 						},
 						title       : "",
 						description : "%Time% 左右發生顯著有感地震\n\n東經: %EastLongitude% 度\n北緯: %NorthLatitude% 度\n位於: %location%\n深度: %Depth% 公里\n規模: %Scale%\n第%Number%報%Final%\n\n發報單位: %Provider%\n\n慎防強烈搖晃，就近避難 [趴下、掩護、穩住]",
