@@ -957,7 +957,7 @@ async function init() {
 					time.innerText = `${timeconvert(new Date(replayTemp)).format("YYYY/MM/DD HH:mm:ss")}`;
 
 					// if (NOW().getTime() - replayT > 180_000 && !Object.keys(eew).length) {
-					if ((replayTemp - replay) > 240_000) {
+					if ((replayTemp - replay) > 300_000) {
 						replayTemp = 0;
 						stopReplay();
 					}
@@ -967,7 +967,7 @@ async function init() {
 					time.innerText = `${timeconvert(new Date(replay + (NOW().getTime() - replayT))).format("YYYY/MM/DD HH:mm:ss")}`;
 
 					// if (NOW().getTime() - replayT > 180_000 && !Object.keys(eew).length) {
-					if (NOW().getTime() - replayT > 240_000) {
+					if (NOW().getTime() - replayT > 300_000) {
 						replayT = 0;
 						stopReplay();
 					}
@@ -981,7 +981,7 @@ async function init() {
 					time1.innerText = `${timeconvert(NOW()).format("YYYY/MM/DD HH:mm:ss")}`;
 					ipcRenderer.send("TREMIntensitytime2", `${timeconvert(NOW()).format("YYYY/MM/DD HH:mm:ss")}`);
 
-					if (replaytestEEW != 0 && NOW().getTime() - replaytestEEW > 240_000) {
+					if (replaytestEEW != 0 && NOW().getTime() - replaytestEEW > 300_000) {
 						testEEWerror = false;
 						replaytestEEW = 0;
 						stopReplay();
@@ -1700,6 +1700,7 @@ function PGAMain() {
 
 							if (!rts_key_verify) {
 								Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
+								Response = {};
 							} else if (rts_key_verify) {
 								if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
 								else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
@@ -1917,6 +1918,7 @@ function PGAMainbkup() {
 
 							if (!rts_key_verify) {
 								Ping = `🔒 ${(t1 / 1000).toFixed(1)}s`;
+								Response = {};
 							} else if (rts_key_verify) {
 								if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
 								else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
@@ -3913,21 +3915,6 @@ const stopReplay = function() {
 
 	if (TREM.speech.speaking()) TREM.speech.cancel();
 
-	// if (setting["p2p.mode"])
-	// 	try {
-	// 		if (service_status.websocket.status)
-	// 			axios.post(posturl + "stop", { uuid: localStorage.UUID_p2p }).catch((error) => dump({ level: 2, message: error, origin: "Verbose" }));
-	// 	} catch (e) {
-	// 		dump({ level: 2, message: e, origin: "Verbose" });
-	// 	}
-
-	axios.post(posturl + "stop", { uuid: `rts-TREM-${localStorage.UUID_rts}` })
-	// Exptech.v1.post("/trem/stop", { uuid: localStorage.UUID })
-		.catch((error) => {
-			log(error, 3, "Verbose", "stopReplay");
-			dump({ level: 2, message: error, origin: "Verbose" });
-		});
-
 	Mapsmainfocus();
 	testEEWerror = false;
 	unstopReplaybtn();
@@ -4698,7 +4685,7 @@ function FCMdata(json, Unit) {
 	} else if (json.type.startsWith("eew") || json.type == "trem-eew") {
 		if (replay != 0 && !json.replay_timestamp) return;
 
-		if (NOW().getTime() - json.time > 240_000) return;
+		if (NOW().getTime() - json.time > 300_000) return;
 
 		if (json.type == "trem-eew" && !eew_key_verify && replay == 0) return;
 
@@ -5893,7 +5880,7 @@ function main(data) {
 		if (NOW().getTime() - Canceltime > 5_000) Cancel = true;
 	}
 
-	if (NOW().getTime() - data.timestamp > 240_000 || Cancel) {
+	if (NOW().getTime() - data.timestamp > 300_000 || Cancel) {
 		TREM.Earthquake.emit("eewEnd", data.id, data.type);
 		// TREM.MapIntensity.clear();
 

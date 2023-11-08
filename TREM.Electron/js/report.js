@@ -695,7 +695,7 @@ TREM.Report = {
 
 		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000;
 		const time_hold = String(timed / 1000);
-		const _end_timed = (timed / 1000) + 205;
+		const _end_timed = (timed / 1000) + 305;
 
 		fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${time_hold}.trem`, (err) => {
 			if (!err) {
