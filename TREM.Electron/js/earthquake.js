@@ -1708,7 +1708,7 @@ function PGAMain() {
 
 								// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
 
-								Response = rts_response;
+								Response = { ...rts_response, ...rts_response_new };
 
 								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
@@ -1926,7 +1926,7 @@ function PGAMainbkup() {
 
 								// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
 
-								Response = rts_response;
+								Response = { ...rts_response, ...rts_response_new };
 
 								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
