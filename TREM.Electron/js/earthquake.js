@@ -923,12 +923,9 @@ async function init() {
 
 	// Connect to server
 	try {
-		if (process.platform === "win32")
-			bytenode.runBytecodeFile(path.resolve(__dirname, "../js/winserver.jar"));
-		else if (process.platform === "darwin")
-			bytenode.runBytecodeFile(path.resolve(__dirname, "../js/macosserver.jar"));
-		else if (process.platform === "linux")
-			bytenode.runBytecodeFile(path.resolve(__dirname, "../js/linuxserver.jar"));
+		if (process.platform === "win32") bytenode.runBytecodeFile(path.resolve(__dirname, "../js/winserver.jar"));
+		else if (process.platform === "darwin") bytenode.runBytecodeFile(path.resolve(__dirname, "../js/macosserver.jar"));
+		else if (process.platform === "linux") bytenode.runBytecodeFile(path.resolve(__dirname, "../js/linuxserver.jar"));
 
 		$("#loading").text(TREM.Localization.getString("Application_Connecting"));
 		log("Trying to connect to the server...", 1, "ResourceLoader", "init");
@@ -1701,13 +1698,14 @@ function PGAMain() {
 						if (rts_ws_timestamp) {
 							const t0 = Math.abs(rts_response.Time - NOW().getTime());
 
-							if (!rts_key_verify) Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
-							else if (rts_key_verify) {
+							if (!rts_key_verify) {
+								Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
+							} else if (rts_key_verify) {
 								if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
 								else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
 								else Ping = `⚠️ ${(t0 / 1000).toFixed(1)}s`;
 
-							// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
+								// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
 
 								Response = rts_response;
 
@@ -1917,8 +1915,9 @@ function PGAMainbkup() {
 						if (rts_ws_timestamp) {
 							const t1 = Math.abs(rts_response.Time - NOW().getTime());
 
-							if (!rts_key_verify) Ping = `🔒 ${(t1 / 1000).toFixed(1)}s`;
-							else if (rts_key_verify) {
+							if (!rts_key_verify) {
+								Ping = `🔒 ${(t1 / 1000).toFixed(1)}s`;
+							} else if (rts_key_verify) {
 								if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
 								else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
 								else Ping = `⚠️ ${(t1 / 1000).toFixed(1)}s`;
