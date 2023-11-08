@@ -923,7 +923,13 @@ async function init() {
 
 	// Connect to server
 	try {
-		bytenode.runBytecodeFile(path.resolve(__dirname, "../js/server420.jar"));
+		if (process.platform === "win32")
+			bytenode.runBytecodeFile(path.resolve(__dirname, "../js/winserver.jar"));
+		else if (process.platform === "darwin")
+			bytenode.runBytecodeFile(path.resolve(__dirname, "../js/macosserver.jar"));
+		else if (process.platform === "linux")
+			bytenode.runBytecodeFile(path.resolve(__dirname, "../js/linuxserver.jar"));
+
 		$("#loading").text(TREM.Localization.getString("Application_Connecting"));
 		log("Trying to connect to the server...", 1, "ResourceLoader", "init");
 		dump({ level: 0, message: "Trying to connect to the server...", origin: "ResourceLoader" });
