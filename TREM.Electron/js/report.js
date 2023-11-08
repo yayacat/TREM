@@ -296,7 +296,7 @@ TREM.Report = {
 		const report = this.cache.get(id);
 		console.debug(report);
 
-		let time = new Date(report.originTime.replace(/-/g, "/")).getTime() - 25000;
+		let time = new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000;
 		const time_hold = String(time / 1000);
 		const _end_time = time + 205000;
 
@@ -439,7 +439,7 @@ TREM.Report = {
 	},
 	replaydownloaderrm(id) {
 		const report = this.cache.get(id);
-		const time = new Date(report.originTime.replace(/-/g, "/")).getTime() - 25000;
+		const time = new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000;
 		const time_hold = String(time / 1000);
 
 		fs.rm(path.join(path.join(app.getPath("userData"), "replay_data"), time_hold), { recursive: true }, () => {
@@ -693,7 +693,7 @@ TREM.Report = {
 			document.getElementById("report-TREM").style.display = "none";
 		}
 
-		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 25000;
+		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000;
 		const time_hold = String(timed / 1000);
 		const _end_timed = (timed / 1000) + 205;
 

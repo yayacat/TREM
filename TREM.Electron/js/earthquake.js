@@ -3482,7 +3482,7 @@ function addReport(report, prepend = false, index = 0) {
 		roll.prepend(Div);
 		investigation = true;
 	} else {
-		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 25000;
+		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000;
 		const timed_hold = String(timed);
 		fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), timed_hold)}/${timed}.trem`, (err) => {
 			if (!err) {
@@ -3955,14 +3955,14 @@ TREM.backindexButton = () => {
 ipcMain.on("testoldEEW", (event) => {
 	const report_data = storage.getItem("report_data");
 	TREM.Report.replayHttp = true;
-	replay = new Date(report_data[0].originTime.replace(/-/g, "/")).getTime() - 25000;
+	replay = new Date(report_data[0].originTime.replace(/-/g, "/")).getTime() - 5000;
 	replayT = NOW().getTime();
 	ipcMain.emit("ReportGET");
 	stopReplaybtn();
 });
 
 ipcMain.on("testoldtimeEEW", (event, oldtime) => {
-	replay = oldtime - 25000;
+	replay = oldtime - 5000;
 	replayT = NOW().getTime();
 	ipcMain.emit("ReportGET");
 	stopReplaybtn();
@@ -3976,7 +3976,7 @@ ipcMain.on("testoldtremEEW", (event, oldtrem) => {
 
 ipcMain.on("testoldtime", (event, oldtime) => {
 	replayD = true;
-	replay = oldtime - 25000;
+	replay = oldtime - 5000;
 	replayTemp = replay;
 	replayT = NOW().getTime();
 	replaydir = replay / 1000;
