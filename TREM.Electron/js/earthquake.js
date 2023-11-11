@@ -3408,7 +3408,7 @@ function addReport(report, prepend = false, index = 0) {
 
 	let star = "";
 
-	if (report.ID.length != 0) star += "↺ ";
+	if (report.ID?.length != 0) star += "↺ ";
 
 	if (report.earthquakeNo % 1000 != 0) star += "✩ ";
 
