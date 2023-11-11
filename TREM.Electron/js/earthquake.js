@@ -907,7 +907,7 @@ win.on("leave-full-screen", () => {
 async function init() {
 	const progressbar = document.getElementById("loading_progress");
 	const progressStep = 5;
-	report_get_timestamp = 0;
+	// report_get_timestamp = 0;
 
 	// TREM.MapRenderingEngine = setting["map.engine"];
 
@@ -2912,7 +2912,7 @@ function ReportGET() {
 
 		if (_report_data == null) _report_data = [];
 
-		const list = {};
+		// const list = {};
 		let _report_data_temp = [];
 		let j = 0;
 
@@ -2934,20 +2934,20 @@ function ReportGET() {
 			controller.abort();
 		}, 5_000);
 
-		if (_report_data.length != 0)
-			for (let i = 0; i < 50; i++) {
-				const md5 = crypto.createHash("md5");
-				list[_report_data[i].identifier] = md5.update(JSON.stringify(_report_data[i])).digest("hex");
-			}
+		// if (_report_data.length != 0)
+		// 	for (let i = 0; i < 50; i++) {
+		// 		const md5 = crypto.createHash("md5");
+		// 		list[_report_data[i].identifier] = md5.update(JSON.stringify(_report_data[i])).digest("hex");
+		// 	}
 
-		let bodyInfo;
+		// let bodyInfo;
 
-		if (setting["report.getInfo"])
-			bodyInfo = JSON.stringify({ list, key: setting["api.key"] != "" ? setting["api.key"] : "" });
-		else if (setting["api.key"] != "")
-			bodyInfo = JSON.stringify({ list, key: setting["api.key"] });
-		else
-			bodyInfo = JSON.stringify({ list });
+		// if (setting["report.getInfo"])
+		// 	bodyInfo = JSON.stringify({ list, key: setting["api.key"] != "" ? setting["api.key"] : "" });
+		// else if (setting["api.key"] != "")
+		// 	bodyInfo = JSON.stringify({ list, key: setting["api.key"] });
+		// else
+		// bodyInfo = JSON.stringify({ list });
 
 		fetch("https://data.exptech.com.tw/api/v1/eq/report?limit=50", { signal: controller.signal })
 			.then((ans0) => {
@@ -2963,8 +2963,9 @@ function ReportGET() {
 								for (let _i = 0; _i < _report_data.length; _i++)
 									if (_report_data[_i].identifier == id) {
 										_report_data.splice(_i, 1);
-										break;
 									}
+
+								if (ans[i].originTime.includes("-")) ans[i].originTime = ans[i].originTime.split(" ")[0].split("-")[0] + "/" + ans[i].originTime.split(" ")[0].split("-")[1] + "/" + ans[i].originTime.split(" ")[0].split("-")[2] + " " + ans[i].originTime.split(" ")[1];
 							}
 
 							for (let i = 0; i < ans.length; i++)
@@ -3094,8 +3095,32 @@ function ReportGET() {
 			controller1.abort();
 		}, 5_000);
 
+		_report_data = [];
+		_report_data = storage.getItem("report_data");
+
+		if (typeof _report_data != "object") _report_data = [];
+
+		if (_report_data == null) _report_data = [];
+
+		// const list = {};
+		let _report_data_temp_1 = [];
+		let k = 0;
+
+		if (_report_data.length != 0 && !setting["report.getInfo"]) {
+			for (let i = 0; i < _report_data.length; i++)
+				if (_report_data[i].identifier.startsWith("CWB")) {
+					_report_data_temp_1[k] = _report_data[i];
+					k += 1;
+				} else if (_report_data[i].identifier.startsWith("CWA")) {
+					_report_data_temp_1[k] = _report_data[i];
+					k += 1;
+				}
+
+			_report_data = _report_data_temp_1;
+		}
+
 		if (api_key_verify && setting["report.getInfo"]) {
-			fetch(`https://exptech.com.tw/api/v1/earthquake/reports?limit=50&key=${setting["api.key"]}`, { signal: controller1.signal })
+			fetch(`https://data.exptech.com.tw/api/v1/eq/report?limit=50&key=${setting["api.key"]}`, { signal: controller1.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
 						console.debug(ans0);
@@ -3109,8 +3134,9 @@ function ReportGET() {
 									for (let _i = 0; _i < _report_data.length; _i++)
 										if (_report_data[_i].identifier == id) {
 											_report_data.splice(_i, 1);
-											break;
 										}
+
+									if (ans[i].originTime.includes("-")) ans[i].originTime = ans[i].originTime.split(" ")[0].split("-")[0] + "/" + ans[i].originTime.split(" ")[0].split("-")[1] + "/" + ans[i].originTime.split(" ")[0].split("-")[2] + " " + ans[i].originTime.split(" ")[1];
 								}
 
 								for (let i = 0; i < ans.length; i++)
@@ -3124,7 +3150,7 @@ function ReportGET() {
 											_report_data[_i] = temp;
 										}
 
-								if (!_report_data) return setTimeout(ReportGET, 10_000);
+								// if (!_report_data) return setTimeout(ReportGET, 10_000);
 
 								storage.setItem("report_data", _report_data);
 							}
@@ -3154,9 +3180,9 @@ function ReportGET() {
 									ReportList(_report_data);
 								}
 
-								return setTimeout(() => {
-									ReportGET();
-								}, 30_000);
+								// return setTimeout(() => {
+								// 	ReportGET();
+								// }, 30_000);
 							}
 
 							case 404: {
@@ -3176,9 +3202,9 @@ function ReportGET() {
 									ReportList(_report_data);
 								}
 
-								return setTimeout(() => {
-									ReportGET();
-								}, 30_000);
+								// return setTimeout(() => {
+								// 	ReportGET();
+								// }, 30_000);
 							}
 
 							case 500: {
@@ -3198,9 +3224,9 @@ function ReportGET() {
 									ReportList(_report_data);
 								}
 
-								return setTimeout(() => {
-									ReportGET();
-								}, 30_000);
+								// return setTimeout(() => {
+								// 	ReportGET();
+								// }, 30_000);
 							}
 
 							default: break;
