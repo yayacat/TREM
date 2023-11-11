@@ -2949,7 +2949,7 @@ function ReportGET() {
 		else
 			bodyInfo = JSON.stringify({ list });
 
-		fetch("https://exptech.com.tw/api/v1/earthquake/reports?limit=50", { signal: controller.signal })
+		fetch("https://data.exptech.com.tw/api/v1/eq/report?limit=50", { signal: controller.signal })
 			.then((ans0) => {
 				if (ans0.ok) {
 					console.debug(ans0);
