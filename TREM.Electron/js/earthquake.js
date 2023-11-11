@@ -2961,9 +2961,8 @@ function ReportGET() {
 								const id = ans[i].identifier;
 
 								for (let _i = 0; _i < _report_data.length; _i++)
-									if (_report_data[_i].identifier == id) {
+									if (_report_data[_i].identifier == id)
 										_report_data.splice(_i, 1);
-									}
 
 								if (ans[i].originTime.includes("-")) ans[i].originTime = ans[i].originTime.split(" ")[0].split("-")[0] + "/" + ans[i].originTime.split(" ")[0].split("-")[1] + "/" + ans[i].originTime.split(" ")[0].split("-")[2] + " " + ans[i].originTime.split(" ")[1];
 							}
@@ -3103,20 +3102,20 @@ function ReportGET() {
 		if (_report_data == null) _report_data = [];
 
 		// const list = {};
-		let _report_data_temp_1 = [];
-		let k = 0;
+		_report_data_temp = [];
+		j = 0;
 
 		if (_report_data.length != 0 && !setting["report.getInfo"]) {
 			for (let i = 0; i < _report_data.length; i++)
 				if (_report_data[i].identifier.startsWith("CWB")) {
-					_report_data_temp_1[k] = _report_data[i];
-					k += 1;
+					_report_data_temp[j] = _report_data[i];
+					j += 1;
 				} else if (_report_data[i].identifier.startsWith("CWA")) {
-					_report_data_temp_1[k] = _report_data[i];
-					k += 1;
+					_report_data_temp[j] = _report_data[i];
+					j += 1;
 				}
 
-			_report_data = _report_data_temp_1;
+			_report_data = _report_data_temp;
 		}
 
 		if (api_key_verify && setting["report.getInfo"]) {
@@ -3132,9 +3131,8 @@ function ReportGET() {
 									const id = ans[i].identifier;
 
 									for (let _i = 0; _i < _report_data.length; _i++)
-										if (_report_data[_i].identifier == id) {
+										if (_report_data[_i].identifier == id)
 											_report_data.splice(_i, 1);
-										}
 
 									if (ans[i].originTime.includes("-")) ans[i].originTime = ans[i].originTime.split(" ")[0].split("-")[0] + "/" + ans[i].originTime.split(" ")[0].split("-")[1] + "/" + ans[i].originTime.split(" ")[0].split("-")[2] + " " + ans[i].originTime.split(" ")[1];
 								}
@@ -3183,6 +3181,7 @@ function ReportGET() {
 								// return setTimeout(() => {
 								// 	ReportGET();
 								// }, 30_000);
+								break;
 							}
 
 							case 404: {
@@ -3205,6 +3204,7 @@ function ReportGET() {
 								// return setTimeout(() => {
 								// 	ReportGET();
 								// }, 30_000);
+								break;
 							}
 
 							case 500: {
@@ -3227,6 +3227,7 @@ function ReportGET() {
 								// return setTimeout(() => {
 								// 	ReportGET();
 								// }, 30_000);
+								break;
 							}
 
 							default: break;
