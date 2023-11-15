@@ -3836,25 +3836,24 @@ ipcMain.once("start", () => {
 
 			rts_clock = setInterval(async () => {
 				try {
-					const now = NOW();
-					const YYYY = now.getFullYear();
-					const MM = (now.getMonth() + 1).toString().padStart(2, "0");
-					const DD = now.getDate().toString().padStart(2, "0");
-					const hh = now.getHours().toString().padStart(2, "0");
-					const mm = now.getMinutes().toString().padStart(2, "0");
-					const ss = now.getSeconds().toString().padStart(2, "0");
-					const t = `${YYYY}${MM}${DD}${hh}${mm}${ss}`;
 					const controller = new AbortController();
 					const timer = setTimeout(() => controller.abort(), 1000);
-					const res = await fetch(`https://api.exptech.com.tw/api/v1/trem/rts/${t}`, { signal: controller.signal });
-					clearTimeout(timer);
-
-					if (!res.ok) throw new Error("server error");
-
-					const ans = await res.json();
-					rts_ws_timestamp = new Date().getTime();
-					ans.Time = rts_ws_timestamp;
-					rts_response = ans;
+					await fetch("https://data.exptech.com.tw/api/v1/trem/rts", { signal: controller.signal })
+						.then((ans0) => {
+							if (ans0.ok) {
+								const ans = ans0.json();
+								rts_ws_timestamp = new Date().getTime();
+								ans.Time = rts_ws_timestamp;
+								rts_response = ans;
+								clearTimeout(timer);
+							} else {
+								log(ans0.status, 3, "server", "rts-clock");
+								clearTimeout(timer);
+							}
+						}).catch((err) => {
+							log(err, 3, "server", "rts-clock");
+							clearTimeout(timer);
+						});
 				} catch (err) {
 					log(err, 3, "server", "rts-clock");
 				}
