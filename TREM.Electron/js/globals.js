@@ -52,6 +52,8 @@ ipcRenderer.on("config:locale", (event, value) => {
 	setLocale(value);
 });
 
+let showDialog_run = false;
+
 const lockScroll = state => {
 	if (state)
 		$(document).off("scroll", () => window.scrollTo(0, 0));
@@ -65,6 +67,8 @@ const closeDialog = event => {
 	if (!event.target.id.includes("dialog"))
 		if (event.target != container)
 			return;
+
+	if (showDialog_run) showDialog_run = false;
 	lockScroll(false);
 	$("#modal-overlay").fadeOut({ duration: 100, complete: () => container.replaceChildren() }).delay(100).show();
 };
@@ -92,6 +96,8 @@ const showDialog
  * @param {int} containerlock containerlock type of the dialog
  */
 = (type, title, message, button = 0, customIcon, callback = () => void 0, buttonAccepttext, buttonCanceltext, callbackCancel = () => void 0, time = 0, containerlock = 0) => {
+	if (showDialog_run) return;
+	showDialog_run = true;
 	const container = document.getElementById("modal-overlay");
 	const icon = document.createElement("span");
 	icon.classList.add("material-symbols-rounded");
@@ -126,7 +132,7 @@ const showDialog
 		Accept.onclick = (...args) => {
 			if (showDialogtime) {
 				clearTimeout(showDialogtime);
-				delete showDialogtime;
+				showDialogtime.close();
 			}
 
 			closeDialog(...args);
@@ -143,7 +149,7 @@ const showDialog
 		Cancel.onclick = (...args) => {
 			if (showDialogtime) {
 				clearTimeout(showDialogtime);
-				delete showDialogtime;
+				showDialogtime.close();
 			}
 
 			closeDialog(...args);
@@ -161,7 +167,7 @@ const showDialog
 		OK.onclick = (...args) => {
 			if (showDialogtime) {
 				clearTimeout(showDialogtime);
-				delete showDialogtime;
+				showDialogtime.close();
 			}
 
 			closeDialog(...args);
@@ -178,10 +184,10 @@ const showDialog
 	container.appendChild(dialog);
 
 	if (containerlock == 0)
-		container.onclick =  (...args) => {
+		container.onclick = (...args) => {
 			if (showDialogtime) {
 				clearTimeout(showDialogtime);
-				delete showDialogtime;
+				showDialogtime.close();
 			}
 
 			closeDialog(...args);
