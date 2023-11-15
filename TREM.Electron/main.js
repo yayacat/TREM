@@ -279,17 +279,20 @@ function isNetworkError(errorObject) {
         errorObject.message === "net::ERR_CONNECTION_TIMED_OUT";
 }
 
+let update_time = 0;
+
 function checkForUpdates() {
 	try {
-		autoUpdater.checkForUpdates().catch((error) => {
-			if (isNetworkError(error)) {
-				console.log('Network Error');
-				console.log(error);
-			} else {
-				console.log('Unknown Error');
-				console.log(error == null ? "unknown" : (error.stack || error).toString());
-			}
-		});
+		if (update_time !== 0)
+			autoUpdater.checkForUpdates().catch((error) => {
+				if (isNetworkError(error)) {
+					console.log('Network Error');
+					console.log(error);
+				} else {
+					console.log('Unknown Error');
+					console.log(error == null ? "unknown" : (error.stack || error).toString());
+				}
+			});
 	} catch (error) {
 		console.error('Error while on checkForUpdates: ', error);
 	}
@@ -315,23 +318,23 @@ TREM.on("ready", () => {
 	if (TREM.Configuration.data["update.time"] != undefined) {
 		if (TREM.Configuration.data["update.time"] != 0){
 			checkForUpdates();
-			const time = TREM.Configuration.data["update.time"] * 3600_000;
+			update_time = TREM.Configuration.data["update.time"] * 3600000;
 			setInterval(() => {
 				checkForUpdates();
-			}, time);
+			}, update_time);
 		} else {
 			checkForUpdates();
-			const time = 3600_000;
+			update_time = 3600000;
 			setInterval(() => {
 				checkForUpdates();
-			}, time);
+			}, update_time);
 		}
 	} else {
 		checkForUpdates();
-		const time = 3600_000;
+		update_time = 3600000;
 		setInterval(() => {
 			checkForUpdates();
-		}, time);
+		}, update_time);
 	}
 
 	// globalShortcut.register("Tab", function() {
