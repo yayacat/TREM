@@ -124,6 +124,11 @@ const showDialog
 		Accept.textContent = buttonAccepttext ?? TREM.Localization.getString("Dialog_Button_Confirm");
 
 		Accept.onclick = (...args) => {
+			if (showDialogtime) {
+				clearTimeout(showDialogtime);
+				delete showDialogtime;
+			}
+
 			closeDialog(...args);
 			callback();
 		};
@@ -136,6 +141,11 @@ const showDialog
 		Cancel.textContent = buttonCanceltext ?? TREM.Localization.getString("Dialog_Button_Cancel");
 
 		Cancel.onclick = (...args) => {
+			if (showDialogtime) {
+				clearTimeout(showDialogtime);
+				delete showDialogtime;
+			}
+
 			closeDialog(...args);
 			callbackCancel();
 		};
@@ -149,6 +159,11 @@ const showDialog
 		OK.onclick = closeDialog;
 
 		OK.onclick = (...args) => {
+			if (showDialogtime) {
+				clearTimeout(showDialogtime);
+				delete showDialogtime;
+			}
+
 			closeDialog(...args);
 			callback();
 		};
@@ -163,7 +178,14 @@ const showDialog
 	container.appendChild(dialog);
 
 	if (containerlock == 0)
-		container.onclick = closeDialog;
+		container.onclick =  (...args) => {
+			if (showDialogtime) {
+				clearTimeout(showDialogtime);
+				delete showDialogtime;
+			}
+
+			closeDialog(...args);
+		};
 
 	$("#modal-overlay").fadeIn(50);
 

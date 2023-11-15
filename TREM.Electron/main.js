@@ -281,9 +281,9 @@ function isNetworkError(errorObject) {
 
 let update_time = 0;
 
-function checkForUpdates() {
+function checkForUpdates(auto = true) {
 	try {
-		if (update_time !== 0)
+		if (update_time !== 0 || !auto)
 			autoUpdater.checkForUpdates().catch((error) => {
 				if (isNetworkError(error)) {
 					console.log('Network Error');
@@ -904,7 +904,7 @@ function trayIcon() {
 					label : TREM.Localization.getString("check_For_Updates"),
 					type  : "normal",
 					click : () => {
-						checkForUpdates();
+						checkForUpdates(false);
 					}
 				},
 				{
