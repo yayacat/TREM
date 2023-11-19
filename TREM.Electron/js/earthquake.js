@@ -2974,7 +2974,7 @@ function ReportGET() {
 
 								for (let i = 0; i < _report_data.length - 1; i++)
 									for (let _i = 0; _i < _report_data.length - 1; _i++)
-										if (new Date(_report_data[_i].originTime.replaceAll("/", "-")).getTime() < new Date(_report_data[_i + 1].originTime.replaceAll("/", "-")).getTime()) {
+										if (new Date(_report_data[_i].originTime).getTime() < new Date(_report_data[_i + 1].originTime).getTime()) {
 											const temp = _report_data[_i + 1];
 											_report_data[_i + 1] = _report_data[_i];
 											_report_data[_i] = temp;
