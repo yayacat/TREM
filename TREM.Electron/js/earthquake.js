@@ -1702,7 +1702,6 @@ function PGAMain() {
 
 							if (!rts_key_verify) {
 								Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
-								Response = {};
 							} else if (rts_key_verify) {
 								if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
 								else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
@@ -1710,7 +1709,8 @@ function PGAMain() {
 
 								// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
 
-								Response = { ...rts_response, ...rts_response_new };
+								if ((NOW().getTime() - rts_ws2_timestamp) > 5_000) Response = rts_response;
+								else Response = { ...rts_response, ...rts_response_new };
 
 								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
@@ -1723,8 +1723,6 @@ function PGAMain() {
 
 									if (Timers.rts_clock) clearInterval(Timers.rts_clock);
 								} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
-									stationnow = 0;
-									Response = {};
 									Ping = "💤";
 								} else if (setting["sleep.mode"]) {
 									Ping = "💤";
@@ -1741,9 +1739,6 @@ function PGAMain() {
 								Ping = "💤";
 							else
 								Ping = "🔒";
-
-							stationnow = 0;
-							Response = {};
 						}
 					} else if (!replayD) {
 						const url = geturl + ReplayTime;
@@ -1757,8 +1752,6 @@ function PGAMain() {
 								res.json().then(res1 => {
 									if (controller.signal.aborted || res1 == undefined) {
 										Ping = "🔒";
-										stationnow = 0;
-										Response = {};
 									} else {
 										Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
 										Response = res1;
@@ -1920,7 +1913,6 @@ function PGAMainbkup() {
 
 							if (!rts_key_verify) {
 								Ping = `🔒 ${(t1 / 1000).toFixed(1)}s`;
-								Response = {};
 							} else if (rts_key_verify) {
 								if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
 								else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
@@ -1928,7 +1920,8 @@ function PGAMainbkup() {
 
 								// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
 
-								Response = { ...rts_response, ...rts_response_new };
+								if ((NOW().getTime() - rts_ws2_timestamp) > 5_000) Response = rts_response;
+								else Response = { ...rts_response, ...rts_response_new };
 
 								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
@@ -1941,8 +1934,6 @@ function PGAMainbkup() {
 
 									if (Timers.rts_clock) clearInterval(Timers.rts_clock);
 								} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
-									stationnow = 0;
-									Response = {};
 									Ping = "💤";
 								} else if (setting["sleep.mode"]) {
 									Ping = "💤";
@@ -1959,9 +1950,6 @@ function PGAMainbkup() {
 								Ping = "💤";
 							else
 								Ping = "🔒";
-
-							stationnow = 0;
-							Response = {};
 						}
 					} else if (!replayD) {
 						const url = geturl + ReplayTime;
@@ -2022,6 +2010,8 @@ function handler(Json) {
 	// console.log(Json);
 	// console.log(station);
 
+	stationnow = 0;
+	Response = {};
 	MAXPGA = { pga: 0, station: "NA", level: 0 };
 
 	// if (Unlock)
@@ -5171,10 +5161,10 @@ TREM.Earthquake.on("eew", (data) => {
 
 	EEWshot = NOW().getTime() - 28500;
 	EEWshotC = 1;
-	const _distance = [];
-	for (let index = 0; index < 1002; index++)
-		_distance[index] = _speed(data.depth, index);
-	EarthquakeList[data.id].distance = _distance;
+	// const _distance = [];
+	// for (let index = 0; index < 1002; index++)
+	// 	_distance[index] = _speed(data.depth, index);
+	// EarthquakeList[data.id].distance = _distance;
 
 	// if (data.type == "trem-eew" && data.number <= 3) EarthquakeList[data.id].distance = null;
 
@@ -5576,21 +5566,55 @@ function main(data) {
 			* @type {number} kmP
 			* @type {number} km
 			*/
-			for (let index = 1; index < EarthquakeList[data.id].distance.length; index++)
-				if (EarthquakeList[data.id].distance[index].Ptime > (NOW().getTime() - data.time) / 1000) {
-					kmP = (index - 1) * 1000;
 
-					if ((index - 1) / EarthquakeList[data.id].distance[index - 1].Ptime > wave.p) kmP = Math.floor(Math.sqrt(Math.pow((NOW().getTime() - data.time) * wave.p, 2) - Math.pow(data.depth * 1000, 2)));
-					break;
-				}
+			const _time_table = TREM.Resources.time[findClosest(TREM.Resources.time_list, data.depth)];
+			let prev_table = null;
 
-			for (let index = 1; index < EarthquakeList[data.id].distance.length; index++)
-				if (EarthquakeList[data.id].distance[index].Stime > (NOW().getTime() - data.time) / 1000) {
-					km = (index - 1) * 1000;
+			for (const table of _time_table) {
+				if (!kmP && table.P > (NOW().getTime() - data.time) / 1000)
+					if (prev_table) {
+						const t_diff = table.P - prev_table.P;
+						const r_diff = table.R - prev_table.R;
+						const t_offset = (NOW().getTime() - data.time) / 1000 - prev_table.P;
+						const r_offset = (t_offset / t_diff) * r_diff;
+						kmP = prev_table.R + r_offset;
+					} else {
+						kmP = table.R;
+					}
 
-					if ((index - 1) / EarthquakeList[data.id].distance[index - 1].Stime > wave.s) km = Math.floor(Math.sqrt(Math.pow((NOW().getTime() - data.time) * wave.s, 2) - Math.pow(data.depth * 1000, 2)));
-					break;
-				}
+				if (!km && table.S > (NOW().getTime() - data.time) / 1000)
+					if (prev_table) {
+						const t_diff = table.S - prev_table.S;
+						const r_diff = table.R - prev_table.R;
+						const t_offset = (NOW().getTime() - data.time) / 1000 - prev_table.S;
+						const r_offset = (t_offset / t_diff) * r_diff;
+						km = prev_table.R + r_offset;
+					} else {
+						km = table.R;
+					}
+
+				if (kmP && km) break;
+
+				prev_table = table;
+			}
+
+			// if (kmP === 0 && km === 0) {
+			// 	for (let index = 1; index < EarthquakeList[data.id].distance.length; index++)
+			// 		if (EarthquakeList[data.id].distance[index].Ptime > (NOW().getTime() - data.time) / 1000) {
+			// 			kmP = (index - 1) * 1000;
+
+			// 			if ((index - 1) / EarthquakeList[data.id].distance[index - 1].Ptime > wave.p) kmP = Math.floor(Math.sqrt(Math.pow((NOW().getTime() - data.time) * wave.p, 2) - Math.pow(data.depth * 1000, 2)));
+			// 			break;
+			// 		}
+
+			// 	for (let index = 1; index < EarthquakeList[data.id].distance.length; index++)
+			// 		if (EarthquakeList[data.id].distance[index].Stime > (NOW().getTime() - data.time) / 1000) {
+			// 			km = (index - 1) * 1000;
+
+			// 			if ((index - 1) / EarthquakeList[data.id].distance[index - 1].Stime > wave.s) km = Math.floor(Math.sqrt(Math.pow((NOW().getTime() - data.time) * wave.s, 2) - Math.pow(data.depth * 1000, 2)));
+			// 			break;
+			// 		}
+			// }
 
 			if (setting["shock.p"])
 				if (kmP > 0) {
@@ -5681,7 +5705,8 @@ function main(data) {
 						},
 					);
 			} else {
-				const num = (NOW().getTime() - data.time) / 10 / EarthquakeList[data.id].distance[1].Stime;
+				const num = Math.round(((NOW().getTime() - data.time) / 1000 / TREM.Resources.time[data.depth][0].S) * 100);
+				// const num = (NOW().getTime() - data.time) / 10 / EarthquakeList[data.id].distance[1].Stime;
 				const icon = L.divIcon({
 					className : "progress_bar",
 					html      : `<div style="background-color: aqua;height: ${num}%;"></div>`,
@@ -6051,6 +6076,10 @@ const changeView = (args, el, event) => {
 
 	TREM.emit("viewChange", currentel.attr("id"), changeel.attr("id"));
 };
+
+function findClosest(arr, target) {
+	return arr.reduce((prev, curr) => (Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev));
+}
 
 function NOW() {
 	return new Date(ServerTime + (Date.now() - ServerT));

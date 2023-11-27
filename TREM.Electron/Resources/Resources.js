@@ -1,8 +1,12 @@
+const time = require("./time.json");
+
 module.exports = {
-	area   : require("./area.json"),
-	areav2   : require("./areav2.json"),
-	region : require("./region.json"),
-	icon   : {
+	area      : require("./area.json"),
+	areav2    : require("./areav2.json"),
+	region    : require("./region.json"),
+	time,
+	time_list : Object.keys(time),
+	icon      : {
 		cross(options) {
 			if (options) {
 				let style = "";
