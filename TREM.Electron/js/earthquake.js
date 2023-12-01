@@ -1701,7 +1701,8 @@ function PGAMain() {
 							const t0 = Math.abs(rts_response.Time - NOW().getTime());
 
 							if (!rts_key_verify) {
-								Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
+								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
+								Response = rts_response;
 							} else if (rts_key_verify) {
 								if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
 								else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
@@ -1734,7 +1735,8 @@ function PGAMain() {
 							const t0 = Math.abs(rts_response_new.Time - NOW().getTime());
 
 							if (!rts_key_verify) {
-								Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
+								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
+								Response = rts_response;
 							} else if (rts_key_verify) {
 								if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
 								else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
@@ -1944,7 +1946,8 @@ function PGAMainbkup() {
 							const t1 = Math.abs(rts_response.Time - NOW().getTime());
 
 							if (!rts_key_verify) {
-								Ping = `🔒 ${(t1 / 1000).toFixed(1)}s`;
+								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
+								Response = rts_response;
 							} else if (rts_key_verify) {
 								if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
 								else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
@@ -1980,7 +1983,8 @@ function PGAMainbkup() {
 							const t1 = Math.abs(rts_response_new.Time - NOW().getTime());
 
 							if (!rts_key_verify) {
-								Ping = `🔒 ${(t1 / 1000).toFixed(1)}s`;
+								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
+								Response = rts_response;
 							} else if (rts_key_verify) {
 								if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
 								else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
@@ -2131,7 +2135,8 @@ function handler(Json) {
 	for (let index = 0, keys = Object.keys(station), n = keys.length; index < n; index++) {
 		const uuid = keys[index];
 		const current_station_data = station[uuid];
-		const current_data = Json[uuid.split("-")[2]];
+		let current_data = Json[uuid.split("-")[2]];
+		if (Json.station) current_data = Json.station[uuid.split("-")[2]];
 
 		// if (uuid == "H-979-11336952-11")
 		// 	console.log(current_data);
@@ -2171,7 +2176,9 @@ function handler(Json) {
 		} else {
 			station_time_json[uuid] = 0;
 			localStorage.stationtime = JSON.stringify(station_time_json);
-			amount = +current_data.v;
+
+			if (current_data.v) amount = +current_data.v;
+			else amount = +current_data.pgv;
 
 			if (amount > current_station_data.MaxPGA) current_station_data.MaxPGA = amount;
 			intensity = (Alert && Json.Alert) ? Math.round(current_data.i)
@@ -2195,10 +2202,10 @@ function handler(Json) {
 			level_class = (intensity != 0 && NA999 != "Y" && NA0999 != "Y") ? IntensityToClassString(intensity)
 				: (intensity == 0 && Alert) ? "pga0"
 					: (amount == 999) ? "pga6"
-						: (amount > 3.5) ? "pga5"
-							: (amount > 3) ? "pga4"
-								: (amount > 2.5) ? "pga3"
-									: (amount > 2) ? "pga2"
+						: (amount > 4.5) ? "pga5"
+							: (amount > 4) ? "pga4"
+								: (amount > 3.5) ? "pga3"
+									: (amount > 3) ? "pga2"
 										: "pga1";
 
 			if (intensity > MaxIntensity1) MaxIntensity1 = intensity;
@@ -3898,11 +3905,12 @@ ipcMain.once("start", () => {
 					await fetch("https://data.exptech.com.tw/api/v1/trem/rts", { signal: controller.signal })
 						.then((ans0) => {
 							if (ans0.ok) {
-								const ans = ans0.json();
-								rts_ws_timestamp = new Date().getTime();
-								ans.Time = rts_ws_timestamp;
-								rts_response = ans;
-								clearTimeout(timer);
+								ans0.json().then(ans => {;
+									rts_ws_timestamp = new Date().getTime();
+									ans.Time = rts_ws_timestamp;
+									rts_response = ans;
+									clearTimeout(timer);
+								});
 							} else {
 								log(ans0.status, 3, "server", "rts-clock");
 								clearTimeout(timer);
