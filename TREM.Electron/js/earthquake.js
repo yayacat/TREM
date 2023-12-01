@@ -1709,8 +1709,7 @@ function PGAMain() {
 
 								// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
 
-								if ((NOW().getTime() - rts_ws2_timestamp) > 5_000) Response = rts_response;
-								else Response = { ...rts_response, ...rts_response_new };
+								Response = rts_response;
 
 								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
@@ -1718,6 +1717,39 @@ function PGAMain() {
 									dump({ level: 1, message: "PGA timer time out 10s", origin: "PGATimer" });
 									setTimeout(() => {
 										reconnect();
+										PGAMainbkup();
+									}, 3000);
+
+									if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+								} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
+									Ping = "💤";
+								} else if (setting["sleep.mode"]) {
+									Ping = "💤";
+								}
+							}
+							// ipcMain.emit("restart");
+						}
+
+						if (rts_ws2_timestamp) {
+							const t0 = Math.abs(rts_response_new.Time - NOW().getTime());
+
+							if (!rts_key_verify) {
+								Ping = `🔒 ${(t0 / 1000).toFixed(1)}s`;
+							} else if (rts_key_verify) {
+								if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
+								else if (t0 < 7500) Ping = `📶 ${(t0 / 1000).toFixed(1)}s`;
+								else Ping = `⚠️ ${(t0 / 1000).toFixed(1)}s`;
+
+								// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
+
+								Response = rts_response_new;
+
+								if ((NOW().getTime() - rts_ws2_timestamp) > 10_000 && !setting["sleep.mode"]) {
+									Ping = `❌ ${((NOW().getTime() - rts_ws2_timestamp) / 1000).toFixed(1)}s`;
+									log("PGA 2 timer time out 10s", 2, "PGATimer", "PGAMain");
+									dump({ level: 1, message: "PGA 2 timer time out 10s", origin: "PGATimer" });
+									setTimeout(() => {
+										reconnect2();
 										PGAMainbkup();
 									}, 3000);
 
@@ -1923,12 +1955,47 @@ function PGAMainbkup() {
 								if ((NOW().getTime() - rts_ws2_timestamp) > 5_000) Response = rts_response;
 								else Response = { ...rts_response, ...rts_response_new };
 
+								if (!rts_response) Response = rts_response_new;
+
 								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
 									log("PGA timer backup time out 10s", 2, "PGATimer", "PGAMainbkup");
 									dump({ level: 1, message: "PGA timer backup time out 10s", origin: "PGATimer" });
 									setTimeout(() => {
 										reconnect();
+										PGAMain();
+									}, 3000);
+
+									if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+								} else if ((NOW().getTime() - Response.Time) > 1_000 && setting["sleep.mode"]) {
+									Ping = "💤";
+								} else if (setting["sleep.mode"]) {
+									Ping = "💤";
+								}
+							}
+							// ipcMain.emit("restart");
+						}
+
+						if (rts_ws2_timestamp) {
+							const t1 = Math.abs(rts_response_new.Time - NOW().getTime());
+
+							if (!rts_key_verify) {
+								Ping = `🔒 ${(t1 / 1000).toFixed(1)}s`;
+							} else if (rts_key_verify) {
+								if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
+								else if (t1 < 7500) Ping = `📶 ${(t1 / 1000).toFixed(1)}s`;
+								else Ping = `⚠️ ${(t1 / 1000).toFixed(1)}s`;
+
+								// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
+
+								Response = rts_response_new;
+
+								if ((NOW().getTime() - rts_ws2_timestamp) > 10_000 && !setting["sleep.mode"]) {
+									Ping = `❌ ${((NOW().getTime() - rts_ws2_timestamp) / 1000).toFixed(1)}s`;
+									log("PGA timer backup time out 10s", 2, "PGATimer", "PGAMainbkup");
+									dump({ level: 1, message: "PGA timer backup time out 10s", origin: "PGATimer" });
+									setTimeout(() => {
+										reconnect2();
 										PGAMain();
 									}, 3000);
 
