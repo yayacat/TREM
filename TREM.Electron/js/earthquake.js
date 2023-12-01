@@ -2136,6 +2136,7 @@ function handler(Json) {
 		const uuid = keys[index];
 		const current_station_data = station[uuid];
 		let current_data = Json[uuid.split("-")[2]];
+
 		if (Json.station) current_data = Json.station[uuid.split("-")[2]];
 
 		// if (uuid == "H-979-11336952-11")
@@ -3905,7 +3906,7 @@ ipcMain.once("start", () => {
 					await fetch("https://data.exptech.com.tw/api/v1/trem/rts", { signal: controller.signal })
 						.then((ans0) => {
 							if (ans0.ok) {
-								ans0.json().then(ans => {;
+								ans0.json().then(ans => {
 									rts_ws_timestamp = new Date().getTime();
 									ans.Time = rts_ws_timestamp;
 									rts_response = ans;
