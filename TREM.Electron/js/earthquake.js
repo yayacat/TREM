@@ -1712,7 +1712,7 @@ function PGAMain() {
 
 								Response = rts_response;
 
-								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
+								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"] && !rts_ws2_timestamp) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
 									log("PGA timer time out 10s", 2, "PGATimer", "PGAMain");
 									dump({ level: 1, message: "PGA timer time out 10s", origin: "PGATimer" });
@@ -1746,7 +1746,7 @@ function PGAMain() {
 
 								Response = rts_response_new;
 
-								if ((NOW().getTime() - rts_ws2_timestamp) > 10_000 && !setting["sleep.mode"]) {
+								if ((NOW().getTime() - rts_ws2_timestamp) > 10_000 && !setting["sleep.mode"] && !rts_ws_timestamp) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws2_timestamp) / 1000).toFixed(1)}s`;
 									log("PGA 2 timer time out 10s", 2, "PGATimer", "PGAMain");
 									dump({ level: 1, message: "PGA 2 timer time out 10s", origin: "PGATimer" });
@@ -1955,12 +1955,9 @@ function PGAMainbkup() {
 
 								// Ping = NOW().getTime() - rts_ws_timestamp + "ms " + "⚡";
 
-								if ((NOW().getTime() - rts_ws2_timestamp) > 5_000) Response = rts_response;
-								else Response = { ...rts_response, ...rts_response_new };
+								Response = rts_response;
 
-								if (!rts_response) Response = rts_response_new;
-
-								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"]) {
+								if ((NOW().getTime() - rts_ws_timestamp) > 10_000 && !setting["sleep.mode"] && !rts_ws2_timestamp) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws_timestamp) / 1000).toFixed(1)}s`;
 									log("PGA timer backup time out 10s", 2, "PGATimer", "PGAMainbkup");
 									dump({ level: 1, message: "PGA timer backup time out 10s", origin: "PGATimer" });
@@ -1994,7 +1991,7 @@ function PGAMainbkup() {
 
 								Response = rts_response_new;
 
-								if ((NOW().getTime() - rts_ws2_timestamp) > 10_000 && !setting["sleep.mode"]) {
+								if ((NOW().getTime() - rts_ws2_timestamp) > 10_000 && !setting["sleep.mode"] && !rts_ws_timestamp) {
 									Ping = `❌ ${((NOW().getTime() - rts_ws2_timestamp) / 1000).toFixed(1)}s`;
 									log("PGA timer backup time out 10s", 2, "PGATimer", "PGAMainbkup");
 									dump({ level: 1, message: "PGA timer backup time out 10s", origin: "PGATimer" });
@@ -2427,7 +2424,7 @@ function handler(Json) {
 				current_station_data.PGA = 13379360;
 
 			if ((detected_list[current_station_data.PGA]?.intensity ?? -1) < intensitytest)
-				if (setting["Real-time.alert"] && rts_key_verify) {
+				if (setting["Real-time.alert"] && rts_key_verify && storage.getItem("rts_alert")) {
 					detected_list[current_station_data.PGA] ??= {
 						intensity : intensitytest,
 						time      : NOW().getTime(),
@@ -3185,23 +3182,39 @@ function ReportGET() {
 								storage.setItem("report_data", _report_data);
 							}
 
-							if (!api_key_verify && !setting["report.getInfo"]) {
-								const _report_data_POST_temp = [];
-								let k = 0;
+							const _report_data_POST_temp = [];
+							let k = 0;
 
-								for (let i = 0; i < _report_data.length; i++)
-									if (_report_data[i].identifier.startsWith("CWB")) {
-										_report_data_POST_temp[k] = _report_data[i];
-										k += 1;
-									} else if (_report_data[i].identifier.startsWith("CWA")) {
-										_report_data_POST_temp[k] = _report_data[i];
-										k += 1;
-									}
+							for (let i = 0; i < _report_data.length; i++)
+								if (_report_data[i].identifier.startsWith("CWB")) {
+									_report_data_POST_temp[k] = _report_data[i];
+									k += 1;
+								} else if (_report_data[i].identifier.startsWith("CWA")) {
+									_report_data_POST_temp[k] = _report_data[i];
+									k += 1;
+								}
 
-								log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
-								dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
-								cacheReport(_report_data_POST_temp);
-							}
+							log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
+							dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
+							cacheReport(_report_data_POST_temp);
+
+							// if (!api_key_verify && !setting["report.getInfo"]) {
+							// 	const _report_data_POST_temp = [];
+							// 	let k = 0;
+
+							// 	for (let i = 0; i < _report_data.length; i++)
+							// 		if (_report_data[i].identifier.startsWith("CWB")) {
+							// 			_report_data_POST_temp[k] = _report_data[i];
+							// 			k += 1;
+							// 		} else if (_report_data[i].identifier.startsWith("CWA")) {
+							// 			_report_data_POST_temp[k] = _report_data[i];
+							// 			k += 1;
+							// 		}
+
+							// 	log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
+							// 	dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
+							// 	cacheReport(_report_data_POST_temp);
+							// }
 						}).catch((err) => {
 							log("Error fetching reports (fetch) json", 3, "EQReportFetcher", "ReportGET");
 							log(err, 3, "EQReportFetcher", "ReportGET");
@@ -3893,38 +3906,7 @@ ipcMain.once("start", () => {
 			}
 		}, 0);
 
-		if (!rts_key_verify) {
-			if (rts_clock) {
-				clearInterval(rts_clock);
-				rts_clock = null;
-			}
-
-			rts_clock = setInterval(async () => {
-				try {
-					const controller = new AbortController();
-					const timer = setTimeout(() => controller.abort(), 1000);
-					await fetch("https://data.exptech.com.tw/api/v1/trem/rts", { signal: controller.signal })
-						.then((ans0) => {
-							if (ans0.ok) {
-								ans0.json().then(ans => {
-									rts_ws_timestamp = new Date().getTime();
-									ans.Time = rts_ws_timestamp;
-									rts_response = ans;
-									clearTimeout(timer);
-								});
-							} else {
-								log(ans0.status, 3, "server", "rts-clock");
-								clearTimeout(timer);
-							}
-						}).catch((err) => {
-							log(err, 3, "server", "rts-clock");
-							clearTimeout(timer);
-						});
-				} catch (err) {
-					log(err, 3, "server", "rts-clock");
-				}
-			}, 1000);
-		}
+		freertsget();
 
 		log(`Initializing ServerCore >> ${ServerVer}`, 1, "Initialization", "start");
 		dump({ level: 0, message: `Initializing ServerCore >> ${ServerVer}`, origin: "Initialization" });
@@ -3935,6 +3917,41 @@ ipcMain.once("start", () => {
 		dump({ level: 2, message: error, origin: "Initialization" });
 	}
 });
+
+function freertsget(rts_key_verify_f = false) {
+	if (!rts_key_verify || rts_key_verify_f) {
+		if (rts_clock) {
+			clearInterval(rts_clock);
+			rts_clock = null;
+		}
+
+		rts_clock = setInterval(async () => {
+			try {
+				const controller = new AbortController();
+				const timer = setTimeout(() => controller.abort(), 1000);
+				await fetch("https://data.exptech.com.tw/api/v1/trem/rts", { signal: controller.signal })
+					.then((ans0) => {
+						if (ans0.ok) {
+							ans0.json().then(ans => {
+								rts_ws_timestamp = new Date().getTime();
+								ans.Time = rts_ws_timestamp;
+								rts_response = ans;
+								clearTimeout(timer);
+							});
+						} else {
+							log(ans0.status, 3, "server", "rts-clock");
+							clearTimeout(timer);
+						}
+					}).catch((err) => {
+						log(err, 3, "server", "rts-clock");
+						clearTimeout(timer);
+					});
+			} catch (err) {
+				log(err, 3, "server", "rts-clock");
+			}
+		}, 1000);
+	}
+}
 
 const stopReplay = function() {
 	if (Object.keys(EarthquakeList).length != 0) Cancel = true;
@@ -6158,7 +6175,7 @@ function findClosest(arr, target) {
 }
 
 function NOW() {
-	return new Date(ServerTime + (Date.now() - ServerT));
+	return new Date(ServerTime + (Date.now() - ((ServerT != 0) ? ServerT : (ServerT0 != 0) ? ServerT0 : ServerT2)));
 }
 
 function timeconvert(time) {

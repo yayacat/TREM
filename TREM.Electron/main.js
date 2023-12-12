@@ -710,6 +710,13 @@ ipcMain.on("config:value", (event, key, value) => {
 			break;
 		}
 
+		case "api.key": {
+			TREM.Configuration.data["api.key"] = value;
+			emitAllWindow("setting", TREM.Configuration._data);
+			ipcMain.emit("apikey");
+			break;
+		}
+
 		default:
 			break;
 	}
