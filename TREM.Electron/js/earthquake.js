@@ -2424,7 +2424,7 @@ function handler(Json) {
 				current_station_data.PGA = 13379360;
 
 			if ((detected_list[current_station_data.PGA]?.intensity ?? -1) < intensitytest)
-				if (setting["Real-time.alert"] && rts_key_verify && storage.getItem("rts_alert")) {
+				if (setting["Real-time.alert"] && alert_key_verify && storage.getItem("rts_alert")) {
 					detected_list[current_station_data.PGA] ??= {
 						intensity : intensitytest,
 						time      : NOW().getTime(),
