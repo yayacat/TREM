@@ -2566,7 +2566,7 @@ function handler(Json) {
 			if (time != 0 && NOW().getTime() - time > 30_000 || PGACancel) {
 				delete detected_list[Object.keys(detected_list)[index]];
 				index--;
-			} else if (NOW().getTime() - RMTpgaTime > 30_000) {
+			} else if (NOW().getTime() - RMTpgaTime > 30_000 || time === 0) {
 				delete detected_list[Object.keys(detected_list)[index]];
 				RMTpgaTime = 0;
 				console.debug("檢知框框結束時間:", NOW().getTime());
@@ -2960,7 +2960,7 @@ function playNextAudio1() {
 // #endregion
 
 // #region Report Data
-function ReportGET() {
+function ReportGET(badcatch = false) {
 	try {
 		if (!localStorage.fixReportGET_0) {
 			localStorage.fixReportGET_0 = 1;
@@ -3006,7 +3006,7 @@ function ReportGET() {
 		// else
 		// bodyInfo = JSON.stringify({ list });
 
-		if (api_key_verify && setting["report.getInfo"]) {
+		if (api_key_verify && setting["report.getInfo"] && !badcatch) {
 			const controller1 = new AbortController();
 			setTimeout(() => {
 				controller1.abort();
@@ -3134,16 +3134,9 @@ function ReportGET() {
 					dump({ level: 2, message: "Error fetching reports (fetch)", origin: "EQReportFetcher" });
 					dump({ level: 2, message: err, origin: "EQReportFetcher" });
 
-					if (_report_data.length > setting["cache.report"]) {
-						_report_data_temp = [];
-						for (let i = 0; i < setting["cache.report"]; i++)
-							_report_data_temp[i] = _report_data[i];
-						TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
-						ReportList(_report_data_temp);
-					} else {
-						TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
-						ReportList(_report_data);
-					}
+					setTimeout(() => {
+						ReportGET(true);
+					}, 3_000);
 				});
 		} else {
 			const controller = new AbortController();
