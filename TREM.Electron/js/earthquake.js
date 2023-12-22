@@ -3134,9 +3134,7 @@ function ReportGET(badcatch = false) {
 					dump({ level: 2, message: "Error fetching reports (fetch)", origin: "EQReportFetcher" });
 					dump({ level: 2, message: err, origin: "EQReportFetcher" });
 
-					setTimeout(() => {
-						ReportGET(true);
-					}, 3_000);
+					ReportGET(true);
 				});
 		} else {
 			const controller = new AbortController();
