@@ -7,6 +7,7 @@ const logger = require("electron-log");
 const path = require("path");
 const pushReceiver = require("electron-fcm-push-receiver");
 const exectest = require('child_process').exec;
+const remote = require("@electron/remote/main");
 
 TREM.Configuration = new Configuration(TREM);
 TREM.Utils = require("./Utils/Utils.js");
@@ -122,8 +123,8 @@ function createWindow() {
 			nativeWindowOpen     : true,
 		},
 	})).get("main");
-	require("@electron/remote/main").initialize();
-	require("@electron/remote/main").enable(MainWindow.webContents);
+	remote.initialize();
+	remote.enable(MainWindow.webContents);
 	process.env.window = MainWindow.id;
 	MainWindow.loadFile("./Views/MainView.html");
 	MainWindow.setAspectRatio(16 / 9);
@@ -170,7 +171,7 @@ function createSettingWindow() {
 			contextIsolation : false,
 		},
 	})).get("setting");
-	require("@electron/remote/main").enable(SettingWindow.webContents);
+	remote.enable(SettingWindow.webContents);
 	SettingWindow.loadFile("./Views/SettingView.html");
 	SettingWindow.setMenu(null);
 	SettingWindow.webContents.on("did-finish-load", () => {
@@ -204,7 +205,7 @@ function createRTSWindow() {
 			nativeWindowOpen     : true,
 		},
 	})).get("rts");
-	require("@electron/remote/main").enable(RTSWindow.webContents);
+	remote.enable(RTSWindow.webContents);
 	RTSWindow.loadFile("./Views/RTSView.html");
 	RTSWindow.setMenu(null);
 	RTSWindow.webContents.on("did-finish-load", () => {
@@ -237,7 +238,7 @@ function createIntensityWindow() {
 			nativeWindowOpen     : true,
 		},
 	})).get("Intensity");
-	require("@electron/remote/main").enable(IntensityWindow.webContents);
+	remote.enable(IntensityWindow.webContents);
 	process.env.intensitywindow = IntensityWindow.id;
 	IntensityWindow.loadFile("./Views/IntensityView.html");
 	IntensityWindow.setAspectRatio(16 / 9);
@@ -422,13 +423,15 @@ autoUpdater.on("update-available", (info) => {
 autoUpdater.on("update-not-available", (info) => {
 	// logger.info(info.version);
 	// logger.info("No new updates found");
-	const getVersion = TREM.getVersion();
-	new Notification({
-		title : TREM.Localization.getString("Notification_No_Update_Title"),
-		body  : TREM.Localization.getString("Notification_No_Update_Body").format(getVersion, info.version),
-		icon  : "TREM.ico",
-	}).show();
-	ipcMain.emit("update-not-available-Notification", info.version, getVersion);
+	if (TREM.Configuration.data["update.mode"] != "never") {
+		const getVersion = TREM.getVersion();
+		new Notification({
+			title : TREM.Localization.getString("Notification_No_Update_Title"),
+			body  : TREM.Localization.getString("Notification_No_Update_Body").format(getVersion, info.version),
+			icon  : "TREM.ico",
+		}).show();
+		ipcMain.emit("update-not-available-Notification", info.version, getVersion);
+	}
 });
 
 autoUpdater.on("error", (err) => {
