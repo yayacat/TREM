@@ -4799,6 +4799,24 @@ ipcMain.on("Olddatabase_eew", (event, json) => {
 	TREM.Earthquake.emit("eew", json);
 });
 
+ipcMain.on("test_eew", (event, json) => {
+	json.time = NOW().getTime();
+	json.timestamp = NOW().getTime();
+	json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
+		: (json.type == "eew-scdzj") ? "四川省地震局 (SCDZJ)"
+			: (json.type == "eew-nied") ? "防災科学技術研究所 (NIED)"
+				: (json.type == "eew-kma") ? "기상청(KMA)"
+					: (json.type == "eew-jma") ? "気象庁(JMA)"
+						: (json.type == "eew-cwb") ? "中央氣象署 (CWA)"
+							: (json.type == "eew-fjdzj") ? "福建省地震局 (FJDZJ)"
+								: (json.type == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
+									: (json.type == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+										: (json.Unit) ? json.Unit : "";
+
+	stopReplaybtn();
+	TREM.Earthquake.emit("eew", json);
+});
+
 // #region Event: eew
 TREM.Earthquake.on("eew", (data) => {
 	log("Got EEW", 1, "API", "eew");
@@ -5636,41 +5654,43 @@ function main(data) {
 	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && data.type == "trem-eew") || data.type != "trem-eew")) {
 		if (data.depth != null) {
 
+			/**
+			 * @type {{p:number,s:number}} wave
+			 */
+
 			const wave = { p: 7, s: 4 };
 
 			/**
-			 * @type {{p:number,s:number}}
+			 * PS 波已走公尺數
+			 * @type {number} kmP
+			 * @type {number} km
 			 */
 
-			let kmP = Math.floor(Math.sqrt(Math.pow((NOW().getTime() - data.time) * wave.p, 2) - Math.pow(data.depth * 1000, 2)));
-			let km = Math.floor(Math.sqrt(Math.pow((NOW().getTime() - data.time) * wave.s, 2) - Math.pow(data.depth * 1000, 2)));
+			let kmP = 0;
+			let km = 0;
 
-			/**
-			* PS 波已走公尺數
-			* @type {number} kmP
-			* @type {number} km
-			*/
+			const km_time = (NOW().getTime() - data.time) / 1000;
 
 			const _time_table = TREM.Resources.time[findClosest(TREM.Resources.time_list, data.depth)];
 			let prev_table = null;
 
 			for (const table of _time_table) {
-				if (!kmP && table.P > (NOW().getTime() - data.time) / 1000)
+				if (!kmP && table.P > km_time)
 					if (prev_table) {
 						const t_diff = table.P - prev_table.P;
 						const r_diff = table.R - prev_table.R;
-						const t_offset = (NOW().getTime() - data.time) / 1000 - prev_table.P;
+						const t_offset = km_time - prev_table.P;
 						const r_offset = (t_offset / t_diff) * r_diff;
 						kmP = prev_table.R + r_offset;
 					} else {
 						kmP = table.R;
 					}
 
-				if (!km && table.S > (NOW().getTime() - data.time) / 1000)
+				if (!km && table.S > km_time)
 					if (prev_table) {
 						const t_diff = table.S - prev_table.S;
 						const r_diff = table.R - prev_table.R;
-						const t_offset = (NOW().getTime() - data.time) / 1000 - prev_table.S;
+						const t_offset = km_time - prev_table.S;
 						const r_offset = (t_offset / t_diff) * r_diff;
 						km = prev_table.R + r_offset;
 					} else {
@@ -5681,6 +5701,13 @@ function main(data) {
 
 				prev_table = table;
 			}
+
+			if (!kmP) kmP = Math.floor(Math.sqrt(Math.pow(km_time * wave.p, 2) - Math.pow(data.depth, 2)));
+
+			if (!km) km = Math.floor(Math.sqrt(Math.pow(km_time * wave.s, 2) - Math.pow(data.depth, 2)));
+
+			kmP *= 1000;
+			km *= 1000;
 
 			// if (kmP === 0 && km === 0) {
 			// 	for (let index = 1; index < EarthquakeList[data.id].distance.length; index++)

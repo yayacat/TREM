@@ -1135,16 +1135,63 @@ function send() {
 
 	axios.post("https://exptech.com.tw/api/v1/et", data)
 		.then((response) => {
-			if (response.data.response == "State Close") {
-				document.getElementById("sendState").innerHTML = "設備未連接至伺服器";
-				console.log("設備未連接至伺服器");
-			} else if (response.data.response == "Device Not Found") {
-				document.getElementById("sendState").innerHTML = "找不到此 UUID 的設備";
-				console.log("找不到此 UUID 的設備");
+			if (response.ok) {
+				if (response.data.response == "State Close") {
+					document.getElementById("sendState").innerHTML = "設備未連接至伺服器";
+					console.log("設備未連接至伺服器");
+				} else if (response.data.response == "Device Not Found") {
+					document.getElementById("sendState").innerHTML = "找不到此 UUID 的設備";
+					console.log("找不到此 UUID 的設備");
+				} else {
+					document.getElementById("sendState").innerHTML = "發送成功，第" + data.Value.number + "報";
+					console.log("發送成功 請刷新網頁");
+				}
+
+				document.getElementById("Version").value = Number(document.getElementById("Version").value) + 1;
+				const utc = new Date();
+				const NOW = new Date(utc.getTime() + utc.getTimezoneOffset() * 60 * 1000 + 60 * 60 * 8 * 1000);
+				const now = new Date(NOW.getTime() - 20000);
+				const Now1 = now.getFullYear()
+				+ "-" + (now.getMonth() + 1)
+				+ "-" + now.getDate()
+				+ " " + now.getHours()
+				+ ":" + now.getMinutes()
+				+ ":" + now.getSeconds();
+				document.getElementById("Time").value = Now1;
+				const now1 = new Date(NOW.getTime());
+				const Now2 = now1.getFullYear()
+				+ "-" + (now1.getMonth() + 1)
+				+ "-" + now1.getDate()
+				+ " " + now1.getHours()
+				+ ":" + now1.getMinutes()
+				+ ":" + now1.getSeconds();
+				document.getElementById("TimeStamp").value = Now2;
 			} else {
-				document.getElementById("sendState").innerHTML = "發送成功，第" + data.Value.number + "報";
-				console.log("發送成功 請刷新網頁");
+				ipcRenderer.send("test_eew", data.Value);
+
+				document.getElementById("Version").value = Number(document.getElementById("Version").value) + 1;
+				const utc = new Date();
+				const NOW = new Date(utc.getTime() + utc.getTimezoneOffset() * 60 * 1000 + 60 * 60 * 8 * 1000);
+				const now = new Date(NOW.getTime() - 20000);
+				const Now1 = now.getFullYear()
+				+ "-" + (now.getMonth() + 1)
+				+ "-" + now.getDate()
+				+ " " + now.getHours()
+				+ ":" + now.getMinutes()
+				+ ":" + now.getSeconds();
+				document.getElementById("Time").value = Now1;
+				const now1 = new Date(NOW.getTime());
+				const Now2 = now1.getFullYear()
+				+ "-" + (now1.getMonth() + 1)
+				+ "-" + now1.getDate()
+				+ " " + now1.getHours()
+				+ ":" + now1.getMinutes()
+				+ ":" + now1.getSeconds();
+				document.getElementById("TimeStamp").value = Now2;
 			}
+		}).catch((err) => {
+			console.error(err);
+			ipcRenderer.send("test_eew", data.Value);
 
 			document.getElementById("Version").value = Number(document.getElementById("Version").value) + 1;
 			const utc = new Date();
