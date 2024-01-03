@@ -2181,8 +2181,7 @@ function handler(Json) {
 			if (amount > current_station_data.MaxPGA) current_station_data.MaxPGA = amount;
 			intensity = (Alert && Json.Alert) ? Math.round(current_data.i)
 				: (NOW().getTime() - current_data.TS * 1000 > 5000) ? "NA"
-					: (!Alert) ? ((current_data.i > -1) ? Math.round(current_data.i) : 0)
-						: 0;
+					: 0;
 			// : (amount >= 800) ? 9
 			// 	: (amount >= 440) ? 8
 			// 		: (amount >= 250) ? 7
