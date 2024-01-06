@@ -1,4 +1,4 @@
-const { getCurrentWindow, shell } = require("@electron/remote");
+const { getCurrentWindow } = require("@electron/remote");
 const echarts = require("echarts");
 const win = getCurrentWindow();
 

@@ -204,6 +204,10 @@ const Constants = Object.freeze({
 			type  : "select",
 			value : "Microsoft Hanhan - Chinese (Traditional, Taiwan)",
 		},
+		"Real-time.websocket": {
+			type  : "select",
+			value : "exptech",
+		},
 		"Real-time.station": {
 			type  : "select",
 			value : "L-711-6732340-12",

@@ -172,7 +172,7 @@ TREM.MapIntensity = {
 						this.trem = false;
 						this.MaxI = palertEntry.intensity;
 						Report = rawPalertData.time;
-						ipcMain.emit("ReportGET");
+						ipcRenderer.send("ReportGET");
 					}
 				}
 
@@ -883,7 +883,7 @@ const folder = path.join(app.getPath("userData"), "data");
 if (!fs.existsSync(folder))
 	fs.mkdirSync(folder);
 
-const win = BrowserWindow.fromId(process.env.window * 1);
+const win = TREM.win;
 const roll = document.getElementById("rolllist");
 win.setAlwaysOnTop(false);
 
@@ -1003,9 +1003,9 @@ async function init() {
 				let GetDataState = "";
 				let Warn = "";
 
-				if (!HTTP) Warn += "0";
+				// if (!HTTP) Warn += "0";
 
-				if (!WS0) Warn += "1";
+				// if (!WS0) Warn += "1";
 
 				if (!WS) Warn += "2";
 
@@ -1484,19 +1484,13 @@ async function init() {
 
 				for (let index = 0; index < Object.keys(detected_list).length; index++)
 					if (Object.keys(detected_list)[index].toString() == "7735548") {
-						detected_list_length += 1;
 						focusScale = 5;
 						xl = index;
 					} else if (Object.keys(detected_list)[index].toString() == "13379360") {
-						detected_list_length += 1;
 						focusScale = 5;
 						yl = index;
-					} else if (Object.keys(detected_list)[index].toString() == "2") {
-						focusScale = 7.5;
-						xl = index;
-					} else if (Object.keys(detected_list)[index].toString() == "15") {
-						focusScale = 7.5;
-						yl = index;
+					} else {
+						detected_list_length += 1;
 					}
 
 				if (xl != 0 || yl != 1) {
@@ -1506,7 +1500,8 @@ async function init() {
 					Y2 = (TREM.Resources.area[Object.keys(detected_list)[yl].toString()][0][1] + (TREM.Resources.area[Object.keys(detected_list)[yl].toString()][1][1] - TREM.Resources.area[Object.keys(detected_list)[yl].toString()][0][1]) / 2);
 				}
 
-				TREM.Earthquake.emit("focus", { center: [(X1 + X2) / 2, (Y1 + Y2) / 2], zoom: focusScale });
+				if (detected_list_length === 43) Mapsmainfocus();
+				else TREM.Earthquake.emit("focus", { center: [(X1 + X2) / 2, (Y1 + Y2) / 2], zoom: focusScale });
 			}
 
 			map_move_back = true;
@@ -1697,8 +1692,8 @@ function PGAMain() {
 					const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
 
 					if (ReplayTime == 0) {
-						if (rts_ws_timestamp) {
-							const t0 = Math.abs(rts_response.Time - NOW().getTime());
+						if (rts_ws_timestamp && setting["Real-time.websocket"] === "exptech") {
+							const t0 = Math.abs(rts_response.time - NOW().getTime());
 
 							if (!rts_key_verify) {
 								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
@@ -1728,10 +1723,8 @@ function PGAMain() {
 									Ping = "💤";
 								}
 							}
-							// ipcMain.emit("restart");
-						}
-
-						if (rts_ws2_timestamp) {
+							// ipcRenderer.send("restart");
+						} else if (rts_ws2_timestamp && setting["Real-time.websocket"] === "yayacat") {
 							const t0 = Math.abs(rts_response_new.Time - NOW().getTime());
 
 							if (!rts_key_verify) {
@@ -1762,7 +1755,7 @@ function PGAMain() {
 									Ping = "💤";
 								}
 							}
-							// ipcMain.emit("restart");
+							// ipcRenderer.send("restart");
 						} else {
 							for (const removedKey of Object.keys(Station)) {
 								Station[removedKey].remove();
@@ -1942,8 +1935,8 @@ function PGAMainbkup() {
 					const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
 
 					if (ReplayTime == 0) {
-						if (rts_ws_timestamp) {
-							const t1 = Math.abs(rts_response.Time - NOW().getTime());
+						if (rts_ws_timestamp && setting["Real-time.websocket"] === "exptech") {
+							const t1 = Math.abs(rts_response.time - NOW().getTime());
 
 							if (!rts_key_verify) {
 								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
@@ -1973,10 +1966,8 @@ function PGAMainbkup() {
 									Ping = "💤";
 								}
 							}
-							// ipcMain.emit("restart");
-						}
-
-						if (rts_ws2_timestamp) {
+							// ipcRenderer.send("restart");
+						} else if (rts_ws2_timestamp && setting["Real-time.websocket"] === "yayacat") {
 							const t1 = Math.abs(rts_response_new.Time - NOW().getTime());
 
 							if (!rts_key_verify) {
@@ -2007,7 +1998,7 @@ function PGAMainbkup() {
 									Ping = "💤";
 								}
 							}
-							// ipcMain.emit("restart");
+							// ipcRenderer.send("restart");
 						} else {
 							for (const removedKey of Object.keys(Station)) {
 								Station[removedKey].remove();
@@ -2096,7 +2087,7 @@ function handler(Json) {
 	// 	// document.getElementById("rt-station").classList.remove("left");
 	// 	// document.getElementById("rt-maxintensitynum").classList.add("hide");
 
-	const removed = Object.keys(Station).filter(key => !Object.keys(Json).includes(key));
+	const removed = Json.station ? Object.keys(Station).filter(key => !Object.keys(Json.station).includes(key)) : Object.keys(Station).filter(key => !Object.keys(Json).includes(key));
 
 	for (const removedKey of removed) {
 		Station[removedKey].remove();
@@ -2147,7 +2138,7 @@ function handler(Json) {
 		let amount = 0;
 		let intensity = 0;
 		let intensitytest = 0;
-		let now = new Date(Json.Time);
+		let now = new Date(Json.Time ?? Json.time);
 		const Alert = current_data?.alert ?? false;
 
 		if (current_data == undefined) {
@@ -2413,7 +2404,7 @@ function handler(Json) {
 				TREM.MapIntensity.trem = false;
 				TREM.MapIntensity.MaxI = max_intensity;
 				Report = Json.Time;
-				ipcMain.emit("ReportGET");
+				ipcRenderer.send("ReportGET");
 				intensitytag = max_intensity;
 			}
 		} else if (NA999 != "Y" && NA0999 != "Y" && intensitytest > -1 && amount < 999) {
@@ -2476,7 +2467,7 @@ function handler(Json) {
 						TREM.MapIntensity.trem = true;
 						TREM.MapIntensity.MaxI = intensitytest;
 						Report = NOW().getTime();
-						ipcMain.emit("ReportGET");
+						ipcRenderer.send("ReportGET");
 					}
 				}
 
@@ -2491,7 +2482,7 @@ function handler(Json) {
 			MAXPGA.long = station[keys[index]].Long;
 			MAXPGA.loc = station[keys[index]].Loc;
 			MAXPGA.intensity = intensity;
-			MAXPGA.time = new Date(Json.Time);
+			MAXPGA.time = new Date(Json.Time ?? Json.time);
 		}
 		// if (MaxIntensity1 > MAXPGA.intensity){
 		// 	MAXPGA.pga = amount;
@@ -3328,7 +3319,7 @@ function ReportGET(badcatch = false) {
 	}
 }
 
-ipcMain.on("ReportGET", () => {
+ipcRenderer.on("ReportGET", () => {
 	let _report_data_GET = [];
 	const _report_data_GET_temp = [];
 	let j = 0;
@@ -3368,7 +3359,7 @@ ipcMain.on("ReportGET", () => {
 	}
 });
 
-ipcMain.on("ReportTREM", () => {
+ipcRenderer.on("ReportTREM", () => {
 	TREM.Report.report_trem = setting["report.trem"];
 
 	if (TREM.Report.view == "report-overview" || TREM.Report.view == "eq-report-overview")
@@ -3431,7 +3422,7 @@ function cacheReport(_report_data_GET) {
 // #region Report 點擊
 // eslint-disable-next-line no-shadow
 const openURL = url => {
-	shell.openExternal(url);
+	ipcRenderer.send("openURL", url);
 };
 // #endregion
 
@@ -3701,7 +3692,7 @@ function addReport(report, prepend = false, index = 0) {
 
 // #endregion
 
-ipcMain.on("Olddatabase_report", (event, json) => {
+ipcRenderer.on("Olddatabase_report", (event, json) => {
 	TREM.set_report_overview = 1;
 	TREM.Report.setView("eq-report-overview", json);
 	changeView("report", "#reportView_btn");
@@ -3728,7 +3719,7 @@ function openIntensityWindow() {
 	ipcRenderer.send("openIntensityWindow");
 	toggleNav(false);
 }
-// ipcMain.on("setting_btn_remove_hide", () => {
+// ipcRenderer.on("setting_btn_remove_hide", () => {
 // 	document.getElementById("setting_btn").classList.remove("hide");
 // });
 // #endregion
@@ -3809,7 +3800,7 @@ TREM.color = function color(Intensity) {
 let rts_clock = null;
 
 // #region IPC
-ipcMain.once("start", () => {
+ipcRenderer.on("start", () => {
 	try {
 		if (!(rts_key_verify ? storage.getItem("disclaimer_off") : false) && !rts_key_verify) {
 			showDialog(
@@ -3960,7 +3951,7 @@ const stopReplay = function() {
 		clearInterval(Timers.eew_clock);
 		TREM.Report.replayHttp = false;
 		PGAMain();
-		ipcMain.emit("ReportGET");
+		ipcRenderer.send("ReportGET");
 	}
 
 	if (link_on) link_on = false;
@@ -4001,29 +3992,29 @@ TREM.backindexButton = () => {
 	changeView("main", "#mainView_btn");
 };
 
-ipcMain.on("testoldEEW", (event) => {
+ipcRenderer.on("testoldEEW", () => {
 	const report_data = storage.getItem("report_data");
 	TREM.Report.replayHttp = true;
 	replay = new Date(report_data[0].originTime.replace(/-/g, "/")).getTime() - 5000;
 	replayT = NOW().getTime();
-	ipcMain.emit("ReportGET");
+	ipcRenderer.send("ReportGET");
 	stopReplaybtn();
 });
 
-ipcMain.on("testoldtimeEEW", (event, oldtime) => {
+ipcRenderer.on("testoldtimeEEW", (event, oldtime) => {
 	replay = oldtime - 5000;
 	replayT = NOW().getTime();
-	ipcMain.emit("ReportGET");
+	ipcRenderer.send("ReportGET");
 	stopReplaybtn();
 });
 
-ipcMain.on("testoldtremEEW", (event, oldtrem) => {
+ipcRenderer.on("testoldtremEEW", (event, oldtrem) => {
 	let list = [];
 	list = list.concat(oldtrem);
 	ipcRenderer.send("testEEW", list);
 });
 
-ipcMain.on("testoldtime", (event, oldtime) => {
+ipcRenderer.on("testoldtime", (event, oldtime) => {
 	replayD = true;
 	replay = oldtime - 5000;
 	replayTemp = replay;
@@ -4031,12 +4022,12 @@ ipcMain.on("testoldtime", (event, oldtime) => {
 	replaydir = replay / 1000;
 	ReportTag = 0;
 	console.debug("ReportTag: ", ReportTag);
-	ipcMain.emit("ReportGET");
+	ipcRenderer.send("ReportGET");
 	stopReplaybtn();
 	PGAMain();
 });
 
-ipcMain.on("testreplaytime", (event, oldtime) => {
+ipcRenderer.on("testreplaytime", (event, oldtime) => {
 	console.debug(oldtime);
 	replayD = true;
 	replay = oldtime;
@@ -4045,23 +4036,23 @@ ipcMain.on("testreplaytime", (event, oldtime) => {
 	replaydir = replay / 1000;
 	ReportTag = 0;
 	console.debug("ReportTag: ", ReportTag);
-	ipcMain.emit("ReportGET");
+	ipcRenderer.send("ReportGET");
 	stopReplaybtn();
 	PGAMain();
 });
 
-ipcMain.on("sleep", (event, mode) => {
+ipcRenderer.on("sleep", (event, mode) => {
 	if (mode)
 		sleep(mode);
 	else
 		sleep(mode);
 });
 
-ipcMain.on("apikey", (event) => {
+ipcRenderer.on("apikey", () => {
 	apikey();
 });
 
-ipcMain.on("report-Notification", (event, report) => {
+ipcRenderer.on("report-Notification", (event, report) => {
 	if (setting["webhook.url"] != "" && setting["report.Notification"]) {
 		console.debug(report);
 		log("Posting Notification report Webhook", 1, "Webhook", "report-Notification");
@@ -4146,7 +4137,7 @@ ipcMain.on("report-Notification", (event, report) => {
 	}
 });
 
-ipcMain.on("intensity-Notification", (event, intensity) => {
+ipcRenderer.on("intensity-Notification", (event, intensity) => {
 	// console.log(intensity);
 	const info = intensity.raw.info;
 	const intensity1 = intensity.raw.intensity;
@@ -4288,7 +4279,7 @@ ipcMain.on("intensity-Notification", (event, intensity) => {
 	}
 });
 
-ipcMain.on("update-available-Notification", (version, getVersion, info) => {
+ipcRenderer.on("update-available-Notification", (event, version, getVersion, info) => {
 	if (setting["webhook.url"] != undefined)
 		if (setting["webhook.url"] != "" && setting["checkForUpdates.Notification"]) {
 			log("Posting Notification Update Webhook", 1, "Webhook", "update-available-Notification");
@@ -4319,11 +4310,11 @@ ipcMain.on("update-available-Notification", (version, getVersion, info) => {
 
 	showDialog("success", `有可用的${info.releaseName}版本更新`, info.releaseNotes.replace("<p>", "").replaceAll("<br>", "").replace("</p>", ""),
 		1, "update", () => {
-			shell.openExternal(`https://github.com/yayacat/TREM/releases/tag/v${version}`);
+			openURL(`https://github.com/yayacat/TREM/releases/tag/v${version}`);
 		}, "前往更新", "暫緩更新", () => void 0, 60);
 });
 
-ipcMain.on("update-not-available-Notification", (version, getVersion) => {
+ipcRenderer.on("update-not-available-Notification", (event, version, getVersion) => {
 	if (setting["webhook.url"] != undefined)
 		if (setting["webhook.url"] != "" && setting["checkForUpdates.Notification"]) {
 			log("Posting Notification No Update Webhook", 1, "Webhook", "update-not-available-Notification");
@@ -4353,7 +4344,7 @@ ipcMain.on("update-not-available-Notification", (version, getVersion) => {
 		}
 });
 
-ipcMain.on("testEEW", (event, list = []) => {
+ipcRenderer.on("testEEW", (event, list = []) => {
 	toggleNav(false);
 	stopReplaybtn();
 	replaytestEEW = NOW().getTime();
@@ -4616,7 +4607,7 @@ function FCMdata(json, Unit) {
 			replayT = NOW().getTime();
 		}
 
-		ipcMain.emit("ReportGET");
+		ipcRenderer.send("ReportGET");
 		stopReplaybtn();
 	} else if (json.type == "report") {
 		const report = json.raw;
@@ -4778,7 +4769,7 @@ function FCMdata(json, Unit) {
 }
 // #endregion
 
-ipcMain.on("Olddatabase_eew", (event, json) => {
+ipcRenderer.on("Olddatabase_eew", (event, json) => {
 	json.replay_time = json.time;
 	json.replay_timestamp = json.time;
 	json.time = NOW().getTime();
@@ -4798,7 +4789,7 @@ ipcMain.on("Olddatabase_eew", (event, json) => {
 	TREM.Earthquake.emit("eew", json);
 });
 
-ipcMain.on("test_eew", (event, json) => {
+ipcRenderer.on("test_eew", (event, json) => {
 	json.time = NOW().getTime();
 	json.timestamp = NOW().getTime();
 	json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
@@ -5555,7 +5546,7 @@ TREM.Earthquake.on("trem-eq", (data) => {
 	}
 });
 
-ipcMain.on("Olddatabase_tsunami", (event, json) => {
+ipcRenderer.on("Olddatabase_tsunami", (event, json) => {
 	TREM.Earthquake.emit("tsunami", json);
 });
 

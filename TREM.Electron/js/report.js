@@ -560,7 +560,7 @@ TREM.Report = {
 
 		const filepath = path.join(app.getPath("temp"), `TREM_Report_${id}.txt`);
 		fs.writeFileSync(filepath, string.join("\n"), { encoding: "utf-8" });
-		shell.openPath(filepath);
+		ipcRenderer.send("openFolder", filepath);
 		setTimeout(() => fs.rmSync(filepath), 5_000);
 	},
 

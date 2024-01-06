@@ -1,4 +1,3 @@
-const { ipcMain } = require("@electron/remote");
 const Speech = require("speak-tts");
 
 let setting, is_setting_disabled;

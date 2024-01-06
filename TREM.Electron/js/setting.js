@@ -1,4 +1,4 @@
-const { getCurrentWindow, shell } = require("@electron/remote");
+const { getCurrentWindow } = require("@electron/remote");
 const axios = require("axios");
 const os = require("node:os");
 const win = getCurrentWindow();
@@ -50,7 +50,7 @@ document.getElementById("client-os").innerText = `${os.version()} (${os.release(
 document.getElementById("client-uuid").title = `rts-TREM-${localStorage.UUID_rts}`;
 
 const openURL = url => {
-	shell.openExternal(url);
+	ipcRenderer.send("openURL", url);
 };
 
 ipcRenderer.on("setting", (event, data) => {
@@ -58,15 +58,15 @@ ipcRenderer.on("setting", (event, data) => {
 		closeDialog({ target: { id: "dialog" } });
 });
 
-ipcMain.on("RTSUnlock", (event, Unlock) => {
-	if (Unlock) {
-		document.getElementById("RTSUnlock").classList.remove("hide");
-		document.getElementById("RTSUnlock1").classList.remove("hide");
-	} else {
-		document.getElementById("RTSUnlock").classList.add("hide");
-		document.getElementById("RTSUnlock1").classList.add("hide");
-	}
-});
+// ipcRenderer.on("RTSUnlock", (event, Unlock) => {
+// 	if (Unlock) {
+// 		document.getElementById("RTSUnlock").classList.remove("hide");
+// 		document.getElementById("RTSUnlock1").classList.remove("hide");
+// 	} else {
+// 		document.getElementById("RTSUnlock").classList.add("hide");
+// 		document.getElementById("RTSUnlock1").classList.add("hide");
+// 	}
+// });
 
 ipcRenderer.on("settingError", (event, error) => {
 	is_setting_disabled = error;
@@ -1323,7 +1323,7 @@ function reset() {
 }
 
 function openLogFolder() {
-	shell.openPath(app.getPath("logs"));
+	ipcRenderer.send("openFolder", "logs");
 }
 
 function openScreenshotsFolder() {
@@ -1463,7 +1463,7 @@ function openSettingFile() {
 }
 
 function openreleases() {
-	ipcRenderer.send("openreleases");
+	ipcRenderer.send("openURL", "releases");
 }
 
 const restart = () => {
@@ -1597,7 +1597,7 @@ const stepUnlockRange = (e) => {
 		$("input[type=range]")[0].step = 0.01;
 };
 
-ipcMain.on("p2p", (event, data, server_ips) => {
+ipcRenderer.on("p2p", (event, data, server_ips) => {
 	// console.log(data);
 	// console.log(server_ips);
 	const p2p_server = document.getElementById("p2p_server");
@@ -1739,7 +1739,7 @@ ipcMain.on("p2p", (event, data, server_ips) => {
 	p2p_out_num.append(p2p_out_num_span);
 });
 
-ipcMain.on("p2p6", (event, data, server_ips) => {
+ipcRenderer.on("p2p6", (event, data, server_ips) => {
 	// console.log(data);
 	// console.log(server_ips);
 	const p2p_server = document.getElementById("p2p_v6_server");

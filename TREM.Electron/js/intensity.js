@@ -712,13 +712,13 @@ TREM.Old_database = {
 	},
 };
 
-ipcMain.on("TREMIntensityhandle", (event, json) => {
+ipcRenderer.on("TREMIntensityhandle", (event, json) => {
 	if (TREM.Intensity.isTriggered)
 		TREM.Intensity.clear();
 	TREM.Intensity.handle(json);
 });
 
-ipcMain.on("TREMIntensityload", (event, json) => {
+ipcRenderer.on("TREMIntensityload", (event, json) => {
 	if (TREM.Intensity.isTriggered)
 		TREM.Intensity.clear();
 
@@ -734,17 +734,17 @@ ipcMain.on("TREMIntensityload", (event, json) => {
 	TREM.Intensity.load(json);
 });
 
-ipcMain.on("TREMIntensitytime2", (event, time) => {
+ipcRenderer.on("TREMIntensitytime2", (event, time) => {
 	const time2 = document.getElementById("time2");
 	time2.innerText = time;
 });
 
-ipcMain.on("TREMIntensitylog2", (event, log) => {
+ipcRenderer.on("TREMIntensitylog2", (event, log) => {
 	const time2 = document.getElementById("log2");
 	time2.innerText = log;
 });
 
-ipcMain.on("TREMIntensityappversion2", (event, version) => {
+ipcRenderer.on("TREMIntensityappversion2", (event, version) => {
 	const time2 = document.getElementById("app-version2");
 	time2.innerText = version;
 });

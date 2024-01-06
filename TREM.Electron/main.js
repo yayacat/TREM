@@ -8,6 +8,7 @@ const path = require("path");
 const pushReceiver = require("electron-fcm-push-receiver");
 const exectest = require('child_process').exec;
 const remote = require("@electron/remote/main");
+const get_Version = TREM.getVersion();
 
 TREM.Configuration = new Configuration(TREM);
 TREM.Utils = require("./Utils/Utils.js");
@@ -167,8 +168,12 @@ function createSettingWindow() {
 		show           : false,
 		icon           : "TREM.ico",
 		webPreferences : {
-			nodeIntegration  : true,
-			contextIsolation : false,
+			preload              : path.join(__dirname, "preload.js"),
+			nodeIntegration      : true,
+			contextIsolation     : false,
+			enableRemoteModule   : true,
+			backgroundThrottling : false,
+			nativeWindowOpen     : true,
 		},
 	})).get("setting");
 	remote.enable(SettingWindow.webContents);
@@ -388,10 +393,9 @@ TREM.on('activate', function () {
 
 autoUpdater.on("update-available", (info) => {
 	if (TREM.Configuration.data["update.mode"] != "never") {
-		const getVersion = TREM.getVersion();
 		new Notification({
 			title : TREM.Localization.getString("Notification_Update_Title"),
-			body  : TREM.Localization.getString("Notification_Update_Body").format(getVersion, info.version),
+			body  : TREM.Localization.getString("Notification_Update_Body").format(get_Version, info.version),
 			icon  : "TREM.ico",
 		}).on("click", () => {
 			logger.info(info);
@@ -410,7 +414,7 @@ autoUpdater.on("update-available", (info) => {
 			}
 
 			case "notify": {
-				ipcMain.emit("update-available-Notification", info.version, getVersion, info);
+				ipcMain.emit("update-available-Notification", info.version, get_Version, info);
 				break;
 			}
 
@@ -424,13 +428,12 @@ autoUpdater.on("update-not-available", (info) => {
 	// logger.info(info.version);
 	// logger.info("No new updates found");
 	if (TREM.Configuration.data["update.mode"] != "never") {
-		const getVersion = TREM.getVersion();
 		new Notification({
 			title : TREM.Localization.getString("Notification_No_Update_Title"),
-			body  : TREM.Localization.getString("Notification_No_Update_Body").format(getVersion, info.version),
+			body  : TREM.Localization.getString("Notification_No_Update_Body").format(get_Version, info.version),
 			icon  : "TREM.ico",
 		}).show();
-		ipcMain.emit("update-not-available-Notification", info.version, getVersion);
+		ipcMain.emit("update-not-available-Notification", info.version, get_Version);
 	}
 });
 
@@ -559,8 +562,126 @@ ipcMain.on("hide", () => {
 	if (currentWindow == IntensityWindow) IntensityWindow.hide();
 });
 
-ipcMain.on("openreleases", () => {
-	shell.openExternal(`https://github.com/yayacat/TREM/releases/tag/v${TREM.getVersion()}`);
+ipcMain.on("openFolder", (event, url) => {
+	if (url === "logs")
+		shell.openPath(TREM.getPath("logs"));
+	else
+		shell.openPath(url);
+});
+
+ipcMain.on("openURL", (event, url) => {
+	if (url === "releases")
+		shell.openExternal(`https://github.com/yayacat/TREM/releases/tag/v${get_Version}`);
+	else
+		shell.openExternal(url);
+});
+
+ipcMain.on("p2p", (event, data, server_ips) => {
+	if (SettingWindow) SettingWindow.webContents.send("p2p", data, server_ips);
+});
+
+ipcMain.on("p2p6", (event, data, server_ips) => {
+	if (SettingWindow) SettingWindow.webContents.send("p2p6", data, server_ips);
+});
+
+ipcMain.on("TREMIntensityhandle", (event, json) => {
+	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensityhandle", json);
+});
+
+ipcMain.on("TREMIntensityload", (event, json) => {
+	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensityload", json);
+});
+
+ipcMain.on("TREMIntensitytime2", (event, time) => {
+	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensitytime2", time);
+});
+
+ipcMain.on("TREMIntensitylog2", (event, log) => {
+	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensitylog2", log);
+});
+
+ipcMain.on("TREMIntensityappversion2", (event, version) => {
+	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensityappversion2", version);
+});
+
+ipcMain.on("ReportGET", () => {
+	if (MainWindow) MainWindow.webContents.send("ReportGET");
+});
+
+ipcMain.on("ReportTREM", () => {
+	if (MainWindow) MainWindow.webContents.send("ReportTREM");
+});
+
+ipcMain.on("Olddatabase_report", (event, json) => {
+	if (MainWindow) MainWindow.webContents.send("Olddatabase_report", json);
+});
+
+// ipcMain.on("setting_btn_remove_hide", () => {
+// 	emitAllWindow("setting_btn_remove_hide");
+// });
+
+ipcMain.on("start", () => {
+	emitAllWindow("start");
+});
+
+ipcMain.on("testoldEEW", () => {
+	emitAllWindow("testoldEEW");
+});
+
+ipcMain.on("testoldtimeEEW", (event, oldtime) => {
+	emitAllWindow("testoldtimeEEW", oldtime);
+});
+
+ipcMain.on("testoldtremEEW", (event, oldtrem) => {
+	emitAllWindow("testoldtremEEW", oldtrem);
+});
+
+ipcMain.on("testoldtime", (event, oldtime) => {
+	emitAllWindow("testoldtime", oldtime);
+});
+
+ipcMain.on("testreplaytime", (event, oldtime) => {
+	emitAllWindow("testreplaytime", oldtime);
+});
+
+ipcMain.on("sleep", (event, mode) => {
+	emitAllWindow("sleep", mode);
+});
+
+ipcMain.on("apikey", () => {
+	emitAllWindow("apikey");
+});
+
+ipcMain.on("report-Notification", (event, report) => {
+	emitAllWindow("report-Notification", report);
+});
+
+ipcMain.on("intensity-Notification", (event, intensity) => {
+	emitAllWindow("intensity-Notification", intensity);
+});
+
+ipcMain.on("update-available-Notification", (event, version, getVersion, info) => {
+	emitAllWindow("update-available-Notification", version, getVersion, info);
+});
+
+ipcMain.on("update-not-available-Notification", (event, version, getVersion) => {
+	emitAllWindow("update-not-available-Notification", version, getVersion);
+});
+
+ipcMain.on("testEEW", (event, list = []) => {
+	emitAllWindow("testEEW", list);
+});
+
+ipcMain.on("Olddatabase_eew", (event, json) => {
+	emitAllWindow("Olddatabase_eew", json);
+});
+
+ipcMain.on("test_eew", (event, json) => {
+	emitAllWindow("test_eew", json);
+});
+
+ipcMain.on("Olddatabase_tsunami", (event, json) => {
+	emitAllWindow("Olddatabase_tsunami", json);
 });
 
 ipcMain.on('startPushReceiver', (event, arg) => {
@@ -581,20 +702,6 @@ ipcMain.on('linkpathtest', (event, cmdPath, cmdStr) => {
 	workerProcess.on('close', function (code) {
 		console.log('out code:' + code);
 	});
-});
-
-TREM.Configuration.on("update", (data) => {
-	emitAllWindow("setting", data);
-	emitAllWindow("config:color", data["theme.customColor"]);
-});
-
-TREM.Configuration.on("detect-locale", (data) => {
-	const detectedLocale = TREM.Localization.matchLocale(TREM.getLocale());
-	ipcMain.emit("config:value", "general.locale", detectedLocale);
-});
-
-TREM.Configuration.on("error", (error) => {
-	emitAllWindow("settingError", error);
 });
 
 ipcMain.on("config:value", (event, key, value) => {
@@ -734,11 +841,6 @@ ipcMain.on("config:open", () => {
 	shell.openPath(TREM.Configuration.path);
 });
 
-function restart() {
-	TREM.relaunch();
-	TREM.exit(0);
-}
-
 ipcMain.on("screenshotEEW", async (event, json) => {
 	// return;
 	const folder = path.join(TREM.getPath("userData"), "EEW");
@@ -779,12 +881,33 @@ ipcMain.on("screenshot", async () => {
 	}
 });
 
+TREM.Configuration.on("update", (data) => {
+	emitAllWindow("setting", data);
+	emitAllWindow("config:color", data["theme.customColor"]);
+});
+
+TREM.Configuration.on("detect-locale", (data) => {
+	const detectedLocale = TREM.Localization.matchLocale(TREM.getLocale());
+	ipcMain.emit("config:value", "general.locale", detectedLocale);
+});
+
+TREM.Configuration.on("error", (error) => {
+	emitAllWindow("settingError", error);
+});
+
+function restart() {
+	TREM.relaunch();
+	TREM.exit(0);
+}
+
 function emitAllWindow(channel, ...args) {
 	for (const [key, win] of TREM.Window[Symbol.iterator]())
 		if (win instanceof BrowserWindow)
 			try {
 				win.webContents.send(channel, ...args);
 			} catch (error) {
+				console.error(channel);
+				console.error(...args);
 				console.error(error);
 			}
 }
@@ -832,7 +955,7 @@ function trayIcon() {
 	});
 	const contextMenu = Menu.buildFromTemplate([
 		{
-			label : `TREMV v${TREM.getVersion()}`,
+			label : `TREMV v${get_Version}`,
 			type  : "normal",
 			click : () => {
 				shell.openExternal("https://github.com/yayacat/TREM");
