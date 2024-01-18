@@ -1088,7 +1088,7 @@ async function init() {
 						globalgc();
 					}
 				} else
-					if (Date.now() - report_get_timestamp > 3600_000) {
+					if (Date.now() - report_get_timestamp > 180_000) {
 						ReportGET();
 						globalgc();
 					}
@@ -1693,10 +1693,10 @@ function PGAMain() {
 
 					if (ReplayTime == 0) {
 						if (rts_ws_timestamp && setting["Real-time.websocket"] === "exptech") {
-							const t0 = Math.abs(rts_response.time - NOW().getTime());
+							const t0 = Math.abs((rts_response.Time ?? rts_response.time) - NOW().getTime());
 
 							if (!rts_key_verify) {
-								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
+								Ping = `🔒 ${(Math.abs((rts_response.Time ?? rts_response.time) - NOW().getTime()) / 1000).toFixed(1)}s`;
 								Response = rts_response;
 							} else if (rts_key_verify) {
 								if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
@@ -1725,10 +1725,10 @@ function PGAMain() {
 							}
 							// ipcRenderer.send("restart");
 						} else if (rts_ws2_timestamp && setting["Real-time.websocket"] === "yayacat") {
-							const t0 = Math.abs(rts_response_new.Time - NOW().getTime());
+							const t0 = Math.abs((rts_response_new.Time ?? rts_response_new.time) - NOW().getTime());
 
 							if (!rts_key_verify) {
-								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
+								Ping = `🔒 ${(Math.abs((rts_response.Time ?? rts_response.time) - NOW().getTime()) / 1000).toFixed(1)}s`;
 								Response = rts_response;
 							} else if (rts_key_verify) {
 								if (t0 < 1500) Ping = `⚡ ${(t0 / 1000).toFixed(1)}s`;
@@ -1936,10 +1936,10 @@ function PGAMainbkup() {
 
 					if (ReplayTime == 0) {
 						if (rts_ws_timestamp && setting["Real-time.websocket"] === "exptech") {
-							const t1 = Math.abs(rts_response.time - NOW().getTime());
+							const t1 = Math.abs((rts_response.Time ?? rts_response.time) - NOW().getTime());
 
 							if (!rts_key_verify) {
-								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
+								Ping = `🔒 ${(Math.abs((rts_response.Time ?? rts_response.time) - NOW().getTime()) / 1000).toFixed(1)}s`;
 								Response = rts_response;
 							} else if (rts_key_verify) {
 								if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
@@ -1968,10 +1968,10 @@ function PGAMainbkup() {
 							}
 							// ipcRenderer.send("restart");
 						} else if (rts_ws2_timestamp && setting["Real-time.websocket"] === "yayacat") {
-							const t1 = Math.abs(rts_response_new.Time - NOW().getTime());
+							const t1 = Math.abs((rts_response_new.Time ?? rts_response_new.time) - NOW().getTime());
 
 							if (!rts_key_verify) {
-								Ping = `🔒 ${(Math.abs(rts_response.time - NOW().getTime()) / 1000).toFixed(1)}s`;
+								Ping = `🔒 ${(Math.abs((rts_response.Time ?? rts_response.time) - NOW().getTime()) / 1000).toFixed(1)}s`;
 								Response = rts_response;
 							} else if (rts_key_verify) {
 								if (t1 < 1500) Ping = `⚡ ${(t1 / 1000).toFixed(1)}s`;
@@ -2113,19 +2113,18 @@ function handler(Json) {
 	let target_count = 0;
 	const detection_location = Json.area ?? [];
 	const detection_list = Json.box ?? {};
-	const Json_temp = Json;
+	const Json_temp = Json.station ? Json.station : Json;
 	Json_temp.area = detection_location;
 
-	if (detection_location.length) TREM.MapArea2.setArea(Json);
+	if (detection_location.length) TREM.MapArea2.setArea(Json_temp);
 
 	// if (Object.keys(detection_list).length) console.log(detection_list);
 
 	for (let index = 0, keys = Object.keys(station), n = keys.length; index < n; index++) {
 		const uuid = keys[index];
 		const current_station_data = station[uuid];
-		let current_data = Json[uuid.split("-")[2]];
-
-		if (Json.station) current_data = Json.station[uuid.split("-")[2]];
+		const current_data = Json.station ? Json.station[uuid.split("-")[2]] : Json[uuid.split("-")[2]];
+		const Json_Time = Json.Time ?? Json.time;
 
 		// if (uuid == "H-979-11336952-11")
 		// 	console.log(current_data);
@@ -2138,7 +2137,7 @@ function handler(Json) {
 		let amount = 0;
 		let intensity = 0;
 		let intensitytest = 0;
-		let now = new Date(Json.Time ?? Json.time);
+		let now = new Date(Json_Time);
 		const Alert = current_data?.alert ?? false;
 
 		if (current_data == undefined) {
@@ -2166,8 +2165,8 @@ function handler(Json) {
 			station_time_json[uuid] = 0;
 			localStorage.stationtime = JSON.stringify(station_time_json);
 
-			if (current_data.v) amount = +current_data.v;
-			else amount = +current_data.pgv;
+			if (current_data.a) amount = +current_data.a;
+			else amount = +current_data.pga;
 
 			if (amount > current_station_data.MaxPGA) current_station_data.MaxPGA = amount;
 			intensity = (Alert && Json.Alert) ? Math.round(current_data.i)
@@ -2206,7 +2205,9 @@ function handler(Json) {
 			if (!current_data.alert) delete level_list[uuid];
 
 			if (current_data.alert) {
-				if ((level_list[uuid] ?? 0) < current_data.v) level_list[uuid] = current_data.v;
+				if (current_data.a) if ((level_list[uuid] ?? 0) < current_data.a) level_list[uuid] = current_data.a;
+
+				if (current_data.pga) if ((level_list[uuid] ?? 0) < current_data.pga) level_list[uuid] = current_data.pga;
 				target_count++;
 			}
 
@@ -2403,7 +2404,7 @@ function handler(Json) {
 
 				TREM.MapIntensity.trem = false;
 				TREM.MapIntensity.MaxI = max_intensity;
-				Report = Json.Time;
+				Report = Json_Time;
 				ipcRenderer.send("ReportGET");
 				intensitytag = max_intensity;
 			}
@@ -2460,7 +2461,9 @@ function handler(Json) {
 							win.setAlwaysOnTop(false);
 						}
 
-					level_list[uuid] = current_data.v;
+					if (current_data.a) level_list[uuid] = current_data.a;
+
+					if (current_data.pga) level_list[uuid] = current_data.pga;
 					target_count++;
 
 					if (replay == 0) {
@@ -2482,7 +2485,7 @@ function handler(Json) {
 			MAXPGA.long = station[keys[index]].Long;
 			MAXPGA.loc = station[keys[index]].Loc;
 			MAXPGA.intensity = intensity;
-			MAXPGA.time = new Date(Json.Time ?? Json.time);
+			MAXPGA.time = new Date(Json_Time);
 		}
 		// if (MaxIntensity1 > MAXPGA.intensity){
 		// 	MAXPGA.pga = amount;
@@ -2657,8 +2660,10 @@ function handler(Json) {
 
 				if (!IMAXdata[All[Index].uuid.split("-")[2]]) IMAXdata[All[Index].uuid.split("-")[2]] = {};
 
-				if (!IMAXdata[All[Index].uuid.split("-")[2]].pga) IMAXdata[All[Index].uuid.split("-")[2]].pga = Json[All[Index].uuid.split("-")[2]].v;
-				else if (IMAXdata[All[Index].uuid.split("-")[2]].pga < Json[All[Index].uuid.split("-")[2]].v) IMAXdata[All[Index].uuid.split("-")[2]].pga = Json[All[Index].uuid.split("-")[2]].v;
+				const Json_station_v = Json.station ? Json.station[All[Index].uuid.split("-")[2]].v : Json[All[Index].uuid.split("-")[2]].v;
+
+				if (!IMAXdata[All[Index].uuid.split("-")[2]].pga) IMAXdata[All[Index].uuid.split("-")[2]].pga = Json_station_v;
+				else if (IMAXdata[All[Index].uuid.split("-")[2]].pga < Json_station_v) IMAXdata[All[Index].uuid.split("-")[2]].pga = Json_station_v;
 				const container = document.createElement("DIV");
 				container.className = IntensityToClassString(All[Index].intensity);
 				const location = document.createElement("span");
@@ -2676,14 +2681,15 @@ function handler(Json) {
 				if (Object.keys(Idata).length >= 8) break;
 				const city = All[Index].loc.split(" ")[0];
 				const CPGA = (Idata[city] == undefined) ? 0 : Idata[city];
+				const Json_station_v = Json.station ? Json.station[All[Index].uuid.split("-")[2]].v : Json[All[Index].uuid.split("-")[2]].v;
 
-				if (Json[All[Index].uuid.split("-")[2]]?.v > CPGA) {
+				if (Json_station_v > CPGA) {
 					if (Idata[city] == undefined) Idata[city] = {};
 
 					if (!IMAXdata[city]) IMAXdata[city] = {};
 
-					if (!IMAXdata[city].pga) IMAXdata[city].pga = Json[All[Index].uuid.split("-")[2]].v;
-					else if (IMAXdata[city].pga < Json[All[Index].uuid.split("-")[2]].v) IMAXdata[city].pga = Json[All[Index].uuid.split("-")[2]].v;
+					if (!IMAXdata[city].pga) IMAXdata[city].pga = Json_station_v;
+					else if (IMAXdata[city].pga < Json_station_v) IMAXdata[city].pga = Json_station_v;
 					Idata[city].intensity = All[Index].intensity;
 				}
 			}
@@ -2970,12 +2976,19 @@ function ReportGET(badcatch = false) {
 
 		if (_report_data.length != 0 && !setting["report.getInfo"]) {
 			for (let i = 0; i < _report_data.length; i++)
-				if (_report_data[i].identifier.startsWith("CWB")) {
-					_report_data_temp[j] = _report_data[i];
-					j += 1;
-				} else if (_report_data[i].identifier.startsWith("CWA")) {
-					_report_data_temp[j] = _report_data[i];
-					j += 1;
+				if (_report_data[i].identifier) {
+					if (_report_data[i].identifier.startsWith("CWB")) {
+						_report_data_temp[j] = _report_data[i];
+						j += 1;
+					} else if (_report_data[i].identifier.startsWith("CWA")) {
+						_report_data_temp[j] = _report_data[i];
+						j += 1;
+					}
+				} else if (_report_data[i].id) {
+					if (_report_data[i].id.match(/-/g).length === 3) {
+						_report_data_temp[j] = _report_data[i];
+						j += 1;
+					}
 				}
 
 			_report_data = _report_data_temp;
@@ -3001,7 +3014,7 @@ function ReportGET(badcatch = false) {
 			setTimeout(() => {
 				controller1.abort();
 			}, 5_000);
-			fetch(`https://exptech.com.tw/api/v1/earthquake/reports?limit=50&key=${setting["api.key"]}`, { signal: controller1.signal })
+			fetch(`https://data.exptech.com.tw/api/v2/eq/report?limit=50&key=${setting["api.key"]}`, { signal: controller1.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
 						console.debug(ans0);
@@ -3010,32 +3023,59 @@ function ReportGET(badcatch = false) {
 
 							if (ans.length != 0) {
 								for (let i = 0; i < ans.length; i++) {
-									const id = ans[i].identifier;
+									const id = ans[i].id;
 
-									for (let _i = 0; _i < _report_data.length; _i++)
-										if (_report_data[_i].identifier === id) {
+									for (let _i = 0; _i < _report_data.length; _i++) {
+										if (_report_data[_i].identifier)
+											if (_report_data[_i].identifier === id)
+												_report_data.splice(_i, 1);
+
+										if (_report_data[_i].id) {
+											if (_report_data[_i].id === id) {
+												if (_report_data[_i].list) {
+													ans[i].list = _report_data[_i].list;
+													ans[i].Max_Level = _report_data[_i].Max_Level;
+													ans[i].Max_Level_areaName = _report_data[_i].Max_Level_areaName;
+													ans[i].Max_Level_stationName = _report_data[_i].Max_Level_stationName;
+												}
+
+												_report_data.splice(_i, 1);
+											} else if (_report_data[_i].id === _report_data[_i + 1].id) {
+												_report_data.splice(_i, 1);
+											}
+
+											if (_report_data[_i].id !== undefined)
+												if (_report_data[_i].id.match(/CWA-EQ(.*)/) !== null)
+													if (_report_data[_i].id.match(/CWA-EQ(.*)/)[1] === id)
+														_report_data.splice(_i, 1);
+
+										} else if (_report_data[_i].identifier === "") {
 											_report_data.splice(_i, 1);
-											console.debug(_i);
 										}
+									}
 
-									if (ans[i].originTime.includes("-")) ans[i].originTime = ans[i].originTime.split(" ")[0].split("-")[0] + "/" + ans[i].originTime.split(" ")[0].split("-")[1] + "/" + ans[i].originTime.split(" ")[0].split("-")[2] + " " + ans[i].originTime.split(" ")[1];
+									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
 								}
 
 								for (let i = 0; i < ans.length; i++)
 									_report_data.push(ans[i]);
 
 								for (let i = 0; i < _report_data.length - 1; i++)
-									for (let _i = 0; _i < _report_data.length - 1; _i++)
-										if (new Date(_report_data[_i].originTime).getTime() < new Date(_report_data[_i + 1].originTime).getTime()) {
+									for (let _i = 0; _i < _report_data.length - 1; _i++) {
+										const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
+										const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
+
+										if (time_temp < time_1_temp) {
 											const temp = _report_data[_i + 1];
 											_report_data[_i + 1] = _report_data[_i];
 											_report_data[_i] = temp;
 										}
+									}
 
 								// if (!_report_data) return setTimeout(ReportGET, 10_000);
 
 								storage.setItem("report_data", _report_data);
-								console.debug(_report_data);
+								// console.debug(_report_data);
 							}
 
 							log("Reports fetched (api key verify)", 1, "EQReportFetcher", "ReportGET");
@@ -3131,7 +3171,7 @@ function ReportGET(badcatch = false) {
 			setTimeout(() => {
 				controller.abort();
 			}, 5_000);
-			fetch("https://data.exptech.com.tw/api/v1/eq/report?limit=50", { signal: controller.signal })
+			fetch("https://data.exptech.com.tw/api/v2/eq/report?limit=50", { signal: controller.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
 						console.debug(ans0);
@@ -3140,25 +3180,54 @@ function ReportGET(badcatch = false) {
 
 							if (ans.length != 0) {
 								for (let i = 0; i < ans.length; i++) {
-									const id = ans[i].identifier;
+									const id = ans[i].id;
 
-									for (let _i = 0; _i < _report_data.length; _i++)
-										if (_report_data[_i].identifier == id)
+									for (let _i = 0; _i < _report_data.length; _i++) {
+										if (_report_data[_i].identifier)
+											if (_report_data[_i].identifier === id)
+												_report_data.splice(_i, 1);
+
+										if (_report_data[_i].id) {
+											if (_report_data[_i].id === id) {
+												if (_report_data[_i].list) {
+													ans[i].list = _report_data[_i].list;
+													ans[i].Max_Level = _report_data[_i].Max_Level;
+													ans[i].Max_Level_areaName = _report_data[_i].Max_Level_areaName;
+													ans[i].Max_Level_stationName = _report_data[_i].Max_Level_stationName;
+												}
+
+												_report_data.splice(_i, 1);
+											} else if (_report_data[_i].id === _report_data[_i + 1].id) {
+												_report_data.splice(_i, 1);
+											}
+
+											if (_report_data[_i].id !== undefined)
+												if (_report_data[_i].id.match(/CWA-EQ(.*)/) !== null)
+													if (_report_data[_i].id.match(/CWA-EQ(.*)/)[1] === id)
+														_report_data.splice(_i, 1);
+
+										} else if (_report_data[_i].identifier === "") {
 											_report_data.splice(_i, 1);
+										}
+									}
 
-									if (ans[i].originTime.includes("-")) ans[i].originTime = ans[i].originTime.split(" ")[0].split("-")[0] + "/" + ans[i].originTime.split(" ")[0].split("-")[1] + "/" + ans[i].originTime.split(" ")[0].split("-")[2] + " " + ans[i].originTime.split(" ")[1];
+									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
 								}
 
 								for (let i = 0; i < ans.length; i++)
 									_report_data.push(ans[i]);
 
 								for (let i = 0; i < _report_data.length - 1; i++)
-									for (let _i = 0; _i < _report_data.length - 1; _i++)
-										if (new Date(_report_data[_i].originTime.replaceAll("/", "-")).getTime() < new Date(_report_data[_i + 1].originTime.replaceAll("/", "-")).getTime()) {
+									for (let _i = 0; _i < _report_data.length - 1; _i++) {
+										const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
+										const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
+
+										if (time_temp < time_1_temp) {
 											const temp = _report_data[_i + 1];
 											_report_data[_i + 1] = _report_data[_i];
 											_report_data[_i] = temp;
 										}
+									}
 
 								storage.setItem("report_data", _report_data);
 							}
@@ -3167,17 +3236,26 @@ function ReportGET(badcatch = false) {
 							let k = 0;
 
 							for (let i = 0; i < _report_data.length; i++)
-								if (_report_data[i].identifier.startsWith("CWB")) {
-									_report_data_POST_temp[k] = _report_data[i];
-									k += 1;
-								} else if (_report_data[i].identifier.startsWith("CWA")) {
-									_report_data_POST_temp[k] = _report_data[i];
-									k += 1;
+								if (_report_data[i].identifier) {
+									if (_report_data[i].identifier.startsWith("CWB")) {
+										_report_data_POST_temp[k] = _report_data[i];
+										k += 1;
+									} else if (_report_data[i].identifier.startsWith("CWA")) {
+										_report_data_POST_temp[k] = _report_data[i];
+										k += 1;
+									}
+								} else if (_report_data[i].id) {
+									if (_report_data[i].id.match(/-/g).length === 3) {
+										_report_data_POST_temp[k] = _report_data[i];
+										k += 1;
+									}
 								}
 
 							log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
 							dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
 							cacheReport(_report_data_POST_temp);
+							console.debug(_report_data.length);
+							console.debug(_report_data_POST_temp.length);
 
 							// if (!api_key_verify && !setting["report.getInfo"]) {
 							// 	const _report_data_POST_temp = [];
@@ -3330,9 +3408,16 @@ ipcRenderer.on("ReportGET", () => {
 
 	if (_report_data_GET.length != 0 && !setting["report.getInfo"]) {
 		for (let i = 0; i < _report_data_GET.length; i++)
-			if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
-				_report_data_GET_temp[j] = _report_data_GET[i];
-				j += 1;
+			if (_report_data_GET[i].identifier) {
+				if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
+					_report_data_GET_temp[j] = _report_data_GET[i];
+					j += 1;
+				}
+			} else if (_report_data_GET[i].id) {
+				if (_report_data_GET[i].id.match(/-/g).length === 3) {
+					_report_data_GET_temp[j] = _report_data_GET[i];
+					j += 1;
+				}
 			}
 
 		cacheReport(_report_data_GET_temp);
@@ -3347,9 +3432,16 @@ ipcRenderer.on("ReportGET", () => {
 			cacheReport(_report_data_GET);
 		} else {
 			for (let i = 0; i < _report_data_GET.length; i++)
-				if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
-					_report_data_GET_temp[j] = _report_data_GET[i];
-					j += 1;
+				if (_report_data_GET[i].identifier) {
+					if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
+						_report_data_GET_temp[j] = _report_data_GET[i];
+						j += 1;
+					}
+				} else if (_report_data_GET[i].id) {
+					if (_report_data_GET[i].id.match(/-/g).length === 3) {
+						_report_data_GET_temp[j] = _report_data_GET[i];
+						j += 1;
+					}
 				}
 
 			// if (setting["api.key"] != "") ReportGET();
@@ -3396,7 +3488,7 @@ function cacheReport(_report_data_GET) {
 		for (let i = 0; i < setting["cache.report"]; i++)
 			_report_data_temp[i] = _report_data_GET[i];
 
-		TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+		TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier ?? v.id, v]));
 
 		if (Report != 0)
 			ReportList(_report_data_temp, {
@@ -3406,7 +3498,7 @@ function cacheReport(_report_data_GET) {
 		else
 			ReportList(_report_data_temp);
 	} else {
-		TREM.Report.cache = new Map(_report_data_GET.map(v => [v.identifier, v]));
+		TREM.Report.cache = new Map(_report_data_GET.map(v => [v.identifier ?? v.id, v]));
 
 		if (Report != 0)
 			ReportList(_report_data_GET, {
@@ -3442,22 +3534,34 @@ function ReportList(earthquakeReportArr, palert) {
 }
 
 function addReport(report, prepend = false, index = 0) {
-	if (replay != 0 && new Date(report.originTime).getTime() > new Date(replay + (NOW().getTime() - replayT)).getTime()) return;
+	const OriginTime = report.originTime ? new Date(report.originTime).getTime() : report.time;
 
-	const Level = IntensityI(report.data[0]?.areaIntensity);
+	if (replay != 0 && OriginTime > new Date(replay + (NOW().getTime() - replayT)).getTime()) return;
+
+	const Level = report.int ? IntensityI(report.int) : IntensityI(report.data[0]?.areaIntensity);
 	// if (setting["api.key"] == "" && Level == "?") return;
 	let msg = "";
 
-	if (report.location.includes("("))
-		msg = report.location.substring(report.location.indexOf("(") + 1, report.location.indexOf(")")).replace("位於", "");
+	if (report.location)
+		if (report.location.includes("("))
+			msg = report.location.substring(report.location.indexOf("(") + 1, report.location.indexOf(")")).replace("位於", "");
+		else
+			msg = report.location;
 	else
-		msg = report.location;
+		if (report.loc.includes("("))
+			msg = report.loc.substring(report.loc.indexOf("(") + 1, report.loc.indexOf(")")).replace("位於", "");
+		else
+			msg = report.loc;
 
 	let star = "";
 
 	if (report.ID) if (report.ID.length != 0) star += "↺ ";
 
-	if (report.earthquakeNo % 1000 != 0) star += "✩ ";
+	if (report.earthquakeNo) {
+		if (report.earthquakeNo % 1000 != 0) star += "✩ ";
+	} else if (report.no) {
+		if (report.no % 1000 != 0) star += "✩ ";
+	}
 
 	const Div = document.createElement("div");
 	Div.className = "md3-ripple ";
@@ -3533,15 +3637,15 @@ function addReport(report, prepend = false, index = 0) {
 		roll.prepend(Div);
 		investigation = true;
 	} else {
-		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000;
+		const timed = report.originTime ? (new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000) : (report.time - 5000);
 		const timed_hold = String(timed);
 		fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), timed_hold)}/${timed}.trem`, (err) => {
 			if (!err) {
 				report.download = true;
-				TREM.Report.cache.set(report.identifier, report);
+				TREM.Report.cache.set(report.identifier ?? report.id, report);
 			} else {
 				report.download = false;
-				TREM.Report.cache.set(report.identifier, report);
+				TREM.Report.cache.set(report.identifier ?? report.id, report);
 			}
 		});
 
@@ -3608,10 +3712,14 @@ function addReport(report, prepend = false, index = 0) {
 		if (msg.length > 12 && index == 0) report_location.style = "font-size: 16px;";
 		const report_time = document.createElement("span");
 		report_time.className = "report-time";
-		report_time.innerText = report.originTime.replace(/-/g, "/");
+		report_time.innerText = timeconvert(new Date(OriginTime)).format("YYYY/MM/DD HH:mm:ss");
 		const report_magnitude = document.createElement("span");
 		report_magnitude.className = "report-magnitude";
-		report_magnitude.innerText = report.magnitudeValue.toFixed(1);
+
+		if (report.magnitudeValue) report_magnitude.innerText = report.magnitudeValue.toFixed(1);
+
+		if (report.mag) report_magnitude.innerText = report.mag.toFixed(1);
+
 		const report_depth = document.createElement("span");
 		report_depth.className = "report-depth";
 		report_depth.innerText = report.depth;
@@ -3620,7 +3728,7 @@ function addReport(report, prepend = false, index = 0) {
 		report_container.append(report_intensity_container, report_detail_container);
 		ripple(Div);
 		Div.append(report_container);
-		Div.className += IntensityToClassString(report.data[0]?.areaIntensity);
+		Div.className += IntensityToClassString(report.int ? report.int : report.data[0]?.areaIntensity);
 		Div.addEventListener("click", () => {
 			if (replay != 0) return;
 			TREM.set_report_overview = 1;
@@ -3628,12 +3736,11 @@ function addReport(report, prepend = false, index = 0) {
 			changeView("report", "#reportView_btn");
 			ReportTag = NOW().getTime();
 			console.debug("ReportTag: ", ReportTag);
-			ipcRenderer.send("report-Notification", report);
 		});
 		Div.addEventListener("contextmenu", () => {
 			if (replay != 0) return;
 
-			TREM.Report.replay(report.identifier);
+			TREM.Report.replay(report.identifier ?? report.id);
 		});
 
 		if (prepend) {
@@ -3652,18 +3759,32 @@ function addReport(report, prepend = false, index = 0) {
 
 			if (Report != 0) Report = 0;
 
-			TREM.Report.cache.set(report.identifier, report);
+			TREM.Report.cache.set(report.identifier ?? report.id, report);
 
-			if ((report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) && setting["report.onlycwachangeView"]) {
-				TREM.Report.setView("eq-report-overview", report);
-				changeView("report", "#reportView_btn");
-				ReportTag = NOW().getTime();
-				console.debug("ReportTag: ", ReportTag);
-			} else if (setting["report.changeView"]) {
-				TREM.Report.setView("eq-report-overview", report);
-				changeView("report", "#reportView_btn");
-				ReportTag = NOW().getTime();
-				console.debug("ReportTag: ", ReportTag);
+			if (report.identifier) {
+				if ((report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) && setting["report.onlycwachangeView"]) {
+					TREM.Report.setView("eq-report-overview", report);
+					changeView("report", "#reportView_btn");
+					ReportTag = NOW().getTime();
+					console.debug("ReportTag: ", ReportTag);
+				} else if (setting["report.changeView"]) {
+					TREM.Report.setView("eq-report-overview", report);
+					changeView("report", "#reportView_btn");
+					ReportTag = NOW().getTime();
+					console.debug("ReportTag: ", ReportTag);
+				}
+			} else if (report.id) {
+				if (report.id.match(/-/g).length === 3 && setting["report.onlycwachangeView"]) {
+					TREM.Report.setView("eq-report-overview", report);
+					changeView("report", "#reportView_btn");
+					ReportTag = NOW().getTime();
+					console.debug("ReportTag: ", ReportTag);
+				} else if (setting["report.changeView"]) {
+					TREM.Report.setView("eq-report-overview", report);
+					changeView("report", "#reportView_btn");
+					ReportTag = NOW().getTime();
+					console.debug("ReportTag: ", ReportTag);
+				}
 			}
 
 			let _report_data = [];
@@ -4057,66 +4178,133 @@ ipcRenderer.on("report-Notification", (event, report) => {
 		console.debug(report);
 		log("Posting Notification report Webhook", 1, "Webhook", "report-Notification");
 		dump({ level: 0, message: "Posting Notification report Webhook", origin: "Webhook" });
-		const msg = {
-			username   : "TREMV | 臺灣即時地震監測變體",
-			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
-			content    : setting["tts.Notification"] ? ("地震報告"
-			+ ((report.data.length != 0) ? "發生規模" + report.magnitudeValue + "有感地震，最大震度" + report.data[0].areaName + report.data[0].eqStation[0].stationName + IntensityI(report.data[0].areaIntensity) + "級。" : "發生規模" + report.magnitudeValue + "有感地震 ")
-			+ "編號"
-			+ (report.location.startsWith("地震資訊") ? "無（地震資訊）" : report.earthquakeNo % 1000 ? report.earthquakeNo : "無（小區域有感地震）")
-			+ "時間"
-			+ report.originTime
-			+ "深度"
-			+ report.depth + " 公里"
-			+ "震央位置"
-			+ "經度 東經 " + report.epicenterLon + "緯度 北緯 " + report.epicenterLat + "即在" + report.location
-			+ ((report.data.length != 0) ? "最大震度" + IntensityI(report.data[0].areaIntensity) + "級地區" : "")
-			+ ((report.data.length != 0) ? report.data[0].areaName : "")) : "地震報告",
-			tts    : setting["tts.Notification"],
-			embeds : [
-				{
-					author: {
-						name     : "地震報告",
-						url      : undefined,
-						icon_url : undefined,
+		let msg = {};
+
+		if (report.data) {
+			msg = {
+				username   : "TREMV | 臺灣即時地震監測變體",
+				avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
+				content    : setting["tts.Notification"] ? ("地震報告"
+				+ ((report.data.length != 0) ? "發生規模" + report.magnitudeValue + "有感地震，最大震度" + report.data[0].areaName + report.data[0].eqStation[0].stationName + IntensityI(report.data[0].areaIntensity) + "級。" : "發生規模" + report.magnitudeValue + "有感地震 ")
+				+ "編號"
+				+ (report.location.startsWith("地震資訊") ? "無（地震資訊）" : report.earthquakeNo % 1000 ? report.earthquakeNo : "無（小區域有感地震）")
+				+ "時間"
+				+ report.originTime
+				+ "深度"
+				+ report.depth + " 公里"
+				+ "震央位置"
+				+ "經度 東經 " + report.epicenterLon + "緯度 北緯 " + report.epicenterLat + "即在" + report.location
+				+ ((report.data.length != 0) ? "最大震度" + IntensityI(report.data[0].areaIntensity) + "級地區" : "")
+				+ ((report.data.length != 0) ? report.data[0].areaName : "")) : "地震報告",
+				tts    : setting["tts.Notification"],
+				embeds : [
+					{
+						author: {
+							name     : "地震報告",
+							url      : undefined,
+							icon_url : undefined,
+						},
+						description : (report.data.length != 0) ? "發生規模" + report.magnitudeValue + "有感地震，最大震度" + report.data[0].areaName + report.data[0].eqStation[0].stationName + IntensityI(report.data[0].areaIntensity) + "級。" : "發生規模" + report.magnitudeValue + "有感地震",
+						fields      : [
+							{
+								name   : "編號",
+								value  : report.location.startsWith("地震資訊") ? "無（地震資訊）" : report.earthquakeNo % 1000 ? report.earthquakeNo : "無（小區域有感地震）",
+								inline : true,
+							},
+							{
+								name   : "時間",
+								value  : report.originTime,
+								inline : true,
+							},
+							{
+								name   : "深度",
+								value  : report.depth + " 公里",
+								inline : true,
+							},
+							{
+								name   : "震央位置",
+								value  : "> 經度 **東經 " + report.epicenterLon + "**\n> 緯度 **北緯 " + report.epicenterLat + "**\n> 即在 **" + report.location + "**",
+								inline : false,
+							},
+							{
+								name   : (report.data.length != 0) ? "最大震度" + IntensityI(report.data[0].areaIntensity) + "級地區" : "",
+								value  : (report.data.length != 0) ? report.data[0].areaName : "",
+								inline : false,
+							},
+							{
+								name   : "地圖",
+								value  : "https://www.google.com/maps/search/?api=1&query=" + report.epicenterLat + "," + report.epicenterLon,
+								inline : true,
+							},
+						],
+						color: report.location.startsWith("地震資訊") ? 9807270 : report.earthquakeNo % 1000 ? 15158332 : 3066993,
 					},
-					description : (report.data.length != 0) ? "發生規模" + report.magnitudeValue + "有感地震，最大震度" + report.data[0].areaName + report.data[0].eqStation[0].stationName + IntensityI(report.data[0].areaIntensity) + "級。" : "發生規模" + report.magnitudeValue + "有感地震",
-					fields      : [
-						{
-							name   : "編號",
-							value  : report.location.startsWith("地震資訊") ? "無（地震資訊）" : report.earthquakeNo % 1000 ? report.earthquakeNo : "無（小區域有感地震）",
-							inline : true,
+				],
+			};
+		} else if (report.list) {
+			const report_list_length = Object.keys(report.list).length;
+			msg = {
+				username   : "TREMV | 臺灣即時地震監測變體",
+				avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
+				content    : setting["tts.Notification"] ? ("地震報告"
+				+ ((report_list_length != 0) ? "發生規模" + report.mag + "有感地震，最大震度" + report.Max_Level_areaName + report.Max_Level_stationName + IntensityI(report.Max_Level) + "級。" : "發生規模" + report.mag + "有感地震 ")
+				+ "編號"
+				+ (report.loc.startsWith("地震資訊") ? "無（地震資訊）" : report.no % 1000 ? report.no : "無（小區域有感地震）")
+				+ "時間"
+				+ timeconvert(new Date(report.time)).format("YYYY/MM/DD HH:mm:ss")
+				+ "深度"
+				+ report.depth + " 公里"
+				+ "震央位置"
+				+ "經度 東經 " + report.lon + "緯度 北緯 " + report.lat + "即在" + report.loc
+				+ ((report_list_length != 0) ? "最大震度" + IntensityI(report.Max_Level) + "級地區" : "")
+				+ ((report_list_length != 0) ? report.Max_Level_areaName : "")) : "地震報告",
+				tts    : setting["tts.Notification"],
+				embeds : [
+					{
+						author: {
+							name     : "地震報告",
+							url      : undefined,
+							icon_url : undefined,
 						},
-						{
-							name   : "時間",
-							value  : report.originTime,
-							inline : true,
-						},
-						{
-							name   : "深度",
-							value  : report.depth + " 公里",
-							inline : true,
-						},
-						{
-							name   : "震央位置",
-							value  : "> 經度 **東經 " + report.epicenterLon + "**\n> 緯度 **北緯 " + report.epicenterLat + "**\n> 即在 **" + report.location + "**",
-							inline : false,
-						},
-						{
-							name   : (report.data.length != 0) ? "最大震度" + IntensityI(report.data[0].areaIntensity) + "級地區" : "",
-							value  : (report.data.length != 0) ? report.data[0].areaName : "",
-							inline : false,
-						},
-						{
-							name   : "地圖",
-							value  : "https://www.google.com/maps/search/?api=1&query=" + report.epicenterLat + "," + report.epicenterLon,
-							inline : true,
-						},
-					],
-					color: report.location.startsWith("地震資訊") ? 9807270 : report.earthquakeNo % 1000 ? 15158332 : 3066993,
-				},
-			],
-		};
+						description : (report_list_length != 0) ? "發生規模" + report.mag + "有感地震，最大震度" + report.Max_Level_areaName + report.Max_Level_stationName + IntensityI(report.Max_Level) + "級。" : "發生規模" + report.mag + "有感地震",
+						fields      : [
+							{
+								name   : "編號",
+								value  : report.loc.startsWith("地震資訊") ? "無（地震資訊）" : report.no % 1000 ? report.no : "無（小區域有感地震）",
+								inline : true,
+							},
+							{
+								name   : "時間",
+								value  : timeconvert(new Date(report.time)).format("YYYY/MM/DD HH:mm:ss"),
+								inline : true,
+							},
+							{
+								name   : "深度",
+								value  : report.depth + " 公里",
+								inline : true,
+							},
+							{
+								name   : "震央位置",
+								value  : "> 經度 **東經 " + report.lon + "**\n> 緯度 **北緯 " + report.lat + "**\n> 即在 **" + report.loc + "**",
+								inline : false,
+							},
+							{
+								name   : (report_list_length != 0) ? "最大震度" + IntensityI(report.Max_Level) + "級地區" : "",
+								value  : (report_list_length != 0) ? report.Max_Level_areaName : "",
+								inline : false,
+							},
+							{
+								name   : "地圖",
+								value  : "https://www.google.com/maps/search/?api=1&query=" + report.lat + "," + report.lon,
+								inline : true,
+							},
+						],
+						color: report.loc.startsWith("地震資訊") ? 9807270 : report.no % 1000 ? 15158332 : 3066993,
+					},
+				],
+			};
+		}
+
 		fetch(setting["webhook.url"], {
 			method  : "POST",
 			headers : { "Content-Type": "application/json" },
@@ -4127,13 +4315,24 @@ ipcRenderer.on("report-Notification", (event, report) => {
 		});
 	}
 
-	const location = report.location.match(/(?<=位於).+(?=\))/);
+	if (report.data) {
+		const location = report.location.match(/(?<=位於).+(?=\))/);
 
-	if (report.data.length != 0 && speecd_use) {
-		const areaIntensity = `${IntensityI(report.data[0].areaIntensity)}級`;
-		TREM.speech.speak({ text: `${location}發生規模 ${report.magnitudeValue.toFixed(1).replace(".", "點")}，最大震度${report.data[0].areaName + report.data[0].eqStation[0].stationName + areaIntensity.replace("-級", "弱").replace("+級", "強")}，深度 ${report.depth.toFixed(1).replace(".", "點")} 公里` });
-	} else if (speecd_use) {
-		TREM.speech.speak({ text: `${location}發生規模 ${report.magnitudeValue.toFixed(1).replace(".", "點")}，深度 ${report.depth.toFixed(1).replace(".", "點")} 公里` });
+		if (report.data.length != 0 && speecd_use) {
+			const areaIntensity = `${IntensityI(report.data[0].areaIntensity)}級`;
+			TREM.speech.speak({ text: `${location}發生規模 ${report.magnitudeValue.toFixed(1).replace(".", "點")}，最大震度${report.data[0].areaName + report.data[0].eqStation[0].stationName + areaIntensity.replace("-級", "弱").replace("+級", "強")}，深度 ${report.depth.toFixed(1).replace(".", "點")} 公里` });
+		} else if (speecd_use) {
+			TREM.speech.speak({ text: `${location}發生規模 ${report.magnitudeValue.toFixed(1).replace(".", "點")}，深度 ${report.depth.toFixed(1).replace(".", "點")} 公里` });
+		}
+	} else if (report.list) {
+		const location = report.loc.match(/(?<=位於).+(?=\))/);
+
+		if (Object.keys(report.list).length != 0 && speecd_use) {
+			const areaIntensity = `${IntensityI(report.Max_Level)}級`;
+			TREM.speech.speak({ text: `${location}發生規模 ${report.mag.toFixed(1).replace(".", "點")}，最大震度${report.Max_Level_areaName + report.Max_Level_stationName + areaIntensity.replace("-級", "弱").replace("+級", "強")}，深度 ${report.depth.toFixed(1).replace(".", "點")} 公里` });
+		} else if (speecd_use) {
+			TREM.speech.speak({ text: `${location}發生規模 ${report.mag.toFixed(1).replace(".", "點")}，深度 ${report.depth.toFixed(1).replace(".", "點")} 公里` });
+		}
 	}
 });
 
@@ -4527,7 +4726,7 @@ ipcRenderer.on("config:maplayer", (event, mapName, state) => {
 function FCMdata(json, Unit) {
 	// const json = JSON.parse(JSON.stringify(data));
 	// const json = JSON.parse(data);
-	// console.log(json);
+	console.log(json);
 
 	if (server_timestamp.includes(json.timestamp) || NOW().getTime() - json.timestamp > 180_000) return;
 	server_timestamp.push(json.timestamp);
@@ -4611,9 +4810,9 @@ function FCMdata(json, Unit) {
 		stopReplaybtn();
 	} else if (json.type == "report") {
 		const report = json.raw;
-		const location = json.location.match(/(?<=位於).+(?=\))/);
+		const location = report.loc.match(/(?<=位於).+(?=\))/);
 
-		if ((report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) && setting["report.onlycwachangeView"]) {
+		if (report.id.match(/-/g).length === 3 && setting["report.onlycwachangeView"]) {
 			if (!win.isFocused())
 				new Notification("地震報告",
 					{
@@ -4623,7 +4822,6 @@ function FCMdata(json, Unit) {
 					});
 
 			addReport(report, true);
-			ipcRenderer.send("report-Notification", report);
 
 			setTimeout(() => {
 				ipcRenderer.send("screenshotEEW", {
@@ -4663,7 +4861,6 @@ function FCMdata(json, Unit) {
 					// 		});
 
 					addReport(report, true);
-					ipcRenderer.send("report-Notification", report);
 
 					setTimeout(() => {
 						ipcRenderer.send("screenshotEEW", {
@@ -4692,7 +4889,7 @@ function FCMdata(json, Unit) {
 							win.setAlwaysOnTop(false);
 						}
 				}
-			} else if (report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) {
+			} else if (report.id.match(/-/g).length === 3) {
 				if (!win.isFocused())
 					new Notification("地震報告",
 						{
@@ -4702,7 +4899,6 @@ function FCMdata(json, Unit) {
 						});
 
 				addReport(report, true);
-				ipcRenderer.send("report-Notification", report);
 
 				setTimeout(() => {
 					ipcRenderer.send("screenshotEEW", {
@@ -6183,7 +6379,7 @@ function findClosest(arr, target) {
 }
 
 function NOW() {
-	return new Date(ServerTime + (Date.now() - ((ServerT != 0) ? ServerT : (ServerT0 != 0) ? ServerT0 : ServerT2)));
+	return new Date(ServerTime + (Date.now() - ((ServerT != 0 && setting["Real-time.websocket"] === "exptech") ? ServerT : (ServerT0 != 0) ? ServerT0 : ServerT2)));
 }
 
 function timeconvert(time) {
