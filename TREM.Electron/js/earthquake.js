@@ -3081,6 +3081,22 @@ function ReportGET(badcatch = false) {
 							log("Reports fetched (api key verify)", 1, "EQReportFetcher", "ReportGET");
 							dump({ level: 0, message: "Reports fetched (api key verify)", origin: "EQReportFetcher" });
 							cacheReport(_report_data);
+						}).catch((err) => {
+							log("Error fetching reports (api key verify) json", 3, "EQReportFetcher", "ReportGET");
+							log(err, 3, "EQReportFetcher", "ReportGET");
+							dump({ level: 2, message: "Error fetching reports (api key verify) json", origin: "EQReportFetcher" });
+							dump({ level: 2, message: err, origin: "EQReportFetcher" });
+
+							if (_report_data.length > setting["cache.report"]) {
+								_report_data_temp = [];
+								for (let i = 0; i < setting["cache.report"]; i++)
+									_report_data_temp[i] = _report_data[i];
+								TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+								ReportList(_report_data_temp);
+							} else {
+								TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+								ReportList(_report_data);
+							}
 						});
 					} else {
 						console.error(ans0);
@@ -3096,10 +3112,10 @@ function ReportGET(badcatch = false) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
 										_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -3119,10 +3135,10 @@ function ReportGET(badcatch = false) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
 										_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -3142,10 +3158,10 @@ function ReportGET(badcatch = false) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
 										_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -3279,6 +3295,17 @@ function ReportGET(badcatch = false) {
 							log(err, 3, "EQReportFetcher", "ReportGET");
 							dump({ level: 2, message: "Error fetching reports (fetch) json", origin: "EQReportFetcher" });
 							dump({ level: 2, message: err, origin: "EQReportFetcher" });
+
+							if (_report_data.length > setting["cache.report"]) {
+								_report_data_temp = [];
+								for (let i = 0; i < setting["cache.report"]; i++)
+									_report_data_temp[i] = _report_data[i];
+								TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+								ReportList(_report_data_temp);
+							} else {
+								TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+								ReportList(_report_data);
+							}
 						});
 					} else {
 						console.error(ans0);
@@ -3294,10 +3321,10 @@ function ReportGET(badcatch = false) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
 										_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -3314,10 +3341,10 @@ function ReportGET(badcatch = false) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
 										_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -3334,10 +3361,10 @@ function ReportGET(badcatch = false) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
 										_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -3357,10 +3384,10 @@ function ReportGET(badcatch = false) {
 						_report_data_temp = [];
 						for (let i = 0; i < setting["cache.report"]; i++)
 							_report_data_temp[i] = _report_data[i];
-						TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+						TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 						ReportList(_report_data_temp);
 					} else {
-						TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+						TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
 						ReportList(_report_data);
 					}
 				});
@@ -3384,10 +3411,10 @@ function ReportGET(badcatch = false) {
 			_report_data_temp = [];
 			for (let i = 0; i < setting["cache.report"]; i++)
 				_report_data_temp[i] = _report_data[i];
-			TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier, v]));
+			TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 			ReportList(_report_data_temp);
 		} else {
-			TREM.Report.cache = new Map(_report_data.map(v => [v.identifier, v]));
+			TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
 			ReportList(_report_data);
 		}
 
@@ -3488,7 +3515,7 @@ function cacheReport(_report_data_GET) {
 		for (let i = 0; i < setting["cache.report"]; i++)
 			_report_data_temp[i] = _report_data_GET[i];
 
-		TREM.Report.cache = new Map(_report_data_temp.map(v => [v.identifier ?? v.id, v]));
+		TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 
 		if (Report != 0)
 			ReportList(_report_data_temp, {
@@ -3498,7 +3525,7 @@ function cacheReport(_report_data_GET) {
 		else
 			ReportList(_report_data_temp);
 	} else {
-		TREM.Report.cache = new Map(_report_data_GET.map(v => [v.identifier ?? v.id, v]));
+		TREM.Report.cache = new Map(_report_data_GET.map(v => [(v.identifier ?? v.id), v]));
 
 		if (Report != 0)
 			ReportList(_report_data_GET, {

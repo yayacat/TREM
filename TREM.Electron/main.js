@@ -414,7 +414,7 @@ autoUpdater.on("update-available", (info) => {
 			}
 
 			case "notify": {
-				ipcMain.emit("update-available-Notification", info.version, get_Version, info);
+				emitAllWindow("update-available-Notification", info.version, get_Version, info);
 				break;
 			}
 
@@ -433,7 +433,7 @@ autoUpdater.on("update-not-available", (info) => {
 			body  : TREM.Localization.getString("Notification_No_Update_Body").format(get_Version, info.version),
 			icon  : "TREM.ico",
 		}).show();
-		ipcMain.emit("update-not-available-Notification", info.version, get_Version);
+		emitAllWindow("update-not-available-Notification", info.version, get_Version);
 	}
 });
 
@@ -658,14 +658,6 @@ ipcMain.on("report-Notification", (event, report) => {
 
 ipcMain.on("intensity-Notification", (event, intensity) => {
 	emitAllWindow("intensity-Notification", intensity);
-});
-
-ipcMain.on("update-available-Notification", (event, version, getVersion, info) => {
-	emitAllWindow("update-available-Notification", version, getVersion, info);
-});
-
-ipcMain.on("update-not-available-Notification", (event, version, getVersion) => {
-	emitAllWindow("update-not-available-Notification", version, getVersion);
 });
 
 ipcMain.on("testEEW", (event, list = []) => {
