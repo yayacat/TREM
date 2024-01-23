@@ -95,6 +95,7 @@ try {
 }
 
 let Location;
+let region;
 let station = {};
 let palert_geojson = null;
 let areav2_geojson = null;
@@ -2155,7 +2156,7 @@ function handler(Json) {
 			}
 
 			now = new Date(station_time_json[uuid]);
-			station_tooltip = `<div>${keys[index]}(${station[keys[index]].Loc})無資料</div><div>最近離線時間: ${timeconvert(new Date(station_time_json[uuid])).format("YYYY/MM/DD HH:mm:ss")}</div>`;
+			station_tooltip = `<div>${keys[index]}(${current_station_data.Loc})無資料</div><div>最近離線時間: ${timeconvert(new Date(station_time_json[uuid])).format("YYYY/MM/DD HH:mm:ss")}</div>`;
 			NA999 = "NA";
 			NA0999 = "NA";
 			size = 8;
@@ -2211,13 +2212,13 @@ function handler(Json) {
 				target_count++;
 			}
 
-			station_tooltip = `<div>${keys[index]}</div><div>${station[keys[index]].Loc}</div><div>${amount}</div><div>${current_data.i}</div>`;
+			station_tooltip = `<div>${keys[index]}</div><div>${current_station_data.Loc}</div><div>${amount}</div><div>${current_data.i}</div>`;
 		}
 
 		if (current_data != undefined || (rts_key_verify && !setting["sleep.mode"]) || replay != 0) {
 			if (!Station[keys[index]] && (!rts_remove_eew || Alert))
 				Station[keys[index]] = L.marker(
-					[station[keys[index]].Lat, keys[index].startsWith("H") ? station[keys[index]].Long + 0.0001 : station[keys[index]].Long],
+					[current_station_data.Lat, keys[index].startsWith("H") ? current_station_data.Long + 0.0001 : current_station_data.Long],
 					{
 						icon: L.divIcon({
 							iconSize  : [size, size],
@@ -2279,7 +2280,7 @@ function handler(Json) {
 						document.getElementById("rt-station").classList.remove("hide");
 					document.getElementById("rt-station-local-intensity").className = `rt-station-intensity ${(amount < 999 && intensity != "NA") ? IntensityToClassString(intensity) : "na"}`;
 					document.getElementById("rt-station-local-id").innerText = keys[index];
-					document.getElementById("rt-station-local-name").innerText = station[keys[index]].Loc;
+					document.getElementById("rt-station-local-name").innerText = current_station_data.Loc;
 					document.getElementById("rt-station-local-time").innerText = timeconvert(now).format("HH:mm:ss");
 					document.getElementById("rt-station-local-pga").innerText = amount;
 				}
@@ -2293,19 +2294,19 @@ function handler(Json) {
 		} else if (rtstation1 == keys[index]) {
 			document.getElementById("rt-station-local-intensity").className = `rt-station-intensity ${(amount < 999 && intensity != "NA") ? IntensityToClassString(intensity) : "na"}`;
 			document.getElementById("rt-station-local-id").innerText = keys[index];
-			document.getElementById("rt-station-local-name").innerText = station[keys[index]].Loc;
+			document.getElementById("rt-station-local-name").innerText = current_station_data.Loc;
 			document.getElementById("rt-station-local-time").innerText = timeconvert(now).format("HH:mm:ss");
 			document.getElementById("rt-station-local-pga").innerText = amount;
 		}
 
 		if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999 && (target_count > 1 || Object.keys(eew).length != 0)) {
-			detected_list[station[keys[index]].PGA] ??= {
+			detected_list[current_station_data.PGA] ??= {
 				intensity : intensity,
 				time      : 0,
 			};
 
-			if ((detected_list[station[keys[index]].PGA].intensity ?? 0) < intensity)
-				detected_list[station[keys[index]].PGA].intensity = intensity;
+			if ((detected_list[current_station_data.PGA].intensity ?? 0) < intensity)
+				detected_list[current_station_data.PGA].intensity = intensity;
 
 			if (Json.Alert) {
 				if (setting["audio.realtime"])
@@ -2321,7 +2322,7 @@ function handler(Json) {
 						TREM.Audios.pga2.play();
 					}
 
-				detected_list[station[keys[index]].PGA].time = NOW().getTime();
+				detected_list[current_station_data.PGA].time = NOW().getTime();
 			}
 		} else if (Object.keys(detection_list).length) {
 			for (let i = 0; i < Object.keys(detection_list).length; i++) {
@@ -2481,9 +2482,9 @@ function handler(Json) {
 			MAXPGA.pga = amount;
 			MAXPGA.station = keys[index];
 			MAXPGA.level = Level;
-			MAXPGA.lat = station[keys[index]].Lat;
-			MAXPGA.long = station[keys[index]].Long;
-			MAXPGA.loc = station[keys[index]].Loc;
+			MAXPGA.lat = current_station_data.Lat;
+			MAXPGA.long = current_station_data.Long;
+			MAXPGA.loc = current_station_data.Loc;
 			MAXPGA.intensity = intensity;
 			MAXPGA.time = new Date(Json_Time);
 		}
@@ -2491,9 +2492,9 @@ function handler(Json) {
 		// 	MAXPGA.pga = amount;
 		// 	MAXPGA.station = keys[index];
 		// 	MAXPGA.level = Level;
-		// 	MAXPGA.lat = station[keys[index]].Lat;
-		// 	MAXPGA.long = station[keys[index]].Long;
-		// 	MAXPGA.loc = station[keys[index]].Loc;
+		// 	MAXPGA.lat = current_station_data.Lat;
+		// 	MAXPGA.long = current_station_data.Long;
+		// 	MAXPGA.loc = current_station_data.Loc;
 		// 	MAXPGA.intensity = MaxIntensity1;
 		// 	MAXPGA.time = new Date(Json_Time * 1000);
 		// }
@@ -3057,8 +3058,13 @@ function ReportGET(badcatch = false) {
 									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
 								}
 
-								for (let i = 0; i < ans.length; i++)
-									_report_data.push(ans[i]);
+								for (let i = 0; i < ans.length; i++) {
+									if (ans[i].id === ans[i + 1].id) {
+										ans.splice(i, 1);
+									} else {
+										_report_data.push(ans[i]);
+									}
+								}
 
 								for (let i = 0; i < _report_data.length - 1; i++)
 									for (let _i = 0; _i < _report_data.length - 1; _i++) {
@@ -3230,8 +3236,13 @@ function ReportGET(badcatch = false) {
 									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
 								}
 
-								for (let i = 0; i < ans.length; i++)
-									_report_data.push(ans[i]);
+								for (let i = 0; i < ans.length; i++) {
+									if (ans[i].id === ans[i + 1].id) {
+										ans.splice(i, 1);
+									} else {
+										_report_data.push(ans[i]);
+									}
+								}
 
 								for (let i = 0; i < _report_data.length - 1; i++)
 									for (let _i = 0; _i < _report_data.length - 1; _i++) {
@@ -5679,7 +5690,7 @@ TREM.Earthquake.on("trem-eq", (data) => {
 
 		for (let index = 0, keys = Object.keys(data.list), n = keys.length; index < n; index++) {
 			if (data.list[keys[index]] > Max_Intensity) Max_Intensity = data.list[keys[index]];
-			description += `${station[keys[index]].Loc} 最大震度 > ${IntensityI(data.list[keys[index]])}\n`;
+			description += `${current_station_data.Loc} 最大震度 > ${IntensityI(data.list[keys[index]])}\n`;
 			state_station = index + 1;
 		}
 
@@ -5731,7 +5742,7 @@ TREM.Earthquake.on("trem-eq", (data) => {
 		description += `\n開始時間 > ${Now2}\n\n`;
 
 		for (let index = 0, keys = Object.keys(data.list), n = keys.length; index < n; index++) {
-			description += `${station[keys[index]].Loc} 最大震度 > ${IntensityI(data.list[keys[index]])}\n`;
+			description += `${current_station_data.Loc} 最大震度 > ${IntensityI(data.list[keys[index]])}\n`;
 			state_station = index + 1;
 		}
 
