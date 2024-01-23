@@ -3058,13 +3058,12 @@ function ReportGET(badcatch = false) {
 									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
 								}
 
-								for (let i = 0; i < ans.length; i++) {
-									if (ans[i].id === ans[i + 1].id) {
+								for (let i = 0; i < ans.length; i++)
+									if (ans[i].id === ans[i + 1].id)
 										ans.splice(i, 1);
-									} else {
+									else
 										_report_data.push(ans[i]);
-									}
-								}
+
 
 								for (let i = 0; i < _report_data.length - 1; i++)
 									for (let _i = 0; _i < _report_data.length - 1; _i++) {
@@ -3236,13 +3235,11 @@ function ReportGET(badcatch = false) {
 									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
 								}
 
-								for (let i = 0; i < ans.length; i++) {
-									if (ans[i].id === ans[i + 1].id) {
+								for (let i = 0; i < ans.length; i++)
+									if (ans[i].id === ans[i + 1].id)
 										ans.splice(i, 1);
-									} else {
+									else
 										_report_data.push(ans[i]);
-									}
-								}
 
 								for (let i = 0; i < _report_data.length - 1; i++)
 									for (let _i = 0; _i < _report_data.length - 1; _i++) {
