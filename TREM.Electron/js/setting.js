@@ -47,7 +47,7 @@ function handleWindowControls() {
 
 document.getElementById("client-version").innerText = `${app.getVersion()}`;
 document.getElementById("client-os").innerText = `${os.version()} (${os.release()})`;
-document.getElementById("client-uuid").title = `rts-TREM-${localStorage.UUID_rts}`;
+// document.getElementById("client-key").title = `${setting["api.key"]}`;
 
 const openURL = url => {
 	ipcRenderer.send("openURL", url);
@@ -413,12 +413,12 @@ function init() {
 
 	// #endregion
 
-	document.getElementById("client-uuid").addEventListener("click", () => {
-		navigator.clipboard.writeText(`rts-TREM-${localStorage.UUID_rts}`).then(() => {
-			console.debug(`rts-TREM-${localStorage.UUID_rts}`);
-			console.debug("複製成功");
-		});
-	});
+	// document.getElementById("client-key").addEventListener("click", () => {
+	// 	navigator.clipboard.writeText(`${setting["api.key"]}`).then(() => {
+	// 		console.debug(`${setting["api.key"]}`);
+	// 		console.debug("複製成功");
+	// 	});
+	// });
 
 	stream_mode(setting["stream.mode"]);
 }

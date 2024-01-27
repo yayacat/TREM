@@ -19,6 +19,7 @@ TREM.Report = {
 	report_circle_cwb   : null,
 	report_circle_rf    : null,
 	replayHttp          : false,
+	route               : route,
 
 	/**
 	 * @type {maplibregl.Marker[]}
@@ -854,7 +855,7 @@ TREM.Report = {
 			this._setupeewget(report);
 		} else if (report.loc) {
 			if (!report.list) {
-				fetch(`https://data.exptech.com.tw/api/v2/eq/report/${report.id}`)
+				fetch(this.route.earthquakeReport(report.id))
 					.then((res) => {
 						if (res.ok) {
 							console.debug(res);

@@ -36,7 +36,8 @@
 		"ReportTag": "writable",
 		"toggleNav": "readonly",
 		"TREM": "readonly",
-		"_speed": "writable"
+		"_speed": "writable",
+		"route": "writable"
 	},
 	"rules": {
 		"array-bracket-newline": ["warn", { "multiline": true, "minItems": 3 }],

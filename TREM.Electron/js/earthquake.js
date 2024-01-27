@@ -8,6 +8,8 @@ const { default: turfCircle } = require("@turf/circle");
 const { setTimeout, setInterval, clearTimeout, clearInterval } = require("node:timers");
 const axios = require("axios");
 const bytenode = require("bytenode");
+const Route = require("../js/route.js");
+const route = new Route();
 
 TREM.Audios = {
 	pga1   : new Audio("../audio/PGA1.wav"),
@@ -43,7 +45,6 @@ const speecd_use = setting["audio.tts"] ?? false;
 
 // #region 變數
 const posturl = "https://exptech.com.tw/api/v1/trem/";
-const geturl = "https://exptech.com.tw/api/v2/trem/rts?time=";
 const getapiequrl = "https://api.exptech.com.tw/api/v1/eq/eew/";
 const MapData = {};
 const Timers = {};
@@ -1769,7 +1770,7 @@ function PGAMain() {
 								Ping = "🔒";
 						}
 					} else if (!replayD) {
-						const url = geturl + ReplayTime;
+						const url = route.rts(ReplayTime);
 						// + "&key=" + setting["api.key"]
 						const controller = new AbortController();
 						setTimeout(() => {
@@ -2012,7 +2013,7 @@ function PGAMainbkup() {
 								Ping = "🔒";
 						}
 					} else if (!replayD) {
-						const url = geturl + ReplayTime;
+						const url = route.rts(ReplayTime);
 						// + "&key=" + setting["api.key"]
 						axios({
 							method : "get",
@@ -3011,11 +3012,12 @@ function ReportGET(badcatch = false) {
 		// bodyInfo = JSON.stringify({ list });
 
 		if (api_key_verify && setting["report.getInfo"] && !badcatch) {
+			route.setkey(setting["api.key"]);
 			const controller1 = new AbortController();
 			setTimeout(() => {
 				controller1.abort();
 			}, 5_000);
-			fetch(`https://data.exptech.com.tw/api/v2/eq/report?limit=50&key=${setting["api.key"]}`, { signal: controller1.signal })
+			fetch(route.earthquakeReportList(50), { signal: controller1.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
 						console.debug(ans0);
@@ -3027,10 +3029,6 @@ function ReportGET(badcatch = false) {
 									const id = ans[i].id;
 
 									for (let _i = 0; _i < _report_data.length; _i++) {
-										if (_report_data[_i].identifier)
-											if (_report_data[_i].identifier === id)
-												_report_data.splice(_i, 1);
-
 										if (_report_data[_i].id) {
 											if (_report_data[_i].id === id) {
 												if (_report_data[_i].list) {
@@ -3050,6 +3048,11 @@ function ReportGET(badcatch = false) {
 													if (_report_data[_i].id.match(/CWA-EQ(.*)/)[1] === id)
 														_report_data.splice(_i, 1);
 
+										}
+
+										if (_report_data[_i].identifier) {
+											if (_report_data[_i].identifier === id)
+												_report_data.splice(_i, 1);
 										} else if (_report_data[_i].identifier === "") {
 											_report_data.splice(_i, 1);
 										}
@@ -3059,11 +3062,7 @@ function ReportGET(badcatch = false) {
 								}
 
 								for (let i = 0; i < ans.length; i++)
-									if (ans[i].id === ans[i + 1].id)
-										ans.splice(i, 1);
-									else
-										_report_data.push(ans[i]);
-
+									_report_data.push(ans[i]);
 
 								for (let i = 0; i < _report_data.length - 1; i++)
 									for (let _i = 0; _i < _report_data.length - 1; _i++) {
@@ -3192,7 +3191,7 @@ function ReportGET(badcatch = false) {
 			setTimeout(() => {
 				controller.abort();
 			}, 5_000);
-			fetch("https://data.exptech.com.tw/api/v2/eq/report?limit=50", { signal: controller.signal })
+			fetch(route.earthquakeReportList(50), { signal: controller.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
 						console.debug(ans0);
@@ -3204,10 +3203,6 @@ function ReportGET(badcatch = false) {
 									const id = ans[i].id;
 
 									for (let _i = 0; _i < _report_data.length; _i++) {
-										if (_report_data[_i].identifier)
-											if (_report_data[_i].identifier === id)
-												_report_data.splice(_i, 1);
-
 										if (_report_data[_i].id) {
 											if (_report_data[_i].id === id) {
 												if (_report_data[_i].list) {
@@ -3227,6 +3222,11 @@ function ReportGET(badcatch = false) {
 													if (_report_data[_i].id.match(/CWA-EQ(.*)/)[1] === id)
 														_report_data.splice(_i, 1);
 
+										}
+
+										if (_report_data[_i].identifier) {
+											if (_report_data[_i].identifier === id)
+												_report_data.splice(_i, 1);
 										} else if (_report_data[_i].identifier === "") {
 											_report_data.splice(_i, 1);
 										}
@@ -3236,10 +3236,7 @@ function ReportGET(badcatch = false) {
 								}
 
 								for (let i = 0; i < ans.length; i++)
-									if (ans[i].id === ans[i + 1].id)
-										ans.splice(i, 1);
-									else
-										_report_data.push(ans[i]);
+									_report_data.push(ans[i]);
 
 								for (let i = 0; i < _report_data.length - 1; i++)
 									for (let _i = 0; _i < _report_data.length - 1; _i++) {
