@@ -1,12 +1,19 @@
 /* eslint-disable no-console */
-
-import { createHelia } from 'helia';
-import { unixfs } from '@helia/unixfs';
-import { CID } from 'multiformats/cid';
-import { base64 } from "multiformats/bases/base64"
+import { createHelia, libp2pDefaults } from "helia";
+import { unixfs } from "@helia/unixfs";
+import { CID } from "multiformats/cid";
+import { base64 } from "multiformats/bases/base64";
 
 export async function create_Helia () {
-  return await createHelia();
+  // return await createHelia();
+
+  const libp2pOptions = libp2pDefaults();
+  console.log(libp2pOptions.peerId);
+
+  const helia = await createHelia({
+    libp2p: libp2pOptions
+  });
+  return helia;
 }
 
 export function helia_unixfs (heliaInstance) {

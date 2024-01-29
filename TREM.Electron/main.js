@@ -356,26 +356,30 @@ async function heliarun() {
 		const helia = await create_Helia();
 		const libp2p = helia.libp2p;
 		const fs = helia_unixfs(helia);
-		const keychain = libp2p.keychain;
+		// const keychain = libp2p.keychain;
 		const id = libp2p.peerId;
 		const Multi = libp2p.getMultiaddrs();
-		const keyInfo = await keychain.createKey("TREM", 'RSA', 4096);
-		const peerId = await keychain.exportPeerId(keyInfo.name);
+		// const keyInfo = await keychain.createKey("TREM", 'RSA', 4096);
+		// const peerId = await keychain.exportPeerId(keyInfo.name);
 		console.log(id);
 		console.log(Multi);
-		console.log(peerId);
+		// console.log(peerId);
 		const bafyFoo = fs.cat(multiformats_CID().parse('mAYAEEiCTojlxqRTl6svwqNJRVM2jCcPBxy+7mRTUfGDzy2gViA', multiformats_base64().decoder));
 		// console.log(bafyFoo);
 
-		libp2p.addEventListener('peer:discovery', (evt) => {
-			console.log(`Discovered peer ${evt.detail.id.toString()} peer: ${libp2p.getPeers().length}`);
-		});
-		libp2p.addEventListener('peer:connect', (evt) => {
-			console.log(`Connected to ${evt.detail.toString()} peer: ${libp2p.getPeers().length}`);
-		});
-		libp2p.addEventListener('peer:disconnect', (evt) => {
-			console.log(`Disconnected from ${evt.detail.toString()} peer: ${libp2p.getPeers().length}`);
-		});
+		setInterval(() => {
+			console.log(`peer: ${libp2p.getPeers().length}`);
+		}, 5000);
+
+		// libp2p.addEventListener('peer:discovery', (evt) => {
+		// 	console.log(`Discovered peer ${evt.detail.id.toString()} peer: ${libp2p.getPeers().length}`);
+		// });
+		// libp2p.addEventListener('peer:connect', (evt) => {
+		// 	console.log(`Connected to ${evt.detail.toString()} peer: ${libp2p.getPeers().length}`);
+		// });
+		// libp2p.addEventListener('peer:disconnect', (evt) => {
+		// 	console.log(`Disconnected from ${evt.detail.toString()} peer: ${libp2p.getPeers().length}`);
+		// });
 	} catch (err) {
 		console.error(err);
 	}
@@ -604,10 +608,6 @@ ipcMain.on("TREMIntensityappversion2", (event, version) => {
 	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensityappversion2", version);
 });
 
-ipcMain.on("ReportGET", () => {
-	if (MainWindow) MainWindow.webContents.send("ReportGET");
-});
-
 ipcMain.on("ReportTREM", () => {
 	if (MainWindow) MainWindow.webContents.send("ReportTREM");
 });
@@ -646,10 +646,6 @@ ipcMain.on("testreplaytime", (event, oldtime) => {
 
 ipcMain.on("sleep", (event, mode) => {
 	emitAllWindow("sleep", mode);
-});
-
-ipcMain.on("apikey", () => {
-	emitAllWindow("apikey");
 });
 
 ipcMain.on("report-Notification", (event, report) => {
@@ -794,14 +790,14 @@ ipcMain.on("config:value", (event, key, value) => {
 		case "cache.report": {
 			TREM.Configuration.data["cache.report"] = value;
 			emitAllWindow("setting", TREM.Configuration._data);
-			ipcMain.emit("ReportGET");
+			if (MainWindow) MainWindow.webContents.send("ReportGET");
 			break;
 		}
 
 		case "report.getInfo": {
 			TREM.Configuration.data["report.getInfo"] = value;
 			emitAllWindow("setting", TREM.Configuration._data);
-			ipcMain.emit("ReportGET");
+			if (MainWindow) MainWindow.webContents.send("ReportGET");
 			break;
 		}
 
@@ -815,7 +811,7 @@ ipcMain.on("config:value", (event, key, value) => {
 		case "api.key": {
 			TREM.Configuration.data["api.key"] = value;
 			emitAllWindow("setting", TREM.Configuration._data);
-			ipcMain.emit("apikey");
+			emitAllWindow("apikey");
 			break;
 		}
 

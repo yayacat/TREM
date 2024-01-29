@@ -125,6 +125,7 @@ let map_move_back = false;
 TREM.set_report_overview = 0;
 let rtstation1 = "";
 let MaxIntensity1 = 0;
+let MaxIntensity2 = -1;
 let testEEWerror = false;
 TREM.win = BrowserWindow.fromId(process.env.window * 1);
 let stationnow = 0;
@@ -149,7 +150,7 @@ TREM.MapIntensity = {
 	isTriggered : false,
 	trem        : false,
 	alertTime   : 0,
-	MaxI        : 0,
+	MaxI        : -1,
 	intensities : new Map(),
 	description : "",
 	palert(rawPalertData) {
@@ -158,7 +159,7 @@ TREM.MapIntensity = {
 		if (rawPalertData.intensity?.length && !replay) {
 			if (rawPalertData.timestamp != this.alertTime) {
 				this.alertTime = rawPalertData.timestamp;
-				this.MaxI = 0;
+				this.MaxI = -1;
 				const PLoc = {};
 				const int = new Map();
 
@@ -174,7 +175,7 @@ TREM.MapIntensity = {
 						this.trem = false;
 						this.MaxI = palertEntry.intensity;
 						Report = rawPalertData.time;
-						ipcRenderer.send("ReportGET");
+						Report_GET();
 					}
 				}
 
@@ -400,7 +401,7 @@ TREM.MapIntensity = {
 		dump({ level: 0, message: "Clearing P-Alert map", origin: "P-Alert" });
 
 		this.alertTime = 0;
-		this.MaxI = 0;
+		this.MaxI = -1;
 		this.isTriggered = false;
 		this.description = "";
 
@@ -1034,11 +1035,11 @@ async function init() {
 
 				else if (type_Unit == "p2pv6") GetDataState += "🟦 P2Pv6";
 
+				else if (type_Unit == "websocket_yayacat") GetDataState += "⬜ WSY";
+
 				else if (type_Unit == "websocket") GetDataState += "⬜ WS";
 
-				else if (type_Unit == "websocket2") GetDataState += "⬜ WS2";
-
-				else if (type_Unit == "websocket3") GetDataState += "⬜ WS3";
+				else if (type_Unit == "websocket_backup") GetDataState += "⬜ WSB";
 
 				else if (type_Unit == "fcm") GetDataState += "🟥 FCM";
 
@@ -1082,7 +1083,10 @@ async function init() {
 						investigation = false;
 						roll.removeChild(roll.children[0]);
 
-						if (!replay) Report = 0;
+						if (!replay) {
+							Report = 0;
+							TREM.MapIntensity.MaxI = -1;
+						}
 
 						if (TREM.MapIntensity.isTriggered && TREM.MapIntensity.intensities.size != undefined)
 							TREM.MapIntensity.clear();
@@ -2171,7 +2175,7 @@ function handler(Json) {
 			else amount = +current_data.pga;
 
 			if (amount > current_station_data.MaxPGA) current_station_data.MaxPGA = amount;
-			intensity = (Alert && Json.Alert) ? Math.round(current_data.i)
+			intensity = ((Alert && Json.Alert) || (rts_key_verify && setting["Real-time.websocket"] === "yayacat" && current_data.alert)) ? Math.round(current_data.i)
 				: (NOW().getTime() - current_data.TS * 1000 > 5000) ? "NA"
 					: 0;
 			// : (amount >= 800) ? 9
@@ -2198,6 +2202,8 @@ function handler(Json) {
 										: "pga1";
 
 			if (intensity > MaxIntensity1) MaxIntensity1 = intensity;
+
+			if (intensity > MaxIntensity2) MaxIntensity2 = intensity;
 
 			if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y") {
 				stationnowindex += 1;
@@ -2407,7 +2413,7 @@ function handler(Json) {
 				TREM.MapIntensity.trem = false;
 				TREM.MapIntensity.MaxI = max_intensity;
 				Report = Json_Time;
-				ipcRenderer.send("ReportGET");
+				Report_GET();
 				intensitytag = max_intensity;
 			}
 		} else if (NA999 != "Y" && NA0999 != "Y" && intensitytest > -1 && amount < 999) {
@@ -2472,7 +2478,7 @@ function handler(Json) {
 						TREM.MapIntensity.trem = true;
 						TREM.MapIntensity.MaxI = intensitytest;
 						Report = NOW().getTime();
-						ipcRenderer.send("ReportGET");
+						Report_GET();
 					}
 				}
 
@@ -2511,7 +2517,37 @@ function handler(Json) {
 
 		$("#level").text(`level: ${level}`);
 		$("#target").text(`target: ${target_count}`);
+
+		if (MaxIntensity2 > TREM.MapIntensity.MaxI)
+			if (setting["Real-time.alert"] && alert_key_verify && setting["Real-time.websocket"] === "yayacat")
+				if (replay == 0) {
+					TREM.MapIntensity.trem = true;
+					TREM.MapIntensity.MaxI = MaxIntensity2;
+
+					if (Report === 0) Report = NOW().getTime();
+					Report_GET();
+
+					if (setting["Real-time.show"]) win.showInactive();
+
+					if (setting["Real-time.cover"])
+						if (!win.isFullScreen()) {
+							win.setAlwaysOnTop(true);
+							win.focus();
+							win.setAlwaysOnTop(false);
+						}
+
+					setTimeout(() => {
+						ipcRenderer.send("screenshotEEW", {
+							Function : "station",
+							ID       : 1,
+							Version  : 1,
+							Time     : NOW().getTime(),
+							Shot     : 1,
+						});
+					}, 300);
+				}
 	} else {
+		MaxIntensity2 = -1;
 		level_list = {};
 		$("#level").text("");
 		$("#target").text("");
@@ -3184,7 +3220,9 @@ function ReportGET(badcatch = false) {
 					dump({ level: 2, message: "Error fetching reports (fetch)", origin: "EQReportFetcher" });
 					dump({ level: 2, message: err, origin: "EQReportFetcher" });
 
-					ReportGET(true);
+					setTimeout(() => {
+						ReportGET(true);
+					}, 30_000);
 				});
 		} else {
 			const controller = new AbortController();
@@ -3430,6 +3468,10 @@ function ReportGET(badcatch = false) {
 }
 
 ipcRenderer.on("ReportGET", () => {
+	Report_GET();
+});
+
+function Report_GET() {
 	let _report_data_GET = [];
 	const _report_data_GET_temp = [];
 	let j = 0;
@@ -3481,7 +3523,7 @@ ipcRenderer.on("ReportGET", () => {
 			cacheReport(_report_data_GET_temp);
 		}
 	}
-});
+}
 
 ipcRenderer.on("ReportTREM", () => {
 	TREM.Report.report_trem = setting["report.trem"];
@@ -3556,7 +3598,7 @@ function ReportList(earthquakeReportArr, palert) {
 
 	if (palert != undefined) {
 		const palertReportArr = { Max: palert.Max, Time: palert.Time, data: [], location: "", ID: [], earthquakeNo: 0, originTime: palert.Time };
-		addReport(palertReportArr, false, 0);
+		addReport(palertReportArr, false, 0, true);
 	}
 
 	for (let index = 0; index < earthquakeReportArr.length; index++)
@@ -3565,7 +3607,7 @@ function ReportList(earthquakeReportArr, palert) {
 	setLocale(setting["general.locale"]);
 }
 
-function addReport(report, prepend = false, index = 0) {
+function addReport(report, prepend = false, index = 0, palert = false) {
 	const OriginTime = report.originTime ? new Date(report.originTime).getTime() : report.time;
 
 	if (replay != 0 && OriginTime > new Date(replay + (NOW().getTime() - replayT)).getTime()) return;
@@ -3573,26 +3615,27 @@ function addReport(report, prepend = false, index = 0) {
 	const Level = report.int ? IntensityI(report.int) : IntensityI(report.data[0]?.areaIntensity);
 	// if (setting["api.key"] == "" && Level == "?") return;
 	let msg = "";
-
-	if (report.location)
-		if (report.location.includes("("))
-			msg = report.location.substring(report.location.indexOf("(") + 1, report.location.indexOf(")")).replace("位於", "");
-		else
-			msg = report.location;
-	else
-		if (report.loc.includes("("))
-			msg = report.loc.substring(report.loc.indexOf("(") + 1, report.loc.indexOf(")")).replace("位於", "");
-		else
-			msg = report.loc;
-
 	let star = "";
 
-	if (report.ID) if (report.ID.length != 0) star += "↺ ";
+	if (!palert) {
+		if (report.location)
+			if (report.location.includes("("))
+				msg = report.location.substring(report.location.indexOf("(") + 1, report.location.indexOf(")")).replace("位於", "");
+			else
+				msg = report.location;
+		else
+			if (report.loc.includes("("))
+				msg = report.loc.substring(report.loc.indexOf("(") + 1, report.loc.indexOf(")")).replace("位於", "");
+			else
+				msg = report.loc;
 
-	if (report.earthquakeNo) {
-		if (report.earthquakeNo % 1000 != 0) star += "✩ ";
-	} else if (report.no) {
-		if (report.no % 1000 != 0) star += "✩ ";
+		if (report.ID) if (report.ID.length != 0) star += "↺ ";
+
+		if (report.earthquakeNo) {
+			if (report.earthquakeNo % 1000 != 0) star += "✩ ";
+		} else if (report.no) {
+			if (report.no % 1000 != 0) star += "✩ ";
+		}
 	}
 
 	const Div = document.createElement("div");
@@ -3789,7 +3832,10 @@ function addReport(report, prepend = false, index = 0) {
 				roll.prepend(Div);
 			}
 
-			if (Report != 0) Report = 0;
+			if (Report != 0) {
+				Report = 0;
+				TREM.MapIntensity.MaxI = -1;
+			}
 
 			TREM.Report.cache.set(report.identifier ?? report.id, report);
 
@@ -4063,7 +4109,7 @@ function freertsget(rts_key_verify_f = false) {
 			try {
 				const controller = new AbortController();
 				const timer = setTimeout(() => controller.abort(), 1000);
-				await fetch("https://data.exptech.com.tw/api/v1/trem/rts", { signal: controller.signal })
+				await fetch(route.rts(1), { signal: controller.signal })
 					.then((ans0) => {
 						if (ans0.ok) {
 							ans0.json().then(ans => {
@@ -4096,6 +4142,7 @@ const stopReplay = function() {
 		intensitytag = -1;
 		replay = 0;
 		Report = 0;
+		TREM.MapIntensity.MaxI = -1;
 		replayTemp = 0;
 		replayT = 0;
 		replaydir = 0;
@@ -4104,7 +4151,7 @@ const stopReplay = function() {
 		clearInterval(Timers.eew_clock);
 		TREM.Report.replayHttp = false;
 		PGAMain();
-		ipcRenderer.send("ReportGET");
+		Report_GET();
 	}
 
 	if (link_on) link_on = false;
@@ -4150,14 +4197,14 @@ ipcRenderer.on("testoldEEW", () => {
 	TREM.Report.replayHttp = true;
 	replay = new Date(report_data[0].originTime.replace(/-/g, "/")).getTime() - 5000;
 	replayT = NOW().getTime();
-	ipcRenderer.send("ReportGET");
+	Report_GET();
 	stopReplaybtn();
 });
 
 ipcRenderer.on("testoldtimeEEW", (event, oldtime) => {
 	replay = oldtime - 5000;
 	replayT = NOW().getTime();
-	ipcRenderer.send("ReportGET");
+	Report_GET();
 	stopReplaybtn();
 });
 
@@ -4175,7 +4222,7 @@ ipcRenderer.on("testoldtime", (event, oldtime) => {
 	replaydir = replay / 1000;
 	ReportTag = 0;
 	console.debug("ReportTag: ", ReportTag);
-	ipcRenderer.send("ReportGET");
+	Report_GET();
 	stopReplaybtn();
 	PGAMain();
 });
@@ -4189,7 +4236,7 @@ ipcRenderer.on("testreplaytime", (event, oldtime) => {
 	replaydir = replay / 1000;
 	ReportTag = 0;
 	console.debug("ReportTag: ", ReportTag);
-	ipcRenderer.send("ReportGET");
+	Report_GET();
 	stopReplaybtn();
 	PGAMain();
 });
@@ -4838,7 +4885,7 @@ function FCMdata(json, Unit) {
 			replayT = NOW().getTime();
 		}
 
-		ipcRenderer.send("ReportGET");
+		Report_GET();
 		stopReplaybtn();
 	} else if (json.type == "report") {
 		const report = json.raw;

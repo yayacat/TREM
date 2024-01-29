@@ -13,6 +13,11 @@ class Route {
    */
 
 	/**
+   * @typedef WSBaseUrl
+   * @type {`wss://lb-${number}.exptech.com.tw/websocket`}
+   */
+
+	/**
    * @constructor
    * @param {{version: version, key: key, random_max_num: random_max_num}} options
    */
@@ -39,10 +44,19 @@ class Route {
 	}
 
 	/**
+   * @template {number} version
+   * @param {version} version
    * @returns {BaseUrl}
    */
-	randomBaseUrl() {
-		return `https://lb-${this.random_ws_num}.exptech.com.tw/api/v${this.version}`;
+	randomBaseUrl(version = this.version) {
+		return `https://lb-${ this.random_ws_num }.exptech.com.tw/api/v${ version }`;
+	}
+
+	/**
+   * @returns {WSBaseUrl}
+   */
+	randomWSBaseUrl() {
+		return `wss://lb-${ this.random_ws_num }.exptech.com.tw/websocket`;
 	}
 
 	/**
@@ -64,12 +78,14 @@ class Route {
 	}
 
 	/**
+   * @template {number} version
+   * @param {version} version
    * @template {number} timestamp
    * @param {timestamp} timestamp
    * @returns {`${BaseUrl}/trem/rts?time=${timestamp}`}
    */
-	rts(timestamp) {
-		return this.randomBaseUrl() + `/trem/rts?time=${timestamp}`;
+	rts(version, timestamp = 0) {
+		return this.randomBaseUrl(version) + `/trem/rts${timestamp ? `?time=${timestamp}` : ""}`;
 	}
 }
 

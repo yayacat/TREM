@@ -1,5 +1,7 @@
 const { getCurrentWindow } = require("@electron/remote");
 const echarts = require("echarts");
+const Route = require("../js/route.js");
+const route = new Route();
 const win = getCurrentWindow();
 
 document.onreadystatechange = () => {
@@ -39,9 +41,8 @@ function handleWindowControls() {
 
 const wave_count = +localStorage.getItem("displayWaveCount") ?? 8;
 
-let ws = new WebSocket("wss://exptech.com.tw/api");
+let ws = new WebSocket(route.randomWSBaseUrl());
 let Reconnect = 0;
-let ServerT = 0;
 
 let Realtimestation = app.Configuration.data["Real-time.station"];
 let Realtimestation1 = app.Configuration.data["Real-time.station.1"];
@@ -70,7 +71,7 @@ function reconnect() {
 		ws = null;
 	}
 
-	ws = new WebSocket("wss://exptech.com.tw/api");
+	ws = new WebSocket(route.randomWSBaseUrl());
 	connect(1000);
 }
 
@@ -88,22 +89,41 @@ const connect = (retryTimeout) => {
 	ws.onopen = function() {
 		const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.api.key"] != "" ? app.Configuration.data["rtw.api.key"] : "") : (app.Configuration.data["api.key"] != "" ? app.Configuration.data["api.key"] : "");
 		ws.send(JSON.stringify({
-			uuid     : `rtw-TREM-${localStorage.UUID_rts}`,
-			function : "subscriptionService",
-			value    : ["trem-rts-original-v1"],
-			key      : key,
-			addition : {
-				"trem-rts-original-v1": chartuuids,
+			type    : "start",
+			key     : key,
+			service : ["trem.rtw"],
+			config  : {
+				"trem.rtw": [
+					parseInt(Realtimestation1.split("-")[2]),
+					parseInt(Realtimestation2.split("-")[2]),
+					parseInt(Realtimestation3.split("-")[2]),
+					parseInt(Realtimestation4.split("-")[2]),
+					parseInt(Realtimestation5.split("-")[2]),
+					parseInt(Realtimestation.split("-")[2]),
+				],
 			},
 		}));
 	};
 
-	ws.onmessage = function(evt) {
-		const parsed = JSON.parse(evt.data);
-		ServerT = Date.now();
+	ws.onmessage = function(raw) {
+		const parsed = JSON.parse(raw.data);
 
-		if (parsed.type == "trem-rts-original")
-			wave(parsed.raw);
+		// console.log(parsed);
+
+		switch (parsed.type) {
+			case "data": {
+				switch (parsed.data.type) {
+					case "rtw": {
+						wave(parsed.data);
+						break;
+					}
+				}
+
+				break;
+			}
+
+			default: break;
+		}
 	};
 };
 
@@ -121,7 +141,22 @@ const Real_time_station_run = () => {
 		Realtimestation5,
 		Realtimestation,
 	];
-	reconnect();
+	const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.api.key"] != "" ? app.Configuration.data["rtw.api.key"] : "") : (app.Configuration.data["api.key"] != "" ? app.Configuration.data["api.key"] : "");
+	ws.send(JSON.stringify({
+		type    : "start",
+		key     : key,
+		service : ["trem.rtw"],
+		config  : {
+			"trem.rtw": [
+				parseInt(Realtimestation1.split("-")[2]),
+				parseInt(Realtimestation2.split("-")[2]),
+				parseInt(Realtimestation3.split("-")[2]),
+				parseInt(Realtimestation4.split("-")[2]),
+				parseInt(Realtimestation5.split("-")[2]),
+				parseInt(Realtimestation.split("-")[2]),
+			],
+		},
+	}));
 	setCharts([
 		Realtimestation1.split("-")[2],
 		Realtimestation2.split("-")[2],
@@ -292,64 +327,63 @@ const setCharts = (ids) => {
 
 const wave = (wave_data) => {
 	// console.log(wave_data);
-	const jsondata = {};
 
-	for (let i = 0; i < wave_data.length; i++)
-		jsondata[wave_data[i].uuid] = wave_data[i].raw;
-
+	const time = wave_data.time;
+	const wave_data_id = wave_data.id;
+	const n = wave_data.Z.length;
+	const timeOffset = 500 / n;
 	const now = new Date(Date.now());
 
-	for (const i in chartuuids) {
-		if (jsondata[chartuuids[i]])
-			chartdata[i].push(...jsondata[chartuuids[i]].map((value, index, array) => ({
-				name  : now.getTime(),
-				value : [new Date(+now + (index * (1000 / array.length))).getTime(), value],
-			})));
-		else
-			for (let j = 0; j < (chartuuids[i].startsWith("H") ? 19 : 38); j++)
-				chartdata[i].push({
-					name  : now.getTime(),
-					value : [new Date(+now + (j * (1000 / (chartuuids[i].startsWith("H") ? 19 : 38)))).getTime(), null],
-				});
+	const arr = [];
+
+	let id;
+
+	for (const i in chartuuids)
+		if (parseInt(chartuuids[i].split("-")[2]) === wave_data_id)
+			id = i;
 
 
-		while (true)
-			if (chartdata[i].length > (chartuuids[i].startsWith("H") ? 1140 : 2280)) {
-				chartdata[i].shift();
-			} else if (chartdata[i].length == (chartuuids[i].startsWith("H") ? 1140 : 2280)) {
-				break;
-			} else if (chartdata[i].length != (chartuuids[i].startsWith("H") ? 1140 : 2280)) {
-				chartdata[i].shift();
-				chartdata[i].unshift({
-					name  : new Date(Date.now() - 60_000).getTime(),
-					value : [new Date(Date.now() - 60_000).getTime(), null],
-				});
-				break;
-			}
-
-		const values = chartdata[i].map(v => v.value[1]);
-		const maxmin = Math.max(Math.abs(Math.max(...values)), Math.abs(Math.min(...values)));
-
-		charts[i].setOption({
-			animation : false,
-			yAxis     : {
-				max : maxmin < (chartuuids[i].startsWith("H") ? 1 : 1000) ? (chartuuids[i].startsWith("H") ? 1 : 1000) : maxmin,
-				min : -(maxmin < (chartuuids[i].startsWith("H") ? 1 : 1000) ? (chartuuids[i].startsWith("H") ? 1 : 1000) : maxmin),
-			},
-			series: [
-				{
-					data: chartdata[i],
-				},
-			],
+	for (let i = 0; i < n; i++) {
+		const calculatedTime = time + (i * timeOffset);
+		chartdata[id].push({
+			name  : now.getTime(),
+			value : [new Date(calculatedTime).getTime(), Math.round(+wave_data.Z[i] * 1000)],
 		});
 	}
+
+	while (true)
+		if (chartdata[id].length > (chartuuids[id].startsWith("H") ? 2950 : 1180)) {
+			chartdata[id].shift();
+		} else if (chartdata[id].length == (chartuuids[id].startsWith("H") ? 2950 : 1180)) {
+			break;
+		} else if (chartdata[id].length != (chartuuids[id].startsWith("H") ? 2950 : 1180)) {
+			chartdata[id].shift();
+			chartdata[id].unshift({
+				name  : new Date(time - 60_000).getTime(),
+				value : [new Date(time - 60_000).getTime(), null],
+			});
+			break;
+		}
+
+	const values = chartdata[id].map(v => v.value[1]);
+	const maxmin = Math.max(Math.abs(Math.max(...values)), Math.abs(Math.min(...values)));
+
+	charts[id].setOption({
+		animation : false,
+		yAxis     : {
+			max : maxmin < (chartuuids[id].startsWith("H") ? 1 : 1000) ? (chartuuids[id].startsWith("H") ? 1 : 1000) : maxmin,
+			min : -(maxmin < (chartuuids[id].startsWith("H") ? 1 : 1000) ? (chartuuids[id].startsWith("H") ? 1 : 1000) : maxmin),
+		},
+		series: [
+			{
+				type : "line",
+				data : chartdata[id],
+			},
+		],
+	});
 };
 
 async function init() {
-	setInterval(() => {
-		if ((Date.now() - ServerT > 15_000 && ServerT != 0))
-			reconnect();
-	}, 3000);
 	connect(1000);
 	await (async () => {
 		await fetch_files();
