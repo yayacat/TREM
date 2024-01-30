@@ -65,7 +65,7 @@ class Route {
    * @returns {`${BaseUrl}/eq/report?limit=${limit}&key=${key}`}
    */
 	earthquakeReportList(limit = "") {
-		return this.randomBaseUrl() + `/eq/report?limit=${limit}&key=${this.key}`;
+		return this.randomBaseUrl() + `/eq/report?limit=${limit}${this.key == "" ? "" : `&key=${this.key}`}`;
 	}
 
 	/**

@@ -3088,37 +3088,36 @@ function ReportGET(badcatch = false) {
 								for (let i = 0; i < ans.length; i++) {
 									const id = ans[i].id;
 
-									for (let _i = 0; _i < _report_data.length; _i++) {
-										if (_report_data[i].show) ans[i].show = _report_data[i].show;
+									for (let _i = 0; _i < _report_data.length; _i++)
+										if (_report_data[_i]) {
+											if (_report_data[_i].show) ans[i].show = _report_data[_i].show;
 
-										if (_report_data[_i].id) {
-											if (_report_data[_i].id === id) {
-												if (_report_data[_i].list) {
-													ans[i].list = _report_data[_i].list;
-													ans[i].Max_Level = _report_data[_i].Max_Level;
-													ans[i].Max_Level_areaName = _report_data[_i].Max_Level_areaName;
-													ans[i].Max_Level_stationName = _report_data[_i].Max_Level_stationName;
-												}
-
-												_report_data.splice(_i, 1);
-											} else if (_report_data[_i].id === _report_data[_i + 1].id) {
-												_report_data.splice(_i, 1);
-											}
-
-											if (_report_data[_i].id !== undefined)
-												if (_report_data[_i].id.match(/CWA-EQ(.*)/) !== null)
+											if (_report_data[_i].id) {
+												if (_report_data[_i].id.match(/CWA-EQ(.*)/) !== null) {
 													if (_report_data[_i].id.match(/CWA-EQ(.*)/)[1] === id)
 														_report_data.splice(_i, 1);
+												} else if (_report_data[_i].id === id) {
+													if (_report_data[_i].list) {
+														ans[i].list = _report_data[_i].list;
+														ans[i].Max_Level = _report_data[_i].Max_Level;
+														ans[i].Max_Level_areaName = _report_data[_i].Max_Level_areaName;
+														ans[i].Max_Level_stationName = _report_data[_i].Max_Level_stationName;
+													}
 
-										}
+													_report_data.splice(_i, 1);
+												} else if (_report_data[_i + 1]) {
+													if (_report_data[_i].id === _report_data[_i + 1].id)
+														_report_data.splice(_i, 1);
 
-										if (_report_data[_i].identifier) {
-											if (_report_data[_i].identifier === id)
+												}
+
+											} else if (_report_data[_i].identifier) {
+												if (_report_data[_i].identifier === id)
+													_report_data.splice(_i, 1);
+											} else if (_report_data[_i].identifier === "") {
 												_report_data.splice(_i, 1);
-										} else if (_report_data[_i].identifier === "") {
-											_report_data.splice(_i, 1);
+											}
 										}
-									}
 
 									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
 								}
@@ -3278,37 +3277,36 @@ function ReportGET(badcatch = false) {
 								for (let i = 0; i < ans.length; i++) {
 									const id = ans[i].id;
 
-									for (let _i = 0; _i < _report_data.length; _i++) {
-										if (_report_data[i].show) ans[i].show = _report_data[i].show;
+									for (let _i = 0; _i < _report_data.length; _i++)
+										if (_report_data[_i]) {
+											if (_report_data[_i].show) ans[i].show = _report_data[_i].show;
 
-										if (_report_data[_i].id) {
-											if (_report_data[_i].id === id) {
-												if (_report_data[_i].list) {
-													ans[i].list = _report_data[_i].list;
-													ans[i].Max_Level = _report_data[_i].Max_Level;
-													ans[i].Max_Level_areaName = _report_data[_i].Max_Level_areaName;
-													ans[i].Max_Level_stationName = _report_data[_i].Max_Level_stationName;
-												}
-
-												_report_data.splice(_i, 1);
-											} else if (_report_data[_i].id === _report_data[_i + 1].id) {
-												_report_data.splice(_i, 1);
-											}
-
-											if (_report_data[_i].id !== undefined)
-												if (_report_data[_i].id.match(/CWA-EQ(.*)/) !== null)
+											if (_report_data[_i].id) {
+												if (_report_data[_i].id.match(/CWA-EQ(.*)/) !== null) {
 													if (_report_data[_i].id.match(/CWA-EQ(.*)/)[1] === id)
 														_report_data.splice(_i, 1);
+												} else if (_report_data[_i].id === id) {
+													if (_report_data[_i].list) {
+														ans[i].list = _report_data[_i].list;
+														ans[i].Max_Level = _report_data[_i].Max_Level;
+														ans[i].Max_Level_areaName = _report_data[_i].Max_Level_areaName;
+														ans[i].Max_Level_stationName = _report_data[_i].Max_Level_stationName;
+													}
 
-										}
+													_report_data.splice(_i, 1);
+												} else if (_report_data[_i + 1]) {
+													if (_report_data[_i].id === _report_data[_i + 1].id)
+														_report_data.splice(_i, 1);
 
-										if (_report_data[_i].identifier) {
-											if (_report_data[_i].identifier === id)
+												}
+
+											} else if (_report_data[_i].identifier) {
+												if (_report_data[_i].identifier === id)
+													_report_data.splice(_i, 1);
+											} else if (_report_data[_i].identifier === "") {
 												_report_data.splice(_i, 1);
-										} else if (_report_data[_i].identifier === "") {
-											_report_data.splice(_i, 1);
+											}
 										}
-									}
 
 									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
 								}
@@ -3365,8 +3363,8 @@ function ReportGET(badcatch = false) {
 							log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
 							dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
 							cacheReport(_report_data_POST_temp);
-							console.debug(_report_data.length);
-							console.debug(_report_data_POST_temp.length);
+							// console.debug(_report_data.length);
+							// console.debug(_report_data_POST_temp.length);
 
 							// if (!api_key_verify && !setting["report.getInfo"]) {
 							// 	const _report_data_POST_temp = [];
