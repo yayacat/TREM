@@ -607,6 +607,8 @@ TREM.Old_database = {
 							return this.setcache(file, type, fileData);
 						else if (type === "tsunami-test")
 							return this.setcache(file, type, fileData);
+						else if (type === "eew")
+							return this.setcache(file, type, fileData);
 						//  else {
 						// 	return this.setcache(file, type, fileData);
 						// }
@@ -661,6 +663,7 @@ TREM.Old_database = {
 		const type = Olddatabase.type;
 		let unit = Olddatabase.unit ? Olddatabase.unit : Olddatabase.type;
 		let scale = "?";
+		let number = Olddatabase.number ? Olddatabase.number : "1";
 
 		if (unit == "cwb") unit = "CWA";
 
@@ -676,11 +679,16 @@ TREM.Old_database = {
 
 		if (Olddatabase.scale) scale = Olddatabase.scale;
 
+		if (Olddatabase.eq) {
+			scale = Olddatabase.eq.mag;
+			number = Olddatabase.serial;
+		}
+
 		if (unit == "intensity" && scale == "?") unit = "intensity" + " 資料有很大的機率無法顯示";
 		// el.id = report.identifier;
 		// el.className += ` ${IntensityToClassString(report.data[0]?.areaIntensity)}`;
 		el.querySelector(".report-list-item-location").innerText = unit;
-		el.querySelector(".report-list-item-id").innerText = Olddatabase.number ? Olddatabase.number : "1";
+		el.querySelector(".report-list-item-id").innerText = number;
 		el.querySelector(".report-list-item-Magnitude").innerText = scale;
 		el.querySelector(".report-list-item-time").innerText = TREM.Intensity.timeformat(new Date(Olddatabase.timestamp));
 

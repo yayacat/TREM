@@ -1008,9 +1008,9 @@ async function init() {
 
 				// if (!HTTP) Warn += "0";
 
-				// if (!WS0) Warn += "1";
+				if (!WS) Warn += "1";
 
-				if (!WS) Warn += "2";
+				if (!WS_backup) Warn += "2";
 
 				if (!FCM) Warn += "3";
 
@@ -1023,7 +1023,7 @@ async function init() {
 				else
 					Warn += "5";
 
-				if (!WS2) Warn += "6";
+				if (!WS_yayacat) Warn += "6";
 
 				Warn = ((Warn == "") ? "" : ` | 📛 ${Warn}`);
 
@@ -1579,6 +1579,30 @@ async function init() {
 	// ipcRenderer.send("intensity-Notification", userJSON1);
 	// const userJSON = require(path.resolve(__dirname, "../js/1688811850345.json"));
 	// TREM.PWS.addPWS(userJSON.raw);
+
+	// setTimeout(() => {
+	// 	const test_json = {
+	// 		type: 'eew',
+	// 		author: 'nied',
+	// 		id: '20240130001930',
+	// 		serial: 5,
+	// 		status: 0,
+	// 		final: 1,
+	// 		eq: {
+	// 		  time: 1706571830000,
+	// 		  lon: 142.4,
+	// 		  lat: 42,
+	// 		  depth: 80,
+	// 		  mag: 4.2,
+	// 		  loc: '浦河沖',
+	// 		  max: 0,
+	// 		  status: 0
+	// 		},
+	// 		timestamp: 1706571830385
+	// 	}
+	// 	const test_Unit = "websocket";
+	// 	FCMdata(test_json, test_Unit);
+	// }, 5000);
 
 	document.getElementById("rt-station-local").addEventListener("click", () => {
 		navigator.clipboard.writeText(document.getElementById("rt-station-local-id").innerText).then(() => {
@@ -3065,6 +3089,8 @@ function ReportGET(badcatch = false) {
 									const id = ans[i].id;
 
 									for (let _i = 0; _i < _report_data.length; _i++) {
+										if (_report_data[i].show) ans[i].show = _report_data[i].show;
+
 										if (_report_data[_i].id) {
 											if (_report_data[_i].id === id) {
 												if (_report_data[_i].list) {
@@ -3113,6 +3139,18 @@ function ReportGET(badcatch = false) {
 									}
 
 								// if (!_report_data) return setTimeout(ReportGET, 10_000);
+
+								const OriginTime = _report_data[0].originTime ? new Date(_report_data[0].originTime).getTime() : _report_data[0].time;
+
+								if ((NOW().getTime() - OriginTime) > 0 && !_report_data[0].show) {
+									if (replay != 0) return;
+									TREM.set_report_overview = 1;
+									TREM.Report.setView("eq-report-overview", _report_data[0]);
+									changeView("report", "#reportView_btn");
+									ReportTag = NOW().getTime();
+									console.debug("ReportTag: ", ReportTag);
+									_report_data[0].show = true;
+								}
 
 								storage.setItem("report_data", _report_data);
 								// console.debug(_report_data);
@@ -3241,6 +3279,8 @@ function ReportGET(badcatch = false) {
 									const id = ans[i].id;
 
 									for (let _i = 0; _i < _report_data.length; _i++) {
+										if (_report_data[i].show) ans[i].show = _report_data[i].show;
+
 										if (_report_data[_i].id) {
 											if (_report_data[_i].id === id) {
 												if (_report_data[_i].list) {
@@ -3287,6 +3327,18 @@ function ReportGET(badcatch = false) {
 											_report_data[_i] = temp;
 										}
 									}
+
+								const OriginTime = _report_data[0].originTime ? new Date(_report_data[0].originTime).getTime() : _report_data[0].time;
+
+								if ((NOW().getTime() - OriginTime) > 0 && !_report_data[0].show) {
+									if (replay != 0) return;
+									TREM.set_report_overview = 1;
+									TREM.Report.setView("eq-report-overview", _report_data[0]);
+									changeView("report", "#reportView_btn");
+									ReportTag = NOW().getTime();
+									console.debug("ReportTag: ", ReportTag);
+									_report_data[0].show = true;
+								}
 
 								storage.setItem("report_data", _report_data);
 							}
@@ -5018,15 +5070,57 @@ function FCMdata(json, Unit) {
 		if (json.type == "trem-eew" && !eew_key_verify && replay == 0) return;
 
 		if (
-			(json.type == "eew-scdzj" && !setting["accept.eew.SCDZJ"])
-			|| (json.type == "eew-nied" && !setting["accept.eew.NIED"])
-			|| (json.type == "eew-jma" && !setting["accept.eew.JMA"])
-			|| (json.type == "eew-kma" && !setting["accept.eew.KMA"])
-			|| (json.type == "eew-cwb" && !setting["accept.eew.CWA"])
-			|| (json.type == "eew-fjdzj" && !setting["accept.eew.FJDZJ"])
-			|| (json.type == "trem-eew" && !setting["accept.eew.trem"])
+			(json.author == "scdzj" && !setting["accept.eew.SCDZJ"])
+			|| (json.author == "nied" && !setting["accept.eew.NIED"])
+			|| (json.author == "jma" && !setting["accept.eew.JMA"])
+			|| (json.author == "kma" && !setting["accept.eew.KMA"])
+			|| (json.author == "cwb" && !setting["accept.eew.CWA"])
+			|| (json.author == "fjdzj" && !setting["accept.eew.FJDZJ"])
+			|| (json.author == "trem-eew" && !setting["accept.eew.trem"])
 		) return;
 
+		json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
+			: (json.author == "scdzj") ? "四川省地震局 (SCDZJ)"
+				: (json.author == "nied") ? "防災科学技術研究所 (NIED)"
+					: (json.author == "kma") ? "기상청(KMA)"
+						: (json.author == "jma") ? "気象庁(JMA)"
+							: (json.author == "cwb") ? "中央氣象署 (CWA)"
+								: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
+									: (json.author == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
+										: (json.author == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+											: (json.Unit) ? json.Unit : "";
+
+		stopReplaybtn();
+		TREM.Earthquake.emit("eew", json);
+	}
+}
+// #endregion
+
+ipcRenderer.on("Olddatabase_eew", (event, json) => {
+	if (json.eq) {
+		json.replay_time = json.eq.time;
+		json.replay_timestamp = json.eq.time;
+		json.time = NOW().getTime();
+		json.timestamp = NOW().getTime();
+	} else {
+		json.replay_time = json.time;
+		json.replay_timestamp = json.time;
+		json.time = NOW().getTime();
+		json.timestamp = NOW().getTime();
+	}
+
+	if (json.author)
+		json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
+			: (json.author == "scdzj") ? "四川省地震局 (SCDZJ)"
+				: (json.author == "nied") ? "防災科学技術研究所 (NIED)"
+					: (json.author == "kma") ? "기상청(KMA)"
+						: (json.author == "jma") ? "気象庁(JMA)"
+							: (json.author == "cwb") ? "中央氣象署 (CWA)"
+								: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
+									: (json.author == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
+										: (json.author == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+											: (json.Unit) ? json.Unit : "";
+	else
 		json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
 			: (json.type == "eew-scdzj") ? "四川省地震局 (SCDZJ)"
 				: (json.type == "eew-nied") ? "防災科学技術研究所 (NIED)"
@@ -5037,28 +5131,6 @@ function FCMdata(json, Unit) {
 									: (json.type == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
 										: (json.type == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
 											: (json.Unit) ? json.Unit : "";
-
-		stopReplaybtn();
-		TREM.Earthquake.emit("eew", json);
-	}
-}
-// #endregion
-
-ipcRenderer.on("Olddatabase_eew", (event, json) => {
-	json.replay_time = json.time;
-	json.replay_timestamp = json.time;
-	json.time = NOW().getTime();
-	json.timestamp = NOW().getTime();
-	json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
-		: (json.type == "eew-scdzj") ? "四川省地震局 (SCDZJ)"
-			: (json.type == "eew-nied") ? "防災科学技術研究所 (NIED)"
-				: (json.type == "eew-kma") ? "기상청(KMA)"
-					: (json.type == "eew-jma") ? "気象庁(JMA)"
-						: (json.type == "eew-cwb") ? "中央氣象署 (CWA)"
-							: (json.type == "eew-fjdzj") ? "福建省地震局 (FJDZJ)"
-								: (json.type == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
-									: (json.type == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
-										: (json.Unit) ? json.Unit : "";
 
 	stopReplaybtn();
 	TREM.Earthquake.emit("eew", json);
@@ -5089,7 +5161,23 @@ TREM.Earthquake.on("eew", (data) => {
 	console.debug(data);
 	let Timer_run;
 
-	if (data.type == "trem-eew" && data.lat == null || data.lon == null) return;
+	if (data.status == 3) data.cancel = true;
+
+	if (data.serial > 0) data.number = data.serial;
+
+	if (data.eq.lon) data.lon = data.eq.lon;
+
+	if (data.eq.lat) data.lat = data.eq.lat;
+
+	if (data.eq.depth) data.depth = data.eq.depth;
+
+	if (data.eq.mag) data.scale = data.eq.mag;
+
+	if (data.eq.loc) data.location = data.eq.loc;
+
+	if (data.eq.time) data.time = data.eq.time;
+
+	if (data.type == "trem-eew" && (data.lat == null && data.lon == null)) return;
 
 	if (data.number == 1 && setting["link.on"] && !link_on) {
 		link_on = true;
@@ -6458,7 +6546,7 @@ function findClosest(arr, target) {
 }
 
 function NOW() {
-	return new Date(ServerTime + (Date.now() - ((ServerT != 0 && setting["Real-time.websocket"] === "exptech") ? ServerT : (ServerT0 != 0) ? ServerT0 : ServerT2)));
+	return new Date(ServerTime + (Date.now() - ((ServerT != 0 && setting["Real-time.websocket"] === "exptech") ? ServerT : (ServerT_backup != 0) ? ServerT_backup : ServerT_yayacat)));
 }
 
 function timeconvert(time) {
