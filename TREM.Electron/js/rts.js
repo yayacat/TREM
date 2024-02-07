@@ -392,11 +392,10 @@ const wave = (wave_data) => {
 
 async function init() {
 	connect(1000);
+
 	if (!timer.WS_rtw)
 		timer.WS_rtw = setInterval(() => {
-			if ((Date.now() - ServerT_rtw > 60_000 && ServerT_rtw != 0) && !WS_rtw) {
-				reconnect();
-			}
+			if ((Date.now() - ServerT_rtw > 60_000 && ServerT_rtw != 0) && !WS_rtw) reconnect();
 		}, 3000);
 	await (async () => {
 		await fetch_files();

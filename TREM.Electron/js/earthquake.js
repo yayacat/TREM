@@ -5095,11 +5095,11 @@ function FCMdata(json, Unit) {
 					: (json.author == "nied") ? "防災科学技術研究所 (NIED)"
 						: (json.author == "kma") ? "기상청(KMA)"
 							: (json.author == "jma") ? "気象庁(JMA)"
-									: (json.author == "cwa") ? "中央氣象署 (CWA)"
-										: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
-											: (json.author == "trem" && json.number > 3) ? "TREM(實驗功能僅供參考)"
-												: (json.author == "trem" && json.number <= 3) ? "NSSPE(無震源參數推算)"
-													: (json.Unit) ? json.Unit : "";
+								: (json.author == "cwa") ? "中央氣象署 (CWA)"
+									: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
+										: (json.author == "trem" && json.number > 3) ? "TREM(實驗功能僅供參考)"
+											: (json.author == "trem" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+												: (json.Unit) ? json.Unit : "";
 		} else {
 			if (
 				(json.type == "eew-scdzj" && !setting["accept.eew.SCDZJ"])
@@ -5148,11 +5148,11 @@ ipcRenderer.on("Olddatabase_eew", (event, json) => {
 				: (json.author == "nied") ? "防災科学技術研究所 (NIED)"
 					: (json.author == "kma") ? "기상청(KMA)"
 						: (json.author == "jma") ? "気象庁(JMA)"
-								: (json.author == "cwa") ? "中央氣象署 (CWA)"
-									: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
-										: (json.author == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
-											: (json.author == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
-												: (json.Unit) ? json.Unit : "";
+							: (json.author == "cwa") ? "中央氣象署 (CWA)"
+								: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
+									: (json.author == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
+										: (json.author == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+											: (json.Unit) ? json.Unit : "";
 	else
 		json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
 			: (json.type == "eew-scdzj") ? "四川省地震局 (SCDZJ)"
