@@ -56,9 +56,10 @@ let arrive = "";
 const audio = { main: [], minor: [], main_lock: false, minor_lock: false };
 const EarthquakeList = {};
 let marker = null;
+let marker_report = null;
 
 /**
- * @type {{main: L.Map, report: maplibregl.Map}}
+ * @type {{main: L.Map, mini: L.Map, report: L.Map, intensity: L.Map}}
  */
 const Maps = { main: null, mini: null, report: null, intensity: null };
 
@@ -2548,6 +2549,8 @@ function handler(Json) {
 					TREM.MapIntensity.trem = true;
 					TREM.MapIntensity.MaxI = MaxIntensity2;
 
+					changeView("main", "#mainView_btn");
+
 					if (Report === 0) Report = NOW().getTime();
 					Report_GET();
 
@@ -2559,6 +2562,8 @@ function handler(Json) {
 							win.focus();
 							win.setAlwaysOnTop(false);
 						}
+
+					if (!win.isFocused()) win.flashFrame(true);
 
 					setTimeout(() => {
 						ipcRenderer.send("screenshotEEW", {
@@ -2885,6 +2890,13 @@ function setUserLocationMarker(town) {
 			keyboard : false,
 		}).addTo(Maps.main);
 	else marker.setLatLng([UserLocationLat, UserLocationLon]);
+
+	if (!marker_report)
+		marker_report = L.marker([UserLocationLat, UserLocationLon], {
+			icon     : L.divIcon({ html: "<img id=\"here-marker\" src=\"../image/here.png\" height=\"20\" width=\"20\" style=\"z-index: 5000;\"></img>" }),
+			keyboard : false,
+		}).addTo(Maps.report);
+	else marker_report.setLatLng([UserLocationLat, UserLocationLon]);
 
 	log(`User location set to ${setting["location.city"]} ${town} (${UserLocationLat}, ${UserLocationLon})`, 1, "Location", "setUserLocationMarker");
 	dump({ level: 0, message: `User location set to ${setting["location.city"]} ${town} (${UserLocationLat}, ${UserLocationLon})`, origin: "Location" });
@@ -5060,33 +5072,56 @@ function FCMdata(json, Unit) {
 
 		log("Got Earthquake Report", 1, "API", "FCMdata");
 		dump({ level: 0, message: "Got Earthquake Report", origin: "API" });
-	} else if (json.type.startsWith("eew") || json.type == "trem-eew") {
+	} else if (json.type.startsWith("eew") || json.type == "eew") {
 		if (replay != 0 && !json.replay_timestamp) return;
 
 		if (NOW().getTime() - json.time > 300_000) return;
 
-		if (json.type == "trem-eew" && !eew_key_verify && replay == 0) return;
+		if (json.type == "trem" && !eew_key_verify && replay == 0) return;
 
-		if (
-			(json.author == "scdzj" && !setting["accept.eew.SCDZJ"])
-			|| (json.author == "nied" && !setting["accept.eew.NIED"])
-			|| (json.author == "jma" && !setting["accept.eew.JMA"])
-			|| (json.author == "kma" && !setting["accept.eew.KMA"])
-			|| (json.author == "cwb" && !setting["accept.eew.CWA"])
-			|| (json.author == "fjdzj" && !setting["accept.eew.FJDZJ"])
-			|| (json.author == "trem-eew" && !setting["accept.eew.trem"])
-		) return;
+		if (json.author) {
+			if (
+				(json.author == "scdzj" && !setting["accept.eew.SCDZJ"])
+				|| (json.author == "nied" && !setting["accept.eew.NIED"])
+				|| (json.author == "jma" && !setting["accept.eew.JMA"])
+				|| (json.author == "kma" && !setting["accept.eew.KMA"])
+				|| (json.author == "cwb" && !setting["accept.eew.CWA"])
+				|| (json.author == "fjdzj" && !setting["accept.eew.FJDZJ"])
+				|| (json.author == "trem" && !setting["accept.eew.trem"])
+			) return;
 
-		json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
-			: (json.author == "scdzj") ? "四川省地震局 (SCDZJ)"
-				: (json.author == "nied") ? "防災科学技術研究所 (NIED)"
-					: (json.author == "kma") ? "기상청(KMA)"
-						: (json.author == "jma") ? "気象庁(JMA)"
-							: (json.author == "cwb") ? "中央氣象署 (CWA)"
-								: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
-									: (json.author == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
-										: (json.author == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
-											: (json.Unit) ? json.Unit : "";
+			json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
+				: (json.author == "scdzj") ? "四川省地震局 (SCDZJ)"
+					: (json.author == "nied") ? "防災科学技術研究所 (NIED)"
+						: (json.author == "kma") ? "기상청(KMA)"
+							: (json.author == "jma") ? "気象庁(JMA)"
+									: (json.author == "cwa") ? "中央氣象署 (CWA)"
+										: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
+											: (json.author == "trem" && json.number > 3) ? "TREM(實驗功能僅供參考)"
+												: (json.author == "trem" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+													: (json.Unit) ? json.Unit : "";
+		} else {
+			if (
+				(json.type == "eew-scdzj" && !setting["accept.eew.SCDZJ"])
+				|| (json.type == "eew-nied" && !setting["accept.eew.NIED"])
+				|| (json.type == "eew-jma" && !setting["accept.eew.JMA"])
+				|| (json.type == "eew-kma" && !setting["accept.eew.KMA"])
+				|| (json.type == "eew-cwb" && !setting["accept.eew.CWA"])
+				|| (json.type == "eew-fjdzj" && !setting["accept.eew.FJDZJ"])
+				|| (json.type == "trem-eew" && !setting["accept.eew.trem"])
+			) return;
+
+			json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
+				: (json.type == "eew-scdzj") ? "四川省地震局 (SCDZJ)"
+					: (json.type == "eew-nied") ? "防災科学技術研究所 (NIED)"
+						: (json.type == "eew-kma") ? "기상청(KMA)"
+							: (json.type == "eew-jma") ? "気象庁(JMA)"
+								: (json.type == "eew-cwb") ? "中央氣象署 (CWA)"
+									: (json.type == "eew-fjdzj") ? "福建省地震局 (FJDZJ)"
+										: (json.type == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
+											: (json.type == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+												: (json.Unit) ? json.Unit : "";
+		}
 
 		stopReplaybtn();
 		TREM.Earthquake.emit("eew", json);
@@ -5113,11 +5148,11 @@ ipcRenderer.on("Olddatabase_eew", (event, json) => {
 				: (json.author == "nied") ? "防災科学技術研究所 (NIED)"
 					: (json.author == "kma") ? "기상청(KMA)"
 						: (json.author == "jma") ? "気象庁(JMA)"
-							: (json.author == "cwb") ? "中央氣象署 (CWA)"
-								: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
-									: (json.author == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
-										: (json.author == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
-											: (json.Unit) ? json.Unit : "";
+								: (json.author == "cwa") ? "中央氣象署 (CWA)"
+									: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
+										: (json.author == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
+											: (json.author == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+												: (json.Unit) ? json.Unit : "";
 	else
 		json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
 			: (json.type == "eew-scdzj") ? "四川省地震局 (SCDZJ)"
