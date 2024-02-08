@@ -5198,17 +5198,19 @@ TREM.Earthquake.on("eew", (data) => {
 
 	if (data.serial > 0) data.number = data.serial;
 
-	if (data.eq.lon) data.lon = data.eq.lon;
+	if (data.eq) {
+		if (data.eq.lon) data.lon = data.eq.lon;
 
-	if (data.eq.lat) data.lat = data.eq.lat;
+		if (data.eq.lat) data.lat = data.eq.lat;
 
-	if (data.eq.depth) data.depth = data.eq.depth;
+		if (data.eq.depth) data.depth = data.eq.depth;
 
-	if (data.eq.mag) data.scale = data.eq.mag;
+		if (data.eq.mag) data.scale = data.eq.mag;
 
-	if (data.eq.loc) data.location = data.eq.loc;
+		if (data.eq.loc) data.location = data.eq.loc;
 
-	if (data.eq.time) data.time = data.eq.time;
+		if (data.eq.time) data.time = data.eq.time;
+	}
 
 	if (data.type == "trem-eew" && (data.lat == null && data.lon == null)) return;
 
