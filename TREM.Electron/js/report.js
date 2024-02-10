@@ -1111,6 +1111,8 @@ TREM.Report = {
 						return "err";
 					});
 			} else {
+				ipcRenderer.send("report-Notification", report);
+
 				document.getElementById("report-overview-number").innerText = TREM.Localization.getString(report.loc.startsWith("地震資訊") ? "Report_Title_Local" : (report.no % 1000 ? report.no : "Report_Title_Small"));
 				document.getElementById("report-overview-location").innerText = report.loc;
 				const time = new Date(new Date(report.time).toLocaleString("en-US", { hourCycle: "h23", timeZone: "Asia/Taipei" }));

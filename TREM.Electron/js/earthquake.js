@@ -3099,6 +3099,7 @@ function ReportGET(badcatch = false) {
 							if (ans.length != 0) {
 								for (let i = 0; i < ans.length; i++) {
 									const id = ans[i].id;
+									ans[i].no = id.split("-")[0];
 
 									for (let _i = 0; _i < _report_data.length; _i++)
 										if (_report_data[_i]) {
@@ -3122,6 +3123,8 @@ function ReportGET(badcatch = false) {
 														_report_data.splice(_i, 1);
 
 												}
+
+												if (!_report_data[_i].no) _report_data[_i].no = _report_data[_i].id.split("-")[0];
 
 											} else if (_report_data[_i].identifier) {
 												if (_report_data[_i].identifier === id)
@@ -3288,6 +3291,7 @@ function ReportGET(badcatch = false) {
 							if (ans.length != 0) {
 								for (let i = 0; i < ans.length; i++) {
 									const id = ans[i].id;
+									ans[i].no = id.split("-")[0];
 
 									for (let _i = 0; _i < _report_data.length; _i++)
 										if (_report_data[_i]) {
@@ -3311,6 +3315,8 @@ function ReportGET(badcatch = false) {
 														_report_data.splice(_i, 1);
 
 												}
+
+												if (!_report_data[_i].no) _report_data[_i].no = _report_data[_i].id.split("-")[0];
 
 											} else if (_report_data[_i].identifier) {
 												if (_report_data[_i].identifier === id)
@@ -3691,7 +3697,11 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 			else
 				msg = report.loc;
 
-		if (report.ID) if (report.ID.length != 0) star += "↺ ";
+		if (report.ID) {
+			if (report.ID.length != 0) star += "↺ ";
+		} else if (report.trem) {
+			if (report.trem != 1000) star += "↺ ";
+		}
 
 		if (report.earthquakeNo) {
 			if (report.earthquakeNo % 1000 != 0) star += "✩ ";
@@ -4950,14 +4960,19 @@ function FCMdata(json, Unit) {
 		Report_GET();
 		stopReplaybtn();
 	} else if (json.type == "report") {
-		const report = json.raw;
+		const report = json.data;
+		// const report = json.raw;
 		const location = report.loc.match(/(?<=位於).+(?=\))/);
+		const MaxareaName = Object.keys(report.list)[0];
+		const MaxstationName = Object.keys(report.list[MaxareaName].town)[0];
+		report.int = report.list[MaxareaName].int;
+		report.no = report.id.split("-")[0];
 
 		if (report.id.match(/-/g).length === 3 && setting["report.onlycwachangeView"]) {
 			if (!win.isFocused())
 				new Notification("地震報告",
 					{
-						body   : `${location}發生規模 ${report.magnitudeValue.toFixed(1)} 有感地震，最大震度${report.data[0].areaName}${report.data[0].eqStation[0].stationName}${TREM.Constants.intensities[report.data[0].eqStation[0].stationIntensity].text}。`,
+						body   : `${location}發生規模 ${report.mag.toFixed(1)} 有感地震，最大震度${MaxareaName}${MaxstationName}${TREM.Constants.intensities[report.list[MaxareaName].town[MaxstationName].int].text}。`,
 						icon   : "../TREM.ico",
 						silent : win.isFocused(),
 					});
@@ -4967,7 +4982,7 @@ function FCMdata(json, Unit) {
 			setTimeout(() => {
 				ipcRenderer.send("screenshotEEW", {
 					Function : "report",
-					ID       : json.earthquakeNo,
+					ID       : json.earthquakeNo ?? report.id,
 					Version  : 1,
 					Time     : NOW().getTime(),
 					Shot     : 1,
@@ -5034,7 +5049,7 @@ function FCMdata(json, Unit) {
 				if (!win.isFocused())
 					new Notification("地震報告",
 						{
-							body   : `${location}發生規模 ${report.magnitudeValue.toFixed(1)} 有感地震，最大震度${report.data[0].areaName}${report.data[0].eqStation[0].stationName}${TREM.Constants.intensities[report.data[0].eqStation[0].stationIntensity].text}。`,
+							body   : `${location}發生規模 ${report.mag.toFixed(1)} 有感地震，最大震度${MaxareaName}${MaxstationName}${TREM.Constants.intensities[report.list[MaxareaName].town[MaxstationName].int].text}。`,
 							icon   : "../TREM.ico",
 							silent : win.isFocused(),
 						});
