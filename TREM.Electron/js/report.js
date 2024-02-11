@@ -1113,6 +1113,50 @@ TREM.Report = {
 			} else {
 				ipcRenderer.send("report-Notification", report);
 
+				if (!report.Max_Level) {
+					let Max_Level = 0;
+					let Max_Level_areaName = "";
+					let Max_Level_stationName = "";
+					let Max_Level_distance = Number.POSITIVE_INFINITY;
+
+					for (let index = 0, keys = Object.keys(report.list), n = keys.length; index < n; index++) {
+						const areaName = keys[index];
+
+						if (Max_Level < report.list[areaName].int) {
+							Max_Level = report.list[areaName].int;
+							Max_Level_areaName = areaName;
+							Max_Level_distance = Number.POSITIVE_INFINITY;
+						}
+
+						for (let station_index = 0, station_keys = Object.keys(report.list[areaName].town), o = station_keys.length; station_index < o; station_index++) {
+							const station_name = station_keys[station_index];
+							const station = report.list[areaName].town[station_name];
+							const distance = TREM.Utils.twoPointDistance(
+								{ lat: report.lat, lon: report.lon },
+								{ lat: station.lat, lon: station.lon },
+							).toFixed(2);
+							report.list[areaName].town[station_name].distance = distance;
+
+							if (Max_Level_distance > parseFloat(distance))
+								if (Max_Level_areaName === areaName) {
+									if (Max_Level === station.int) {
+										Max_Level_stationName = station_name;
+										Max_Level_distance = parseFloat(distance);
+									}
+								} else if (Max_Level === station.int) {
+									Max_Level_areaName = areaName;
+									Max_Level_stationName = station_name;
+									Max_Level_distance = parseFloat(distance);
+								}
+
+						}
+					}
+
+					report.Max_Level = Max_Level;
+					report.Max_Level_areaName = Max_Level_areaName;
+					report.Max_Level_stationName = Max_Level_stationName;
+				}
+
 				document.getElementById("report-overview-number").innerText = TREM.Localization.getString(report.loc.startsWith("地震資訊") ? "Report_Title_Local" : (report.no % 1000 ? report.no : "Report_Title_Small"));
 				document.getElementById("report-overview-location").innerText = report.loc;
 				const time = new Date(new Date(report.time).toLocaleString("en-US", { hourCycle: "h23", timeZone: "Asia/Taipei" }));
