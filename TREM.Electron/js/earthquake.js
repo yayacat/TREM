@@ -4960,7 +4960,7 @@ function FCMdata(json, Unit) {
 		Report_GET();
 		stopReplaybtn();
 	} else if (json.type == "report") {
-		const report = json.data;
+		const report = json.data[0];
 		// const report = json.raw;
 		const location = report.loc.match(/(?<=位於).+(?=\))/);
 		const MaxareaName = Object.keys(report.list)[0];
