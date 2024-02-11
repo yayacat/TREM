@@ -5006,7 +5006,7 @@ function FCMdata(json, Unit) {
 					win.setAlwaysOnTop(false);
 				}
 		} else if (!setting["report.onlycwachangeView"]) {
-			if (report.location.startsWith("地震資訊")) {
+			if (report.loc.startsWith("地震資訊")) {
 				if (api_key_verify && setting["report.getInfo"]) {
 					// if (!win.isFocused())
 					// 	new Notification("地震報告",
