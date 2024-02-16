@@ -1,6 +1,6 @@
 {
   "name": "tremv",
-  "version": "6.1.84",
+  "version": "6.1.85",
   "description": "Taiwan Real-time Earthquake Monitoring Variety ( 臺灣即時地震監測變體 )",
   "main": "main.js",
   "homepage": "https://exptech.com.tw/",
@@ -88,6 +88,7 @@
     "electron-updater": "^6.1.7",
     "expose-gc": "^1.0.0",
     "jquery": "3.7.1",
+    "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
     "leaflet-edgebuffer": "^1.0.6",
     "leaflet-geojson-vt": "github:ExpTechTW/leaflet-geojson-vt",

@@ -11,6 +11,8 @@ const bytenode = require("bytenode");
 const Route = require("../js/route.js");
 const route = new Route();
 
+const JSZip = require("jszip");
+
 TREM.Audios = {
 	pga1   : new Audio("../audio/PGA1.wav"),
 	pga2   : new Audio("../audio/PGA2.wav"),
@@ -110,6 +112,7 @@ let Response = {};
 let replay = 0;
 let replayT = 0;
 let replayD = false;
+let replayF = false;
 let replayTemp = 0;
 let replaydir = 0;
 let replaytestEEW = 0;
@@ -1007,7 +1010,7 @@ async function init() {
 				let GetDataState = "";
 				let Warn = "";
 
-				// if (!HTTP) Warn += "0";
+				if (!HTTP) Warn += "0";
 
 				if (!WS) Warn += "1";
 
@@ -1653,25 +1656,16 @@ function PGAMain() {
 				PGAMainbkup();
 			}
 		}, 1_000);
-	} else {
+	} else if (!replayF) {
 		Timers.eew_clock = setInterval(() => {
 			const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
 
 			if (ReplayTime != 0 && TREM.Report.replayHttp) {
-				const now = new Date(ReplayTime);
-				const YYYY = now.getFullYear();
-				const MM = (now.getMonth() + 1).toString().padStart(2, "0");
-				const DD = now.getDate().toString().padStart(2, "0");
-				const hh = now.getHours().toString().padStart(2, "0");
-				const mm = now.getMinutes().toString().padStart(2, "0");
-				const ss = now.getSeconds().toString().padStart(2, "0");
-				const t = `${YYYY}${MM}${DD}${hh}${mm}${ss}`;
-				const url1 = getapiequrl + t + "?type=all";
 				const controller1 = new AbortController();
 				setTimeout(() => {
 					controller1.abort();
 				}, 2500);
-				fetch(url1, { signal: controller1.signal }).then((res2) => {
+				fetch(route.eewReplay(1, ReplayTime * 1000), { signal: controller1.signal }).then((res2) => {
 					if (res2.ok) {
 						res2.json().then(res3 => {
 							if (controller1.signal.aborted || res3 == undefined)
@@ -1799,7 +1793,7 @@ function PGAMain() {
 								Ping = "🔒";
 						}
 					} else if (!replayD) {
-						const url = route.rts(ReplayTime);
+						const url = route.rtsReplay(1, ReplayTime * 1000);
 						// + "&key=" + setting["api.key"]
 						const controller = new AbortController();
 						setTimeout(() => {
@@ -1893,27 +1887,18 @@ function PGAMainbkup() {
 				PGAMain();
 			}
 		}, 1_000);
-	} else {
+	} else if (!replayF) {
 		Timers.eew_clock = setInterval(() => {
 			const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
 
 			if (ReplayTime != 0 && TREM.Report.replayHttp) {
-				const now = new Date(ReplayTime);
-				const YYYY = now.getFullYear();
-				const MM = (now.getMonth() + 1).toString().padStart(2, "0");
-				const DD = now.getDate().toString().padStart(2, "0");
-				const hh = now.getHours().toString().padStart(2, "0");
-				const mm = now.getMinutes().toString().padStart(2, "0");
-				const ss = now.getSeconds().toString().padStart(2, "0");
-				const t = `${YYYY}${MM}${DD}${hh}${mm}${ss}`;
-				const url1 = getapiequrl + t + "?type=all";
 				const controller1 = new AbortController();
 				setTimeout(() => {
 					controller1.abort();
 				}, 2500);
 				axios({
 					method : "get",
-					url    : url1,
+					url    : route.eewReplay(1, ReplayTime * 1000),
 				}).then((res2) => {
 					if (res2.ok) {
 						res2.json().then(res3 => {
@@ -2042,7 +2027,7 @@ function PGAMainbkup() {
 								Ping = "🔒";
 						}
 					} else if (!replayD) {
-						const url = route.rts(ReplayTime);
+						const url = route.rtsReplay(1, ReplayTime * 1000);
 						// + "&key=" + setting["api.key"]
 						axios({
 							method : "get",
@@ -2200,9 +2185,10 @@ function handler(Json) {
 			else amount = +current_data.pga;
 
 			if (amount > current_station_data.MaxPGA) current_station_data.MaxPGA = amount;
-			intensity = ((Alert && Json.Alert) || (rts_key_verify && setting["Real-time.websocket"] === "yayacat" && current_data.alert)) ? Math.round(current_data.i)
-				: (NOW().getTime() - current_data.TS * 1000 > 5000) ? "NA"
-					: 0;
+			intensity = (rts_key_verify && Alert) ? Math.round(current_data.I)
+				: (current_data.i >= 0) ? Math.round(current_data.i)
+					: (NOW().getTime() - current_data.TS * 1000 > 5000) ? "NA"
+						: 0;
 			// : (amount >= 800) ? 9
 			// 	: (amount >= 440) ? 8
 			// 		: (amount >= 250) ? 7
@@ -2244,7 +2230,7 @@ function handler(Json) {
 				target_count++;
 			}
 
-			station_tooltip = `<div>${keys[index]}</div><div>${current_station_data.Loc}</div><div>${amount}</div><div>${current_data.i}</div>`;
+			station_tooltip = `<div>${keys[index]}</div><div>${current_station_data.Loc}</div><div>${amount}</div><div>${current_data.v ?? current_data.pgv}</div><div>${current_data.i}</div>`;
 		}
 
 		if (current_data != undefined || (rts_key_verify && !setting["sleep.mode"]) || replay != 0) {
@@ -2435,80 +2421,81 @@ function handler(Json) {
 
 				if (!win.isFocused()) win.flashFrame(true);
 
-				TREM.MapIntensity.trem = false;
-				TREM.MapIntensity.MaxI = max_intensity;
-				Report = Json_Time;
-				Report_GET();
+				// TREM.MapIntensity.trem = false;
+				// TREM.MapIntensity.MaxI = max_intensity;
+				// Report = Json_Time;
+				// Report_GET();
 				intensitytag = max_intensity;
 			}
-		} else if (NA999 != "Y" && NA0999 != "Y" && intensitytest > -1 && amount < 999) {
-			if (uuid.split("-")[2] == "7735548")
-				current_station_data.PGA = 7735548;
-			else if (uuid.split("-")[2] == "13379360")
-				current_station_data.PGA = 13379360;
-
-			if ((detected_list[current_station_data.PGA]?.intensity ?? -1) < intensitytest)
-				if (setting["Real-time.alert"] && alert_key_verify && storage.getItem("rts_alert")) {
-					detected_list[current_station_data.PGA] ??= {
-						intensity : intensitytest,
-						time      : NOW().getTime(),
-					};
-					new Notification(`🐈 測站反應，${station[uuid].area}`, {
-						body   : `${uuid}\nPGA: ${amount} gal 最大震度: ${IntensityI(intensitytest)}\n時間:${timeconvert(now).format("YYYY/MM/DD HH:mm:ss")}\n${station[uuid].Loc}`,
-						icon   : "../TREM.ico",
-						silent : win.isFocused(),
-					});
-					const _intensity = `${IntensityI(intensitytest)}級`;
-					Json_temp[uuid.split("-")[2]].alert = true;
-					Json_temp.Alert = true;
-
-					if (speecd_use) {
-						TREM.speech.speak({ text: `測站反應，${station[uuid].area}` });
-						TREM.speech.speak({ text: `最大震度，${_intensity.replace("-級", "弱").replace("+級", "強")}` });
-					}
-
-					if ((detected_list[current_station_data.PGA].intensity ?? 0) < intensitytest)
-						detected_list[current_station_data.PGA].intensity = intensitytest;
-
-					if (Json_temp.area.length) Json_temp.area.push(station[uuid].area);
-					else Json_temp.area = [station[uuid].area];
-
-					TREM.MapArea2.setArea(Json_temp);
-
-					setTimeout(() => {
-						ipcRenderer.send("screenshotEEW", {
-							Function : "station",
-							ID       : 1,
-							Version  : 1,
-							Time     : NOW().getTime(),
-							Shot     : 1,
-						});
-					}, 300);
-
-					if (setting["Real-time.show"]) win.showInactive();
-
-					if (setting["Real-time.cover"])
-						if (!win.isFullScreen()) {
-							win.setAlwaysOnTop(true);
-							win.focus();
-							win.setAlwaysOnTop(false);
-						}
-
-					if (current_data.a) level_list[uuid] = current_data.a;
-
-					if (current_data.pga) level_list[uuid] = current_data.pga;
-					target_count++;
-
-					if (replay == 0) {
-						TREM.MapIntensity.trem = true;
-						TREM.MapIntensity.MaxI = intensitytest;
-						Report = NOW().getTime();
-						Report_GET();
-					}
-				}
-
-			intensitytag = -1;
 		}
+		//  else if (NA999 != "Y" && NA0999 != "Y" && intensitytest > -1 && amount < 999) {
+		// 	if (uuid.split("-")[2] == "7735548")
+		// 		current_station_data.PGA = 7735548;
+		// 	else if (uuid.split("-")[2] == "13379360")
+		// 		current_station_data.PGA = 13379360;
+
+		// 	if ((detected_list[current_station_data.PGA]?.intensity ?? -1) < intensitytest)
+		// 		if (setting["Real-time.alert"] && alert_key_verify && storage.getItem("rts_alert")) {
+		// 			detected_list[current_station_data.PGA] ??= {
+		// 				intensity : intensitytest,
+		// 				time      : NOW().getTime(),
+		// 			};
+		// 			new Notification(`🐈 測站反應，${station[uuid].area}`, {
+		// 				body   : `${uuid}\nPGA: ${amount} gal 最大震度: ${IntensityI(intensitytest)}\n時間:${timeconvert(now).format("YYYY/MM/DD HH:mm:ss")}\n${station[uuid].Loc}`,
+		// 				icon   : "../TREM.ico",
+		// 				silent : win.isFocused(),
+		// 			});
+		// 			const _intensity = `${IntensityI(intensitytest)}級`;
+		// 			Json_temp[uuid.split("-")[2]].alert = true;
+		// 			Json_temp.Alert = true;
+
+		// 			if (speecd_use) {
+		// 				TREM.speech.speak({ text: `測站反應，${station[uuid].area}` });
+		// 				TREM.speech.speak({ text: `最大震度，${_intensity.replace("-級", "弱").replace("+級", "強")}` });
+		// 			}
+
+		// 			if ((detected_list[current_station_data.PGA].intensity ?? 0) < intensitytest)
+		// 				detected_list[current_station_data.PGA].intensity = intensitytest;
+
+		// 			if (Json_temp.area.length) Json_temp.area.push(station[uuid].area);
+		// 			else Json_temp.area = [station[uuid].area];
+
+		// 			TREM.MapArea2.setArea(Json_temp);
+
+		// 			setTimeout(() => {
+		// 				ipcRenderer.send("screenshotEEW", {
+		// 					Function : "station",
+		// 					ID       : 1,
+		// 					Version  : 1,
+		// 					Time     : NOW().getTime(),
+		// 					Shot     : 1,
+		// 				});
+		// 			}, 300);
+
+		// 			if (setting["Real-time.show"]) win.showInactive();
+
+		// 			if (setting["Real-time.cover"])
+		// 				if (!win.isFullScreen()) {
+		// 					win.setAlwaysOnTop(true);
+		// 					win.focus();
+		// 					win.setAlwaysOnTop(false);
+		// 				}
+
+		// 			if (current_data.a) level_list[uuid] = current_data.a;
+
+		// 			if (current_data.pga) level_list[uuid] = current_data.pga;
+		// 			target_count++;
+
+		// 			if (replay == 0) {
+		// 				TREM.MapIntensity.trem = true;
+		// 				TREM.MapIntensity.MaxI = intensitytest;
+		// 				Report = NOW().getTime();
+		// 				Report_GET();
+		// 			}
+		// 		}
+
+		// 	intensitytag = -1;
+		// }
 
 		if (MAXPGA.pga < amount && amount < 999 && Level != "NA") {
 			MAXPGA.pga = amount;
@@ -2543,38 +2530,38 @@ function handler(Json) {
 		$("#level").text(`level: ${level}`);
 		$("#target").text(`target: ${target_count}`);
 
-		if (MaxIntensity2 > TREM.MapIntensity.MaxI)
-			if (setting["Real-time.alert"] && alert_key_verify && setting["Real-time.websocket"] === "yayacat")
-				if (replay == 0) {
-					TREM.MapIntensity.trem = true;
-					TREM.MapIntensity.MaxI = MaxIntensity2;
+		// if (MaxIntensity2 > TREM.MapIntensity.MaxI)
+		// 	if (setting["Real-time.alert"] && alert_key_verify && setting["Real-time.websocket"] === "yayacat")
+		// 		if (replay == 0) {
+		// 			TREM.MapIntensity.trem = true;
+		// 			TREM.MapIntensity.MaxI = MaxIntensity2;
 
-					changeView("main", "#mainView_btn");
+		// 			changeView("main", "#mainView_btn");
 
-					if (Report === 0) Report = NOW().getTime();
-					Report_GET();
+		// 			if (Report === 0) Report = NOW().getTime();
+		// 			Report_GET();
 
-					if (setting["Real-time.show"]) win.showInactive();
+		// 			if (setting["Real-time.show"]) win.showInactive();
 
-					if (setting["Real-time.cover"])
-						if (!win.isFullScreen()) {
-							win.setAlwaysOnTop(true);
-							win.focus();
-							win.setAlwaysOnTop(false);
-						}
+		// 			if (setting["Real-time.cover"])
+		// 				if (!win.isFullScreen()) {
+		// 					win.setAlwaysOnTop(true);
+		// 					win.focus();
+		// 					win.setAlwaysOnTop(false);
+		// 				}
 
-					if (!win.isFocused()) win.flashFrame(true);
+		// 			if (!win.isFocused()) win.flashFrame(true);
 
-					setTimeout(() => {
-						ipcRenderer.send("screenshotEEW", {
-							Function : "station",
-							ID       : 1,
-							Version  : 1,
-							Time     : NOW().getTime(),
-							Shot     : 1,
-						});
-					}, 300);
-				}
+		// 			setTimeout(() => {
+		// 				ipcRenderer.send("screenshotEEW", {
+		// 					Function : "station",
+		// 					ID       : 1,
+		// 					Version  : 1,
+		// 					Time     : NOW().getTime(),
+		// 					Shot     : 1,
+		// 				});
+		// 			}, 300);
+		// 		}
 	} else {
 		MaxIntensity2 = -1;
 		level_list = {};
@@ -3784,9 +3771,9 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 		roll.prepend(Div);
 		investigation = true;
 	} else {
-		const timed = report.originTime ? (new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000) : (report.time - 5000);
+		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000;
 		const timed_hold = String(timed);
-		fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), timed_hold)}/${timed}.trem`, (err) => {
+		fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), timed_hold)}/${timed / 1000}.trem`, (err) => {
 			if (!err) {
 				report.download = true;
 				TREM.Report.cache.set(report.identifier ?? report.id, report);
@@ -3968,6 +3955,94 @@ ipcRenderer.on("Olddatabase_report", (event, json) => {
 	TREM.Report.setView("eq-report-overview", json);
 	changeView("report", "#reportView_btn");
 });
+
+// #region 檔案
+function openFileWindow() {
+	ipcRenderer.send("openFileWindow");
+	toggleNav(false);
+}
+
+ipcRenderer.on("readReplayFile", (event, filePaths) => {
+	try {
+		fs.readFile(filePaths[0], async (err, deta) => {
+			if (err) throw err;
+			await JSZip.loadAsync(deta).then(async (zip) => {
+				const replayData = [];
+
+				for (let i = 0, k = Object.keys(zip.files), n = k.length; i < n; i++) {
+					const filename = k[i];
+					const content = await zip.files[filename].async("string");
+					const data = JSON.parse(content);
+					data.rts.replay = true;
+					data.eew.forEach((e) => (e.replay = true));
+					data.time = +filename;
+					replayData.push(data);
+				}
+
+				const replayLength = replayData.length;
+				let replayPercentage = 0;
+				console.log(`[Replay] Loaded ${replayLength} frames.`);
+
+				let replay_time = NOW().getTime();
+
+				const emitEvents = () => {
+					const current = replayData.shift();
+
+					replayTemp = current.rts.time;
+					handler(current.rts);
+					current.eew.forEach((e) => {
+						if (e.serial == 1) replay_time = NOW().getTime() - 3000;
+
+						e.replay_time = e.eq.time;
+						e.replay_timestamp = e.eq.time;
+						e.time = replay_time;
+						e.timestamp = NOW().getTime();
+						e.Unit = (e.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
+							: (e.author == "scdzj") ? "四川省地震局 (SCDZJ)"
+								: (e.author == "nied") ? "防災科学技術研究所 (NIED)"
+									: (e.author == "kma") ? "기상청(KMA)"
+										: (e.author == "jma") ? "気象庁(JMA)"
+											: (e.author == "cwa") ? "中央氣象署 (CWA)"
+												: (e.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
+													: (e.author == "trem" && e.serial > 3) ? "TREM(實驗功能僅供參考)"
+														: (e.author == "trem" && e.serial <= 3) ? "NSSPE(無震源參數推算)"
+															: (e.Unit) ? e.Unit : "";
+						FCMdata(e, "cache");
+					});
+
+					const newReplayPercentage = ~~(
+						(1 - replayData.length / replayLength) * 10
+					);
+
+					if (newReplayPercentage > replayPercentage)
+						console.log(`[Replay] ${`${newReplayPercentage * 10}`.padStart(3, " ")}% [${"#".repeat(newReplayPercentage).padEnd(10, ".")}] | Frame ${replayLength - replayData.length}`);
+
+					replayPercentage = newReplayPercentage;
+
+					Timers.replay = setTimeout(
+						emitEvents,
+						replayData[0] ? replayData[0].time - current.time : 1_000,
+					);
+				};
+
+				replayD = false;
+				replayF = true;
+				replay = replayData[0].time;
+				replayTemp = replay;
+				replayT = NOW().getTime();
+				ReportTag = 0;
+				console.debug("ReportTag: ", ReportTag);
+				Report_GET();
+				stopReplaybtn();
+				PGAMain();
+				emitEvents();
+			});
+		});
+	} catch (error) {
+		console.error("[Replay] Exception thrown while loading replay.", error);
+	}
+});
+
 
 // #region 設定
 function openSettingWindow() {
@@ -4210,7 +4285,7 @@ const stopReplay = function() {
 
 	if (Object.keys(detected_list).length != 0) PGACancel = true;
 
-	if (replay != 0 || Report != 0 || replayTemp != 0 || replayT != 0 || replaydir != 0 || replayD) {
+	if (replay != 0 || Report != 0 || replayTemp != 0 || replayT != 0 || replaydir != 0 || replayD || replayF) {
 		intensitytag = -1;
 		replay = 0;
 		Report = 0;
@@ -4219,8 +4294,14 @@ const stopReplay = function() {
 		replayT = 0;
 		replaydir = 0;
 		replayD = false;
-		clearInterval(Timers.rts_clock);
-		clearInterval(Timers.eew_clock);
+		replayF = false;
+
+		if (Timers.rts_clock) clearInterval(Timers.rts_clock);
+
+		if (Timers.eew_clock) clearInterval(Timers.eew_clock);
+
+		if (Timers.replay) clearInterval(Timers.replay);
+
 		TREM.Report.replayHttp = false;
 		PGAMain();
 		Report_GET();
@@ -5112,8 +5193,8 @@ function FCMdata(json, Unit) {
 							: (json.author == "jma") ? "気象庁(JMA)"
 								: (json.author == "cwa") ? "中央氣象署 (CWA)"
 									: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
-										: (json.author == "trem" && json.number > 3) ? "TREM(實驗功能僅供參考)"
-											: (json.author == "trem" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+										: (json.author == "trem" && json.serial > 3) ? "TREM(實驗功能僅供參考)"
+											: (json.author == "trem" && json.serial <= 3) ? "NSSPE(無震源參數推算)"
 												: (json.Unit) ? json.Unit : "";
 		} else {
 			if (
@@ -5165,8 +5246,8 @@ ipcRenderer.on("Olddatabase_eew", (event, json) => {
 						: (json.author == "jma") ? "気象庁(JMA)"
 							: (json.author == "cwa") ? "中央氣象署 (CWA)"
 								: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
-									: (json.author == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
-										: (json.author == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+									: (json.author == "trem" && json.serial > 3) ? "TREM(實驗功能僅供參考)"
+										: (json.author == "trem" && json.serial <= 3) ? "NSSPE(無震源參數推算)"
 											: (json.Unit) ? json.Unit : "";
 	else
 		json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
@@ -5224,10 +5305,10 @@ TREM.Earthquake.on("eew", (data) => {
 
 		if (data.eq.loc) data.location = data.eq.loc;
 
-		if (data.eq.time) data.time = data.eq.time;
+		if (data.eq.time && !data.time) data.time = data.eq.time;
 	}
 
-	if (data.type == "trem-eew" && (data.lat == null && data.lon == null)) return;
+	if ((data.type == "trem-eew" || data.type == "trem") && (data.lat == null && data.lon == null)) return;
 
 	if (data.number == 1 && setting["link.on"] && !link_on) {
 		link_on = true;
@@ -5332,7 +5413,7 @@ TREM.Earthquake.on("eew", (data) => {
 	}
 
 	if (setting["dev.mode"])
-		if (data.type == "trem-eew" || data.type == "eew-cwb" || data.type == "eew-fjdzj") {
+		if ((data.type == "trem-eew" || data.type == "trem") || data.type == "eew-cwb" || data.type == "eew-fjdzj") {
 			console.debug(MaxIntensity);
 		} else {
 			const int = TREM.Utils.PGAToIntensity(
@@ -5447,7 +5528,7 @@ TREM.Earthquake.on("eew", (data) => {
 
 		eewt.id = data.id;
 
-		if (data.type != "trem-eew")
+		if (data.type != "trem-eew" || data.type != "trem")
 			if (setting["audio.eew"] && Alert) {
 				log("Playing Audio > eew", 1, "Audio", "eew");
 				dump({ level: 0, message: "Playing Audio > eew", origin: "Audio" });
@@ -5476,7 +5557,7 @@ TREM.Earthquake.on("eew", (data) => {
 			}
 	}
 
-	if (data.type != "trem-eew")
+	if (data.type != "trem-eew" || data.type != "trem")
 		if (MaxIntensity.value >= 5) {
 			data.Alert = true;
 
@@ -5499,7 +5580,7 @@ TREM.Earthquake.on("eew", (data) => {
 	let stamp = 0;
 
 	if ((EarthquakeList[data.id].number ?? 1) < data.number) {
-		if (data.type == "trem-eew" && setting["audio.eew"] && Alert) {
+		if ((data.type == "trem-eew" || data.type == "trem") && setting["audio.eew"] && Alert) {
 			log("Playing Audio > note", 1, "Audio", "eew");
 			dump({ level: 0, message: "Playing Audio > note", origin: "Audio" });
 			TREM.Audios.note.play();
@@ -5533,7 +5614,7 @@ TREM.Earthquake.on("eew", (data) => {
 		eew[data.id].arrive = "";
 	}
 
-	if (data.type != "trem-eew")
+	if (data.type != "trem-eew" || data.type != "trem")
 		if (eew[data.id].Second == -1 || eew[data.id].value < eew[data.id].Second)
 			if (setting["audio.eew"] && Alert)
 				if (eew[data.id].arrive == "") {
@@ -5622,7 +5703,7 @@ TREM.Earthquake.on("eew", (data) => {
 	INFO[find] = {
 		ID              : data.id,
 		alert_number    : data.number,
-		alert_intensity : (data.type == "trem-eew") ? data.max ?? 0 : MaxIntensity.value,
+		alert_intensity : (data.type == "trem-eew" || data.type == "trem") ? data.max ?? 0 : MaxIntensity.value,
 		alert_location  : data.location ?? "未知區域",
 		alert_time      : time,
 		alert_sTime     : Math.floor(data.time + _speed(data.depth, distance).Stime * 1000),
@@ -5764,6 +5845,12 @@ TREM.Earthquake.on("eew", (data) => {
 					msg = msg.replace("%Provider%", "기상청(KMA)");
 				else if (data.type == "trem-eew" && data.number <= 3)
 					msg = msg.replace("%Provider%", "NSSPE(無震源參數推算)");
+				else if (data.type == "trem-eew" && data.number > 3)
+					msg = msg.replace("%Provider%", "TREM(實驗功能僅供參考)");
+				else if (data.type == "trem" && data.serial <= 3)
+					msg = msg.replace("%Provider%", "NSSPE(無震源參數推算)");
+				else if (data.type == "trem" && data.serial > 3)
+					msg = msg.replace("%Provider%", "TREM(實驗功能僅供參考)");
 				else
 					msg = msg.replace("%Provider%", data.Unit);
 
@@ -5787,7 +5874,7 @@ TREM.Earthquake.on("eew", (data) => {
 					log(error, 3, "Webhook", "eew");
 					dump({ level: 2, message: error, origin: "Webhook" });
 				});
-			} else if (setting["trem-eew.No-Notification"] && data.type != "trem-eew") {
+			} else if (setting["trem-eew.No-Notification"] && (data.type != "trem-eew" || data.type != "trem")) {
 				const Now1 = NOW().getFullYear()
 					+ "/" + (NOW().getMonth() + 1)
 					+ "/" + NOW().getDate()
@@ -6054,7 +6141,7 @@ function main(data) {
 		showDialogtime.close();
 	}
 
-	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && data.type == "trem-eew") || data.type != "trem-eew")) {
+	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && (data.type == "trem-eew" || data.type == "trem")) || (data.type != "trem-eew" || data.type != "trem"))) {
 		if (data.depth != null) {
 
 			/**
@@ -6481,7 +6568,7 @@ function tsunami_color_int(color) {
 }
 
 function clear(ID, type) {
-	// if (type != "trem-eew") {
+	// if (type != "trem-eew" || type != "trem") {
 	if (EarthquakeList[ID].CircleS != undefined) EarthquakeList[ID].CircleS = EarthquakeList[ID].CircleS.remove();
 
 	if (EarthquakeList[ID].CircleP != undefined) EarthquakeList[ID].CircleP = EarthquakeList[ID].CircleP.remove();

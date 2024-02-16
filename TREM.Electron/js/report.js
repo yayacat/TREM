@@ -354,22 +354,14 @@ TREM.Report = {
 					},
 				};
 				const gettime = time / 1000;
-				const now = new Date(time);
-				const YYYY = now.getFullYear();
-				const MM = (now.getMonth() + 1).toString().padStart(2, "0");
-				const DD = now.getDate().toString().padStart(2, "0");
-				const hh = now.getHours().toString().padStart(2, "0");
-				const mm = now.getMinutes().toString().padStart(2, "0");
-				const ss = now.getSeconds().toString().padStart(2, "0");
-				const t = `${YYYY}${MM}${DD}${hh}${mm}${ss}`;
-				fetch(`https://api.exptech.com.tw/api/v1/trem/rts/${t}`)
+				fetch(this.route.rtsReplay(1, time))
 					.then((res) => {
 						if (res.ok) {
 							// console.debug(res);
 							res.json().then(res1 => {
 								// console.debug(res1);
 								result.rts = res1;
-								fetch(`https://api.exptech.com.tw/api/v1/eq/eew/${t}?type=all`)
+								fetch(this.route.eewReplay(1, time))
 									.then((res0) => {
 										if (res0.ok) {
 											// console.debug(res);
@@ -968,15 +960,15 @@ TREM.Report = {
 								document.getElementById("report-detail-copy").style.display = "";
 								document.getElementById("report-detail-copy").value = report.id;
 
-								document.getElementById("report-replay").value = report.id;
-								document.getElementById("report-replay-downloader").value = report.id;
+								// document.getElementById("report-replay").value = report.id;
+								// document.getElementById("report-replay-downloader").value = report.id;
 
-								if (report.trem[0]) {
-									document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem[0]}`;
-									document.getElementById("report-TREM").style.display = "";
-								} else {
-									document.getElementById("report-TREM").style.display = "none";
-								}
+								// if (report.trem[0]) {
+								// 	document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem[0]}`;
+								// 	document.getElementById("report-TREM").style.display = "";
+								// } else {
+								// 	document.getElementById("report-TREM").style.display = "none";
+								// }
 
 								const timed = (report.time - 5000);
 								const time_hold = String(timed / 1000);
@@ -1189,15 +1181,15 @@ TREM.Report = {
 				document.getElementById("report-detail-copy").style.display = "";
 				document.getElementById("report-detail-copy").value = report.id;
 
-				document.getElementById("report-replay").value = report.id;
-				document.getElementById("report-replay-downloader").value = report.id;
+				// document.getElementById("report-replay").value = report.id;
+				// document.getElementById("report-replay-downloader").value = report.id;
 
-				if (report.trem[0]) {
-					document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem[0]}`;
-					document.getElementById("report-TREM").style.display = "";
-				} else {
-					document.getElementById("report-TREM").style.display = "none";
-				}
+				// if (report.trem[0]) {
+				// 	document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem[0]}`;
+				// 	document.getElementById("report-TREM").style.display = "";
+				// } else {
+				// 	document.getElementById("report-TREM").style.display = "none";
+				// }
 
 				const timed = (report.time - 5000);
 				const time_hold = String(timed / 1000);

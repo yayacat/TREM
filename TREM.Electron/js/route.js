@@ -26,6 +26,8 @@ class Route {
 		this.key = options.key ?? "";
 		this.random_max_num = options.random_max_num ?? 4;
 		this.random_ws_num = this.randomWSNum();
+		this.ws_num = -1;
+		this.ws_num_bk = -1;
 	}
 
 	/**
@@ -41,6 +43,20 @@ class Route {
    */
 	randomWSNum() {
 		return Math.ceil(Math.random() * this.random_max_num);
+	}
+
+	/**
+   * @returns {ws_num,ws_num_bk}
+   */
+	random_num() {
+		let ws_num, ws_num_bk;
+
+		do {
+			ws_num = this.randomWSNum();
+			ws_num_bk = this.randomWSNum();
+		} while (ws_num === ws_num_bk);
+
+		return { ws_num, ws_num_bk };
 	}
 
 	/**
@@ -86,6 +102,37 @@ class Route {
    */
 	rts(version, timestamp = 0) {
 		return this.randomBaseUrl(version) + `/trem/rts${timestamp ? `?time=${timestamp}` : ""}`;
+	}
+
+	/**
+   * @template {number} version
+   * @param {version} version
+   * @template {number} timestamp
+   * @param {timestamp} timestamp
+   * @returns {`${BaseUrl}/trem/rts/${timestamp}`}
+   */
+	rtsReplay(version, timestamp = 0) {
+		return this.randomBaseUrl(version) + `/trem/rts/${timestamp}`;
+	}
+
+	/**
+   * @template {number} version
+   * @param {version} version
+   * @returns {`${BaseUrl}/eq/eew`}
+   */
+	eew(version) {
+		return this.randomBaseUrl(version) + "/eq/eew";
+	}
+
+	/**
+   * @template {number} version
+   * @param {version} version
+   * @template {number} timestamp
+   * @param {timestamp} timestamp
+   * @returns {`${BaseUrl}/eq/eew/${timestamp}`}
+   */
+	eewReplay(version, timestamp) {
+		return this.randomBaseUrl(version) + `/eq/eew/${timestamp}`;
 	}
 }
 

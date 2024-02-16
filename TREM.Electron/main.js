@@ -1,4 +1,4 @@
-const { BrowserWindow, Menu, Notification, app: TREM, Tray, ipcMain, nativeImage, shell, globalShortcut } = require("electron");
+const { BrowserWindow, Menu, Notification, app: TREM, Tray, ipcMain, nativeImage, shell, globalShortcut, dialog } = require("electron");
 const Configuration = require("./Configuration/Configuration");
 const { autoUpdater } = require("electron-updater");
 const fs = require("fs");
@@ -495,6 +495,28 @@ ipcMain.on("reloadpage", () => {
 ipcMain.on("Mainreloadpage", () => {
 	MainWindow.reload();
 });
+
+ipcMain.on("openFileWindow", (event, arg) => {
+	dialog.showOpenDialog(MainWindow, {
+		properties: ['openFile']
+	}).then(result => {
+		console.log(result.canceled);
+		console.log(result.filePaths);
+
+		if (result.canceled) {
+			dialog.showMessageBox(MainWindow, {
+				title    : "取消???",
+				message  : "你為什麼點取消???",
+				type     : "error",
+			});
+		} else {
+			if (MainWindow) MainWindow.webContents.send("readReplayFile", result.filePaths);
+		}
+	}).catch(err => {
+		console.log(err);
+	});
+});
+
 
 ipcMain.on("openChildWindow", async (event, arg) => {
 	await createSettingWindow();

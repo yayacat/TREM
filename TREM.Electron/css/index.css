@@ -1910,6 +1910,17 @@ body:not(.darkmode) #here-marker {
 	padding-left: 4px;
 }
 
+.rt-station-tooltip > div:nth-child(4)::before {
+	content: "PGV";
+	font-weight: 400;
+	padding-right: 8px;
+}
+
+.rt-station-tooltip > div:nth-child(4)::after {
+	content: "kine";
+	padding-left: 4px;
+}
+
 .rt-station-tooltip > div:last-child::before {
 	content: var(--rt-station-intensity);
 	font-weight: 400;
