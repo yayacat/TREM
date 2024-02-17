@@ -5708,7 +5708,7 @@ TREM.Earthquake.on("eew", (data) => {
 	INFO[find] = {
 		ID              : data.id,
 		alert_number    : data.number,
-		alert_intensity : (data.type == "trem-eew" || data.author == "trem") ? data.max ? data.max : data.eq.max ?? 0 : MaxIntensity.value,
+		alert_intensity : (data.type == "trem-eew" || data.author == "trem") ? (data.max ? data.max : data.eq.max ?? 0 ): MaxIntensity.value,
 		alert_location  : data.location ?? "未知區域",
 		alert_time      : time,
 		alert_sTime     : data.depth ? Math.floor(data.time + _speed(data.depth, distance).Stime * 1000) : null,
