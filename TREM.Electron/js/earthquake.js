@@ -5308,7 +5308,7 @@ TREM.Earthquake.on("eew", (data) => {
 		if (data.eq.time && !data.time) data.time = data.eq.time;
 	}
 
-	if ((data.type == "trem-eew" || data.type == "trem") && (data.lat == null && data.lon == null)) return;
+	if ((data.type == "trem-eew" || data.author == "trem") && (data.lat == null && data.lon == null)) return;
 
 	if (data.number == 1 && setting["link.on"] && !link_on) {
 		link_on = true;
@@ -5413,7 +5413,7 @@ TREM.Earthquake.on("eew", (data) => {
 	}
 
 	if (setting["dev.mode"])
-		if ((data.type == "trem-eew" || data.type == "trem") || data.type == "eew-cwb" || data.type == "eew-fjdzj") {
+		if ((data.type == "trem-eew" || data.author == "trem") || data.type == "eew-cwb" || data.type == "eew-fjdzj") {
 			console.debug(MaxIntensity);
 		} else {
 			const int = TREM.Utils.PGAToIntensity(
@@ -5436,10 +5436,15 @@ TREM.Earthquake.on("eew", (data) => {
 
 	let Nmsg = "";
 
-	// if (data.type == "trem-eew" && data.number <= 3) {
-	// 	data.scale = null;
-	// 	data.depth = null;
-	// }
+	if (data.type == "trem-eew" && data.number <= 3) {
+		data.scale = null;
+		data.depth = null;
+	}
+
+	if (data.author == "trem" && data.serial <= 3) {
+		data.scale = null;
+		data.depth = null;
+	}
 
 	clearInterval(AudioT);
 	audio.main_lock = false;
@@ -5528,7 +5533,7 @@ TREM.Earthquake.on("eew", (data) => {
 
 		eewt.id = data.id;
 
-		if (data.type != "trem-eew" || data.type != "trem")
+		if (data.type != "trem-eew" || data.author != "trem")
 			if (setting["audio.eew"] && Alert) {
 				log("Playing Audio > eew", 1, "Audio", "eew");
 				dump({ level: 0, message: "Playing Audio > eew", origin: "Audio" });
@@ -5557,7 +5562,7 @@ TREM.Earthquake.on("eew", (data) => {
 			}
 	}
 
-	if (data.type != "trem-eew" || data.type != "trem")
+	if (data.type != "trem-eew" || data.author != "trem")
 		if (MaxIntensity.value >= 5) {
 			data.Alert = true;
 
@@ -5580,7 +5585,7 @@ TREM.Earthquake.on("eew", (data) => {
 	let stamp = 0;
 
 	if ((EarthquakeList[data.id].number ?? 1) < data.number) {
-		if ((data.type == "trem-eew" || data.type == "trem") && setting["audio.eew"] && Alert) {
+		if ((data.type == "trem-eew" || data.author == "trem") && setting["audio.eew"] && Alert) {
 			log("Playing Audio > note", 1, "Audio", "eew");
 			dump({ level: 0, message: "Playing Audio > note", origin: "Audio" });
 			TREM.Audios.note.play();
@@ -5614,7 +5619,7 @@ TREM.Earthquake.on("eew", (data) => {
 		eew[data.id].arrive = "";
 	}
 
-	if (data.type != "trem-eew" || data.type != "trem")
+	if (data.type != "trem-eew" || data.author != "trem")
 		if (eew[data.id].Second == -1 || eew[data.id].value < eew[data.id].Second)
 			if (setting["audio.eew"] && Alert)
 				if (eew[data.id].arrive == "") {
@@ -5703,11 +5708,11 @@ TREM.Earthquake.on("eew", (data) => {
 	INFO[find] = {
 		ID              : data.id,
 		alert_number    : data.number,
-		alert_intensity : (data.type == "trem-eew" || data.type == "trem") ? data.max ?? 0 : MaxIntensity.value,
+		alert_intensity : (data.type == "trem-eew" || data.author == "trem") ? (data.max ? data.max : data.eq.max ?? 0 ): MaxIntensity.value,
 		alert_location  : data.location ?? "未知區域",
 		alert_time      : time,
-		alert_sTime     : Math.floor(data.time + _speed(data.depth, distance).Stime * 1000),
-		alert_pTime     : Math.floor(data.time + _speed(data.depth, distance).Ptime * 1000),
+		alert_sTime     : data.depth ? Math.floor(data.time + _speed(data.depth, distance).Stime * 1000) : null,
+		alert_pTime     : data.depth ? Math.floor(data.time + _speed(data.depth, distance).Ptime * 1000) : null,
 		alert_local     : level.value,
 		alert_magnitude : data.scale ?? "?",
 		alert_depth     : data.depth ?? "?",
@@ -5847,9 +5852,9 @@ TREM.Earthquake.on("eew", (data) => {
 					msg = msg.replace("%Provider%", "NSSPE(無震源參數推算)");
 				else if (data.type == "trem-eew" && data.number > 3)
 					msg = msg.replace("%Provider%", "TREM(實驗功能僅供參考)");
-				else if (data.type == "trem" && data.serial <= 3)
+				else if (data.author == "trem" && data.serial <= 3)
 					msg = msg.replace("%Provider%", "NSSPE(無震源參數推算)");
-				else if (data.type == "trem" && data.serial > 3)
+				else if (data.author == "trem" && data.serial > 3)
 					msg = msg.replace("%Provider%", "TREM(實驗功能僅供參考)");
 				else
 					msg = msg.replace("%Provider%", data.Unit);
@@ -5874,7 +5879,7 @@ TREM.Earthquake.on("eew", (data) => {
 					log(error, 3, "Webhook", "eew");
 					dump({ level: 2, message: error, origin: "Webhook" });
 				});
-			} else if (setting["trem-eew.No-Notification"] && (data.type != "trem-eew" || data.type != "trem")) {
+			} else if (setting["trem-eew.No-Notification"] && (data.type != "trem-eew" || data.author != "trem")) {
 				const Now1 = NOW().getFullYear()
 					+ "/" + (NOW().getMonth() + 1)
 					+ "/" + NOW().getDate()
@@ -6141,7 +6146,7 @@ function main(data) {
 		showDialogtime.close();
 	}
 
-	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && (data.type == "trem-eew" || data.type == "trem")) || (data.type != "trem-eew" || data.type != "trem"))) {
+	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && (data.type == "trem-eew" || data.author == "trem")) || (data.type != "trem-eew" || data.author != "trem"))) {
 		if (data.depth != null) {
 
 			/**

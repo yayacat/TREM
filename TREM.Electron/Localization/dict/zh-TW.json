@@ -51,6 +51,6 @@
     "check_For_Updates": "檢查更新",
     "open_Devtool_F10": "開發者工具",
     "Notification_No_Update_Title": "沒有可用的更新",
-    "Notification_No_Update_Body": "當前v{0}\n最新v{1}",
+    "Notification_No_Update_Body": "目前v{0}\n最新v{1}",
     "Tray_Reload": "重新加載"
 }
