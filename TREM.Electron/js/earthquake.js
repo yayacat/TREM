@@ -1012,9 +1012,9 @@ async function init() {
 
 				if (!HTTP) Warn += "0";
 
-				if (!WS) Warn += "1";
+				if (!WS) Warn += `1(${ws_num})`;
 
-				if (!WS_backup) Warn += "2";
+				if (!WS_backup) Warn += `2(${ws_num_bk})`;
 
 				if (!FCM) Warn += "3";
 
@@ -1066,14 +1066,14 @@ async function init() {
 				const stationall = Object.keys(station).length;
 				const stationPercentage = Math.round(stationnow / stationall * 1000) / 10;
 
-				const formatMemoryUsage = (data) => `${Math.round(data / 1024 / 1024 * 100) / 100} MB`;
+				// const formatMemoryUsage = (data) => `${Math.round(data / 1024 / 1024 * 100) / 100} MB`;
 				const memoryData = process.memoryUsage();
-				const rss = formatMemoryUsage(memoryData.rss);
+				const rss = `${(((memoryData.rss / 1024) / 1024) / 1024).toFixed(2)} GB`;
 				// const warn = (Warn) ? "⚠️" : "";
 				const error = (testEEWerror) ? "❌" : "";
 				// const unlock = (Unlock) ? "⚡" : "";
-				$("#log").text(`${stationnow}/${stationall} | ${stationPercentage}% | ${rss}`);
-				$("#log1").text(`${stationnow}/${stationall} | ${stationPercentage}% | ${rss}`);
+				$("#log").text(`${stationnow}/${stationall} | ${stationPercentage}% | LB(${ws_num},${ws_num_bk}) | ${rss}`);
+				$("#log1").text(`${stationnow}/${stationall} | ${stationPercentage}% | LB(${ws_num},${ws_num_bk}) | ${rss}`);
 				ipcRenderer.send("TREMIntensitylog2", `${stationnow}/${stationall} | ${stationPercentage}% | ${rss}`);
 				$("#app-version").text(`${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}`);
 				$("#app-version1").text(`${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}`);
@@ -5041,7 +5041,7 @@ function FCMdata(json, Unit) {
 		Report_GET();
 		stopReplaybtn();
 	} else if (json.type == "report") {
-		const report = json.data[0];
+		const report = json.data;
 		// const report = json.raw;
 		const location = report.loc.match(/(?<=位於).+(?=\))/);
 		const MaxareaName = Object.keys(report.list)[0];
