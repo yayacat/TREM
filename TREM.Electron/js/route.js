@@ -19,7 +19,7 @@ class Route {
 
 	/**
    * @constructor
-   * @param {{version: version, key: key, random_max_num: random_max_num}} options
+   * @param {{version: version, key: key, random_max_num: random_max_num, random_ws_num: random_ws_num, ws_num: ws_num, ws_num_bk: ws_num_bk}} options
    */
 	constructor(options = {}) {
 		this.version = options.version ?? 2;
@@ -40,6 +40,7 @@ class Route {
 
 	auto_run() {
 		this.random_ws_num = this.randomWSNum();
+		return this.random_ws_num;
 	}
 
 	/**

@@ -41,6 +41,7 @@ function handleWindowControls() {
 
 const wave_count = +localStorage.getItem("displayWaveCount") ?? 8;
 
+console.log(`lb-${route.auto_run()}`);
 let ws = new WebSocket(route.randomWSBaseUrl());
 let Reconnect = 0;
 
@@ -74,6 +75,7 @@ function reconnect() {
 		ws = null;
 	}
 
+	console.log(`lb-${route.auto_run()}`);
 	ws = new WebSocket(route.randomWSBaseUrl());
 	connect(1000);
 }
@@ -222,30 +224,112 @@ const Real_time_station = () => {
 
 const fetch_files = async () => {
 	try {
-		let res;
-		const s = {};
+		// let res;
+		// const s = {};
 
-		if (app.Configuration.data["Real-time.local"]) res = require(path.resolve(__dirname, "../station.json"));
-		else res = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/station.json")).json();
-
-		if (!res) res = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/Json/earthquake/station.json")).json();
-
-		if (!res) res = await (await fetch("https://exptech.com.tw/api/v1/file?path=/resource/station.json")).json();
-
-		if (res) {
-			for (let i = 0, k = Object.keys(res), n = k.length; i < n; i++) {
-				const id = k[i];
-
-				if (res[id].Long > 118)
-					s[id.split("-")[2]] = { uuid: id, ...res[id] };
-			}
-
-			data.stations = s;
+		if (app.Configuration.data["Real-time.local"]) {
+			const station_data = require(path.resolve(__dirname, "../station.json"));
+			station_v2_run(station_data);
+		} else {
+			const station_data = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/resource/station.json")).json();
+			station_v2_run(station_data);
 		}
+
+		if (!data.stations) {
+			const station_data = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/station.json")).json();
+			station_v2_run(station_data);
+		}
+
+		if (!data.stations) {
+			const station_data = await (await fetch(`${route.randomBaseFileUrl()}station.json`)).json();
+			station_v2_run(station_data);
+		}
+
+		// if (app.Configuration.data["Real-time.local"]) res = require(path.resolve(__dirname, "../station.json"));
+		// else res = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/station.json")).json();
+
+		// if (!res) res = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/Json/earthquake/station.json")).json();
+
+		// if (!res) res = await (await fetch("https://exptech.com.tw/api/v1/file?path=/resource/station.json")).json();
+
+		// if (res) {
+		// 	for (let i = 0, k = Object.keys(res), n = k.length; i < n; i++) {
+		// 		const id = k[i];
+
+		// 		if (res[id].Long > 118)
+		// 			s[id.split("-")[2]] = { uuid: id, ...res[id] };
+		// 	}
+
+		// 	data.stations = s;
+		// }
 	} catch (error) {
 		console.warn("Failed to load station data!", error);
 	}
 };
+
+function station_v2_run(station_data) {
+	for (let k = 0, k_ks = Object.keys(station_data), n = k_ks.length; k < n; k++) {
+		const station_id = k_ks[k];
+		const station_ = station_data[station_id];
+
+		if (!station_.work) continue;
+
+		const station_net = station_.net === "MS-Net" ? "H" : "L";
+
+		let station_new_id = "";
+		let station_code = "000";
+		let Loc = "";
+		let area = "";
+		let Lat = 0;
+		let Long = 0;
+
+		let latest = station_.info[0];
+
+		if (station_.info.length > 1)
+			for (let i = 1; i < station_.info.length; i++) {
+				const currentTime = new Date(station_.info[i].time);
+				const latestTime = new Date(latest.time);
+
+				if (currentTime > latestTime)
+					latest = station_.info[i];
+			}
+
+		for (let i = 0, ks = Object.keys(TREM.Resources.regionv2), j = ks.length; i < j; i++) {
+			const reg_id = ks[i];
+			const reg = TREM.Resources.regionv2[reg_id];
+
+			for (let r = 0, r_ks = Object.keys(reg), l = r_ks.length; r < l; r++) {
+				const ion_id = r_ks[r];
+				const ion = reg[ion_id];
+
+				if (ion.code === latest.code) {
+					station_code = latest.code.toString();
+					Loc = `${reg_id} ${ion_id}`;
+					area = ion.area;
+					Lat = latest.lat;
+					Long = latest.lon;
+				}
+			}
+		}
+
+		station_new_id = `${station_net}-${station_code}-${station_id}`;
+
+		if (station_code === "000") {
+			Lat = latest.lat;
+			Long = latest.lon;
+
+			if (station_id === "13379360") {
+				Loc = "重庆市 北碚区";
+				area = "重庆市中部";
+			} else if (station_id === "7735548") {
+				Loc = "南楊州市 和道邑";
+				area = "南楊州市中部";
+			}
+		}
+
+		data.stations[station_id] = { uuid: station_new_id, Lat, Long, Loc, area };
+	}
+}
 
 const charts = [
 	echarts.init(document.getElementById("wave-1"), null, { height: 560 / 6, width: 400 }),
