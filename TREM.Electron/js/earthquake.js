@@ -2184,7 +2184,7 @@ function handler(Json) {
 			if (current_data.a) amount = +current_data.a;
 			else amount = +current_data.pga;
 
-			if (amount > current_station_data.MaxPGA) current_station_data.MaxPGA = amount;
+			// if (amount > current_station_data.MaxPGA) current_station_data.MaxPGA = amount;
 			intensity = (rts_key_verify && Alert) ? Math.round(current_data.I)
 				: (current_data.i >= 0) ? Math.round(current_data.i)
 					: (NOW().getTime() - current_data.TS * 1000 > 5000) ? "NA"
@@ -2317,32 +2317,33 @@ function handler(Json) {
 			document.getElementById("rt-station-local-pga").innerText = amount;
 		}
 
-		if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999 && (target_count > 1 || Object.keys(eew).length != 0)) {
-			detected_list[current_station_data.PGA] ??= {
-				intensity : intensity,
-				time      : 0,
-			};
+		// if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999 && (target_count > 1 || Object.keys(eew).length != 0)) {
+			// detected_list[current_station_data.PGA] ??= {
+			// 	intensity : intensity,
+			// 	time      : 0,
+			// };
 
-			if ((detected_list[current_station_data.PGA].intensity ?? 0) < intensity)
-				detected_list[current_station_data.PGA].intensity = intensity;
+			// if ((detected_list[current_station_data.PGA].intensity ?? 0) < intensity)
+			// 	detected_list[current_station_data.PGA].intensity = intensity;
 
-			if (Json.Alert) {
-				if (setting["audio.realtime"])
-					if (amount > 8 && PGALimit == 0) {
-						PGALimit = 1;
-						log("Playing Audio > pga1", 1, "Audio", "handler");
-						dump({ level: 0, message: "Playing Audio > pga1", origin: "Audio" });
-						TREM.Audios.pga1.play();
-					} else if (amount > 250 && PGALimit > 1) {
-						PGALimit = 2;
-						log("Playing Audio > pga2", 1, "Audio", "handler");
-						dump({ level: 0, message: "Playing Audio > pga2", origin: "Audio" });
-						TREM.Audios.pga2.play();
-					}
+		if (Json.Alert)// {
+			if (setting["audio.realtime"])
+				if (amount > 8 && PGALimit == 0) {
+					PGALimit = 1;
+					log("Playing Audio > pga1", 1, "Audio", "handler");
+					dump({ level: 0, message: "Playing Audio > pga1", origin: "Audio" });
+					TREM.Audios.pga1.play();
+				} else if (amount > 250 && PGALimit > 1) {
+					PGALimit = 2;
+					log("Playing Audio > pga2", 1, "Audio", "handler");
+					dump({ level: 0, message: "Playing Audio > pga2", origin: "Audio" });
+					TREM.Audios.pga2.play();
+				}
 
-				detected_list[current_station_data.PGA].time = NOW().getTime();
-			}
-		} else if (Object.keys(detection_list).length) {
+				// detected_list[current_station_data.PGA].time = NOW().getTime();
+		// }
+		// } else
+		if (Object.keys(detection_list).length) {
 			for (let i = 0; i < Object.keys(detection_list).length; i++) {
 				const key = Object.keys(detection_list)[i];
 
@@ -2771,11 +2772,13 @@ async function fetchFiles() {
 		dump({ level: 0, message: "Get Location File", origin: "Location" });
 
 		if (setting["Real-time.local"]) {
-			station = require(path.resolve(__dirname, "../station.json"));
+			const station_data = require(path.resolve(__dirname, "../station.json"));
+			station_v2_run(station_data);
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
-			station = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/station.json")).json();
+			const station_data = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/resource/station.json")).json();
+			station_v2_run(station_data);
 			log("Get Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Station File", origin: "Location" });
 		}
@@ -2796,11 +2799,13 @@ async function fetchFilesbackup() {
 		dump({ level: 0, message: "Get Location backup File", origin: "Location" });
 
 		if (setting["Real-time.local"]) {
-			station = require(path.resolve(__dirname, "../station.json"));
+			const station_data = require(path.resolve(__dirname, "../station.json"));
+			station_v2_run(station_data);
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
-			station = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/Json/earthquake/station.json")).json();
+			const station_data = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/station.json")).json();
+			station_v2_run(station_data);
 			log("Get Station backup File", 1, "Location", "fetchFilesbackup");
 			dump({ level: 0, message: "Get Station backup File", origin: "Location" });
 		}
@@ -2821,11 +2826,13 @@ async function fetchFilesbackup0() {
 		dump({ level: 0, message: "Get Location backup File", origin: "Location" });
 
 		if (setting["Real-time.local"]) {
-			station = require(path.resolve(__dirname, "../station.json"));
+			const station_data = require(path.resolve(__dirname, "../station.json"));
+			station_v2_run(station_data);
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
-			station = await (await fetch("https://exptech.com.tw/api/v1/file?path=/resource/station.json")).json();
+			const station_data = await (await fetch(`${route.randomBaseFileUrl()}station.json`)).json();
+			station_v2_run(station_data);
 			log("Get Station backup File", 1, "Location", "fetchFilesbackup");
 			dump({ level: 0, message: "Get Station backup File", origin: "Location" });
 		}
@@ -2836,6 +2843,72 @@ async function fetchFilesbackup0() {
 		log(err, 3, "Location", "fetchFilesbackup");
 		dump({ level: 2, message: err, origin: "Location" });
 		await fetchFiles();
+	}
+}
+
+function station_v2_run(station_data) {
+	for (let k = 0, k_ks = Object.keys(station_data), n = k_ks.length; k < n; k++) {
+		const station_id = k_ks[k];
+		const station_ = station_data[station_id];
+
+		if (!station_.work) continue;
+
+		const station_net = station_.net === "MS-Net" ? "H" : "L";
+
+		let station_new_id = "";
+		let station_code = "000";
+		let Loc = "";
+		let area = "";
+		let Lat = 0;
+		let Long = 0;
+
+		let latest = station_.info[0];
+
+		if (station_.info.length > 1) {
+			for(let i = 1; i < station_.info.length; i++) {
+				const currentTime = new Date(station_.info[i].time);
+				const latestTime = new Date(latest.time);
+
+				if(currentTime > latestTime) {
+					latest = station_.info[i];
+				}
+			}
+		}
+
+		for (let i = 0, ks = Object.keys(TREM.Resources.regionv2), n = ks.length; i < n; i++) {
+			const reg_id = ks[i];
+			const reg = TREM.Resources.regionv2[reg_id];
+
+			for (let r = 0, r_ks = Object.keys(reg), n = r_ks.length; r < n; r++) {
+				const ion_id = r_ks[r];
+				const ion = reg[ion_id];
+
+				if (ion.code === latest.code) {
+					station_code = latest.code.toString();
+					Loc = `${reg_id} ${ion_id}`;
+					area = ion.area;
+					Lat = latest.lat;
+					Long = latest.lon;
+				}
+			}
+		}
+
+		station_new_id = `${station_net}-${station_code}-${station_id}`;
+
+		if (station_code === "000") {
+			Lat = latest.lat;
+			Long = latest.lon;
+
+			if (station_id === "13379360") {
+				Loc = "重庆市 北碚区";
+				area = "重庆市中部";
+			} else if (station_id === "7735548") {
+				Loc = "南楊州市 和道邑";
+				area = "南楊州市中部";
+			}
+		}
+
+		station[station_new_id] = {Lat,Long,Loc,area};
 	}
 }
 
@@ -6688,7 +6761,7 @@ function findClosest(arr, target) {
 }
 
 function NOW() {
-	return new Date(ServerTime + (Date.now() - ((ServerT != 0 && setting["Real-time.websocket"] === "exptech") ? ServerT : (ServerT_backup != 0) ? ServerT_backup : ServerT_yayacat)));
+	return new Date(ServerTime + (Date.now() - ((ServerT != 0 && setting["Real-time.websocket"] === "exptech") ? ServerT : (ServerT_backup != 0 && setting["Real-time.websocket"] === "exptech") ? ServerT_backup : ServerT_yayacat)));
 }
 
 function timeconvert(time) {

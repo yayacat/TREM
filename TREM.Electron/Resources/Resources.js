@@ -4,6 +4,7 @@ module.exports = {
 	area      : require("./area.json"),
 	areav2    : require("./areav2.json"),
 	region    : require("./region.json"),
+	regionv2  : require("./region_v2.json"),
 	time,
 	time_list : Object.keys(time),
 	icon      : {

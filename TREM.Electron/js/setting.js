@@ -4,6 +4,9 @@ const os = require("node:os");
 const win = getCurrentWindow();
 TREM.Constants = require(path.resolve(__dirname, "../Constants/Constants.js"));
 
+const Route = require("../js/route.js");
+const route = new Route();
+
 document.onreadystatechange = () => {
 	if (document.readyState == "complete")
 		handleWindowControls();
@@ -78,7 +81,7 @@ ipcRenderer.on("settingError", (event, error) => {
 	init();
 });
 
-let station;
+let station = {};
 
 /**
  * 初始化設定
@@ -304,12 +307,23 @@ function init() {
 	})();
 
 	(async () => {
-		if (setting["Real-time.local"]) station = require(path.resolve(__dirname, "../station.json"));
-		else station = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/station.json")).json();
+		if (setting["Real-time.local"]) {
+			const station_data = require(path.resolve(__dirname, "../station.json"));
+			station_v2_run(station_data);
+		} else {
+			const station_data = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/resource/station.json")).json();
+			station_v2_run(station_data);
+		}
 
-		if (!station) station = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/Json/earthquake/station.json")).json();
+		if (!station) {
+			const station_data = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/station.json")).json();
+			station_v2_run(station_data);
+		}
 
-		if (!station) station = await (await fetch("https://exptech.com.tw/api/v1/file?path=/resource/station.json")).json();
+		if (!station) {
+			const station_data = await (await fetch(`${route.randomBaseFileUrl()}station.json`)).json();
+			station_v2_run(station_data);
+		}
 
 		const el = document.getElementById("Real-time.station");
 		const el1 = document.getElementById("Real-time.station.1");
@@ -421,6 +435,72 @@ function init() {
 	// });
 
 	stream_mode(setting["stream.mode"]);
+}
+
+function station_v2_run(station_data) {
+	for (let k = 0, k_ks = Object.keys(station_data), n = k_ks.length; k < n; k++) {
+		const station_id = k_ks[k];
+		const station_ = station_data[station_id];
+
+		if (!station_.work) continue;
+
+		const station_net = station_.net === "MS-Net" ? "H" : "L";
+
+		let station_new_id = "";
+		let station_code = "000";
+		let Loc = "";
+		let area = "";
+		let Lat = 0;
+		let Long = 0;
+
+		let latest = station_.info[0];
+
+		if (station_.info.length > 1) {
+			for(let i = 1; i < station_.info.length; i++) {
+				const currentTime = new Date(station_.info[i].time);
+				const latestTime = new Date(latest.time);
+
+				if(currentTime > latestTime) {
+					latest = station_.info[i];
+				}
+			}
+		}
+
+		for (let i = 0, ks = Object.keys(TREM.Resources.regionv2), n = ks.length; i < n; i++) {
+			const reg_id = ks[i];
+			const reg = TREM.Resources.regionv2[reg_id];
+
+			for (let r = 0, r_ks = Object.keys(reg), n = r_ks.length; r < n; r++) {
+				const ion_id = r_ks[r];
+				const ion = reg[ion_id];
+
+				if (ion.code === latest.code) {
+					station_code = latest.code.toString();
+					Loc = `${reg_id} ${ion_id}`;
+					area = ion.area;
+					Lat = latest.lat;
+					Long = latest.lon;
+				}
+			}
+		}
+
+		station_new_id = `${station_net}-${station_code}-${station_id}`;
+
+		if (station_code === "000") {
+			Lat = latest.lat;
+			Long = latest.lon;
+
+			if (station_id === "13379360") {
+				Loc = "重庆市 北碚区";
+				area = "重庆市中部";
+			} else if (station_id === "7735548") {
+				Loc = "南楊州市 和道邑";
+				area = "南楊州市中部";
+			}
+		}
+
+		station[station_new_id] = {Lat,Long,Loc,area};
+	}
 }
 
 function SelectSave(id) {

@@ -69,6 +69,13 @@ class Route {
 	}
 
 	/**
+    * @returns {BaseFileUrl}
+    */
+	randomBaseFileUrl() {
+		return `https://lb-${ this.random_ws_num }.exptech.com.tw/file/resource/`;
+	}
+
+	/**
    * @returns {WSBaseUrl}
    */
 	randomWSBaseUrl() {

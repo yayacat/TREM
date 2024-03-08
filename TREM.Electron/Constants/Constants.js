@@ -210,27 +210,27 @@ const Constants = Object.freeze({
 		},
 		"Real-time.station": {
 			type  : "select",
-			value : "L-711-6732340-12",
+			value : "L-711-6732340",
 		},
 		"Real-time.station.1": {
 			type  : "select",
-			value : "H-335-11339620-4",
+			value : "H-335-11339620",
 		},
 		"Real-time.station.2": {
 			type  : "select",
-			value : "H-979-11336952-11",
+			value : "H-979-11336952",
 		},
 		"Real-time.station.3": {
 			type  : "select",
-			value : "H-711-11334880-12",
+			value : "H-711-11334880",
 		},
 		"Real-time.station.4": {
 			type  : "select",
-			value : "H-541-11370676-10",
+			value : "H-541-11370676",
 		},
 		"Real-time.station.5": {
 			type  : "select",
-			value : "H-269-6126556-5",
+			value : "H-269-6126556",
 		},
 		"report.cover": {
 			type  : "toggle",
