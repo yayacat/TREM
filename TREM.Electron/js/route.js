@@ -38,6 +38,10 @@ class Route {
 		this.key = key;
 	}
 
+	auto_run() {
+		this.random_ws_num = this.randomWSNum();
+	}
+
 	/**
    * @returns {number}
    */
@@ -128,6 +132,7 @@ class Route {
    * @returns {`${BaseUrl}/eq/eew`}
    */
 	eew(version) {
+		this.auto_run();
 		return this.randomBaseUrl(version) + "/eq/eew";
 	}
 
