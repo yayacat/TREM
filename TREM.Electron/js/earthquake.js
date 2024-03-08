@@ -949,6 +949,8 @@ async function init() {
 		const time = document.getElementById("time");
 		const time1 = document.getElementById("time1");
 
+		const now_format = (time_now) => timeconvert(time_now).format("YYYY/MM/DD HH:mm:ss");
+
 		// clock
 		log("Initializing clock", 1, "Clock", "init");
 		dump({ level: 0, message: "Initializing clock", origin: "Clock" });
@@ -961,7 +963,7 @@ async function init() {
 				} else if (replayTemp) {
 					if (!time.classList.contains("replay"))
 						time.classList.add("replay");
-					time.innerText = `${timeconvert(new Date(replayTemp)).format("YYYY/MM/DD HH:mm:ss")}`;
+					time.innerText = `${now_format(new Date(replayTemp))}`;
 
 					// if (NOW().getTime() - replayT > 180_000 && !Object.keys(eew).length) {
 					if ((replayTemp - replay) > 300_000) {
@@ -971,7 +973,7 @@ async function init() {
 				} else if (replay) {
 					if (!time.classList.contains("replay"))
 						time.classList.add("replay");
-					time.innerText = `${timeconvert(new Date(replay + (NOW().getTime() - replayT))).format("YYYY/MM/DD HH:mm:ss")}`;
+					time.innerText = `${now_format(new Date(replay + (NOW().getTime() - replayT)))}`;
 
 					// if (NOW().getTime() - replayT > 180_000 && !Object.keys(eew).length) {
 					if (NOW().getTime() - replayT > 300_000) {
@@ -984,9 +986,11 @@ async function init() {
 
 					if (time.classList.contains("desynced"))
 						time.classList.remove("desynced");
-					time.innerText = `${timeconvert(NOW()).format("YYYY/MM/DD HH:mm:ss")}`;
-					time1.innerText = `${timeconvert(NOW()).format("YYYY/MM/DD HH:mm:ss")}`;
-					ipcRenderer.send("TREMIntensitytime2", `${timeconvert(NOW()).format("YYYY/MM/DD HH:mm:ss")}`);
+
+					const now_f = now_format(NOW());
+					time.innerText = `${now_f}`;
+					time1.innerText = `${now_f}`;
+					ipcRenderer.send("TREMIntensitytime2", `${now_f}`);
 
 					if (replaytestEEW != 0 && NOW().getTime() - replaytestEEW > 300_000) {
 						testEEWerror = false;
@@ -2103,7 +2107,9 @@ function handler(Json) {
 	// 	// document.getElementById("rt-station").classList.remove("left");
 	// 	// document.getElementById("rt-maxintensitynum").classList.add("hide");
 
-	const removed = Json.station ? Object.keys(Station).filter(key => !Object.keys(Json.station).includes(key)) : Object.keys(Station).filter(key => !Object.keys(Json).includes(key));
+	const Station_rm = (Json_rm) => Object.keys(Station).filter(key => !Object.keys(Json_rm).includes(key));
+
+	const removed = Json.station ? Station_rm(Json.station) : Station_rm(Json);
 
 	for (const removedKey of removed) {
 		Station[removedKey].remove();
@@ -2130,6 +2136,13 @@ function handler(Json) {
 	const detection_location = Json.area ?? [];
 	const detection_list = Json.box ?? {};
 	const Json_temp = Json.station ? Json.station : Json;
+	const Json_Time = Json.Time ?? Json.time;
+
+	const now_format = (time) => timeconvert(time).format("HH:mm:ss");
+
+	const now = new Date(Json_Time);
+	const now_f = now_format(now);
+	const now_time = NOW().getTime();
 	Json_temp.area = detection_location;
 
 	if (detection_location.length) TREM.MapArea2.setArea(Json_temp);
@@ -2138,9 +2151,9 @@ function handler(Json) {
 
 	for (let index = 0, keys = Object.keys(station), n = keys.length; index < n; index++) {
 		const uuid = keys[index];
+		const id = uuid.split("-")[2];
 		const current_station_data = station[uuid];
-		const current_data = Json.station ? Json.station[uuid.split("-")[2]] : Json[uuid.split("-")[2]];
-		const Json_Time = Json.Time ?? Json.time;
+		const current_data = Json.station ? Json.station[id] : Json[id];
 
 		// if (uuid == "H-979-11336952-11")
 		// 	console.log(current_data);
@@ -2153,25 +2166,19 @@ function handler(Json) {
 		let amount = 0;
 		let intensity = 0;
 		let intensitytest = 0;
-		let now = new Date(Json_Time);
 		const Alert = current_data?.alert ?? false;
 
 		if (current_data == undefined) {
 			level_class = "na";
 
-			if (station_time_json[uuid] == undefined && replay == 0) {
+			if (station_time_json[uuid] == undefined && replay == 0)
 				station_time_json[uuid] = Date.now();
-				localStorage.stationtime = JSON.stringify(station_time_json);
-			} else if (station_time_json[uuid] == 0 && replay == 0) {
+			else if (station_time_json[uuid] == 0 && replay == 0)
 				station_time_json[uuid] = Date.now();
-				localStorage.stationtime = JSON.stringify(station_time_json);
-			} else if (station_time_json[uuid] == undefined && replay != 0) {
+			else if (station_time_json[uuid] == undefined && replay != 0)
 				station_time_json[uuid] = 0;
-				localStorage.stationtime = JSON.stringify(station_time_json);
-			}
 
-			now = new Date(station_time_json[uuid]);
-			station_tooltip = `<div>${keys[index]}(${current_station_data.Loc})無資料</div><div>最近離線時間: ${timeconvert(new Date(station_time_json[uuid])).format("YYYY/MM/DD HH:mm:ss")}</div>`;
+			station_tooltip = `<div>${keys[index]}(${current_station_data.Loc})無資料</div><div>最近離線時間: ${now_format(new Date(station_time_json[uuid]))}</div>`;
 			NA999 = "NA";
 			NA0999 = "NA";
 			size = 8;
@@ -2179,7 +2186,6 @@ function handler(Json) {
 			intensity = "-";
 		} else {
 			station_time_json[uuid] = 0;
-			localStorage.stationtime = JSON.stringify(station_time_json);
 
 			if (current_data.a) amount = +current_data.a;
 			else amount = +current_data.pga;
@@ -2187,7 +2193,7 @@ function handler(Json) {
 			// if (amount > current_station_data.MaxPGA) current_station_data.MaxPGA = amount;
 			intensity = (rts_key_verify && Alert) ? Math.round(current_data.I)
 				: (current_data.i >= 0) ? Math.round(current_data.i)
-					: (NOW().getTime() - current_data.TS * 1000 > 5000) ? "NA"
+					: (now_time - current_data.TS * 1000 > 5000) ? "NA"
 						: 0;
 			// : (amount >= 800) ? 9
 			// 	: (amount >= 440) ? 8
@@ -2230,7 +2236,9 @@ function handler(Json) {
 				target_count++;
 			}
 
-			station_tooltip = `<div>${keys[index]}</div><div>${current_station_data.Loc}</div><div>${amount}</div><div>${current_data.v ?? current_data.pgv}</div><div>${current_data.i}</div>`;
+			const pgv = current_data.v ?? current_data.pgv;
+
+			station_tooltip = `<div>${keys[index]}</div><div>${current_station_data.Loc}</div><div>${amount}</div><div>${pgv}</div><div>${current_data.i}</div>`;
 		}
 
 		if (current_data != undefined || (rts_key_verify && !setting["sleep.mode"]) || replay != 0) {
@@ -2299,7 +2307,7 @@ function handler(Json) {
 					document.getElementById("rt-station-local-intensity").className = `rt-station-intensity ${(amount < 999 && intensity != "NA") ? IntensityToClassString(intensity) : "na"}`;
 					document.getElementById("rt-station-local-id").innerText = keys[index];
 					document.getElementById("rt-station-local-name").innerText = current_station_data.Loc;
-					document.getElementById("rt-station-local-time").innerText = timeconvert(now).format("HH:mm:ss");
+					document.getElementById("rt-station-local-time").innerText = now_f;
 					document.getElementById("rt-station-local-pga").innerText = amount;
 				}
 			} else {
@@ -2313,7 +2321,7 @@ function handler(Json) {
 			document.getElementById("rt-station-local-intensity").className = `rt-station-intensity ${(amount < 999 && intensity != "NA") ? IntensityToClassString(intensity) : "na"}`;
 			document.getElementById("rt-station-local-id").innerText = keys[index];
 			document.getElementById("rt-station-local-name").innerText = current_station_data.Loc;
-			document.getElementById("rt-station-local-time").innerText = timeconvert(now).format("HH:mm:ss");
+			document.getElementById("rt-station-local-time").innerText = now_f;
 			document.getElementById("rt-station-local-pga").innerText = amount;
 		}
 
@@ -2505,7 +2513,7 @@ function handler(Json) {
 			MAXPGA.long = current_station_data.Long;
 			MAXPGA.loc = current_station_data.Loc;
 			MAXPGA.intensity = intensity;
-			MAXPGA.time = new Date(Json_Time);
+			MAXPGA.time = now;
 		}
 		// if (MaxIntensity1 > MAXPGA.intensity){
 		// 	MAXPGA.pga = amount;
@@ -2518,6 +2526,8 @@ function handler(Json) {
 		// 	MAXPGA.time = new Date(Json_Time * 1000);
 		// }
 	}
+
+	localStorage.stationtime = JSON.stringify(station_time_json);
 
 	if (target_count != 0) {
 		let level = 0;
@@ -2573,7 +2583,7 @@ function handler(Json) {
 		document.getElementById("rt-station-max-intensity").className = `rt-station-intensity ${(MAXPGA.pga < 999) ? IntensityToClassString(MAXPGA.intensity) : "na"}`;
 		document.getElementById("rt-station-max-id").innerText = MAXPGA.station;
 		document.getElementById("rt-station-max-name").innerText = MAXPGA.loc;
-		document.getElementById("rt-station-max-time").innerText = timeconvert(MAXPGA.time).format("HH:mm:ss");
+		document.getElementById("rt-station-max-time").innerText = now_format(MAXPGA.time);
 		document.getElementById("rt-station-max-pga").innerText = MAXPGA.pga;
 	} else {
 		document.getElementById("rt-station-max-intensity").className = "rt-station-intensity na";
@@ -2712,16 +2722,18 @@ function handler(Json) {
 
 				if (count >= 8) break;
 
-				if (!IMAXdata[All[Index].uuid.split("-")[2]]) IMAXdata[All[Index].uuid.split("-")[2]] = {};
+				const id = All[Index].uuid.split("-")[2];
 
-				const Json_station_v = Json.station ? Json.station[All[Index].uuid.split("-")[2]].v : Json[All[Index].uuid.split("-")[2]].v;
+				if (!IMAXdata[id]) IMAXdata[id] = {};
 
-				if (!IMAXdata[All[Index].uuid.split("-")[2]].pga) IMAXdata[All[Index].uuid.split("-")[2]].pga = Json_station_v;
-				else if (IMAXdata[All[Index].uuid.split("-")[2]].pga < Json_station_v) IMAXdata[All[Index].uuid.split("-")[2]].pga = Json_station_v;
+				const Json_station_v = Json.station ? Json.station[id].v : Json[id].v;
+
+				if (!IMAXdata[id].pga) IMAXdata[id].pga = Json_station_v;
+				else if (IMAXdata[id].pga < Json_station_v) IMAXdata[id].pga = Json_station_v;
 				const container = document.createElement("DIV");
 				container.className = IntensityToClassString(All[Index].intensity);
 				const location = document.createElement("span");
-				location.innerText = `${All[Index].loc}\n${IMAXdata[All[Index].uuid.split("-")[2]].pga} gal`;
+				location.innerText = `${All[Index].loc}\n${IMAXdata[id].pga} gal`;
 				container.appendChild(document.createElement("span"));
 				container.appendChild(location);
 				list.push(container);
@@ -2734,8 +2746,9 @@ function handler(Json) {
 
 				if (Object.keys(Idata).length >= 8) break;
 				const city = All[Index].loc.split(" ")[0];
+				const id = All[Index].uuid.split("-")[2];
 				const CPGA = (Idata[city] == undefined) ? 0 : Idata[city];
-				const Json_station_v = Json.station ? Json.station[All[Index].uuid.split("-")[2]].v : Json[All[Index].uuid.split("-")[2]].v;
+				const Json_station_v = Json.station ? Json.station[id].v : Json[id].v;
 
 				if (Json_station_v > CPGA) {
 					if (Idata[city] == undefined) Idata[city] = {};
@@ -3094,6 +3107,8 @@ function ReportGET(badcatch = false) {
 			storage.setItem("report_data", []);
 		}
 
+		const now_format = (time) => timeconvert(time).format("YYYY/MM/DD HH:mm:ss");
+
 		let _report_data = [];
 		_report_data = storage.getItem("report_data");
 
@@ -3191,7 +3206,7 @@ function ReportGET(badcatch = false) {
 											}
 										}
 
-									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
+									ans[i].originTime = now_format(new Date(ans[i].time));
 								}
 
 								for (let i = 0; i < ans.length; i++)
@@ -3383,7 +3398,7 @@ function ReportGET(badcatch = false) {
 											}
 										}
 
-									ans[i].originTime = timeconvert(new Date(ans[i].time)).format("YYYY/MM/DD HH:mm:ss");
+									ans[i].originTime = now_format(new Date(ans[i].time));
 								}
 
 								for (let i = 0; i < ans.length; i++)
@@ -3681,6 +3696,8 @@ ipcRenderer.on("ReportTREM", () => {
 });
 
 function cacheReport(_report_data_GET) {
+	const now_format = (time) => timeconvert(time).format("YYYY/MM/DD HH:mm:ss");
+
 	if (_report_data_GET.length > setting["cache.report"]) {
 		const _report_data_temp = [];
 
@@ -3692,7 +3709,7 @@ function cacheReport(_report_data_GET) {
 		if (Report != 0)
 			ReportList(_report_data_temp, {
 				Max  : TREM.MapIntensity.MaxI,
-				Time : timeconvert(new Date(Report)).format("YYYY/MM/DD HH:mm:ss"),
+				Time : now_format(new Date(Report)),
 			});
 		else
 			ReportList(_report_data_temp);
@@ -3702,7 +3719,7 @@ function cacheReport(_report_data_GET) {
 		if (Report != 0)
 			ReportList(_report_data_GET, {
 				Max  : TREM.MapIntensity.MaxI,
-				Time : timeconvert(new Date(Report)).format("YYYY/MM/DD HH:mm:ss"),
+				Time : now_format(new Date(Report)),
 			});
 		else
 			ReportList(_report_data_GET);
@@ -5070,10 +5087,10 @@ function FCMdata(json, Unit) {
 		TREM.Earthquake.emit("tsunami", json);
 	} else if (json.type == "trem-eq") {
 		TREM.Earthquake.emit("trem-eq", json);
-	} else if (json.type == "palert") {
-		TREM.MapIntensity.palert(json);
-	} else if (json.type == "palert-app") {
-		console.debug(json);
+	// } else if (json.type == "palert") {
+	// 	TREM.MapIntensity.palert(json);
+	// } else if (json.type == "palert-app") {
+	// 	console.debug(json);
 	} else if (json.type == "pws") {
 		TREM.PWS.addPWS(json.raw);
 	} else if (json.type == "intensity") {
