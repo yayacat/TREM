@@ -85,7 +85,7 @@
     "electron-common-ipc": "^16.0.4",
     "electron-fcm-push-receiver": "^2.1.7",
     "electron-log": "5.1.1",
-    "electron-updater": "^6.1.8",
+    "electron-updater": "^6.2.1",
     "expose-gc": "^1.0.0",
     "jquery": "3.7.1",
     "jszip": "^3.10.1",
