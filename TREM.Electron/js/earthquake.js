@@ -100,7 +100,7 @@ try {
 
 let Location;
 let region;
-let station = {};
+const station = {};
 let palert_geojson = null;
 let areav2_geojson = null;
 let investigation = false;
@@ -2318,15 +2318,15 @@ function handler(Json) {
 		}
 
 		// if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999 && (target_count > 1 || Object.keys(eew).length != 0)) {
-			// detected_list[current_station_data.PGA] ??= {
-			// 	intensity : intensity,
-			// 	time      : 0,
-			// };
+		// detected_list[current_station_data.PGA] ??= {
+		// 	intensity : intensity,
+		// 	time      : 0,
+		// };
 
-			// if ((detected_list[current_station_data.PGA].intensity ?? 0) < intensity)
-			// 	detected_list[current_station_data.PGA].intensity = intensity;
+		// if ((detected_list[current_station_data.PGA].intensity ?? 0) < intensity)
+		// 	detected_list[current_station_data.PGA].intensity = intensity;
 
-		if (Json.Alert)// {
+		if (Json.Alert)
 			if (setting["audio.realtime"])
 				if (amount > 8 && PGALimit == 0) {
 					PGALimit = 1;
@@ -2340,8 +2340,7 @@ function handler(Json) {
 					TREM.Audios.pga2.play();
 				}
 
-				// detected_list[current_station_data.PGA].time = NOW().getTime();
-		// }
+		// detected_list[current_station_data.PGA].time = NOW().getTime();
 		// } else
 		if (Object.keys(detection_list).length) {
 			for (let i = 0; i < Object.keys(detection_list).length; i++) {
@@ -2864,22 +2863,20 @@ function station_v2_run(station_data) {
 
 		let latest = station_.info[0];
 
-		if (station_.info.length > 1) {
-			for(let i = 1; i < station_.info.length; i++) {
+		if (station_.info.length > 1)
+			for (let i = 1; i < station_.info.length; i++) {
 				const currentTime = new Date(station_.info[i].time);
 				const latestTime = new Date(latest.time);
 
-				if(currentTime > latestTime) {
+				if (currentTime > latestTime)
 					latest = station_.info[i];
-				}
 			}
-		}
 
-		for (let i = 0, ks = Object.keys(TREM.Resources.regionv2), n = ks.length; i < n; i++) {
+		for (let i = 0, ks = Object.keys(TREM.Resources.regionv2), j = ks.length; i < j; i++) {
 			const reg_id = ks[i];
 			const reg = TREM.Resources.regionv2[reg_id];
 
-			for (let r = 0, r_ks = Object.keys(reg), n = r_ks.length; r < n; r++) {
+			for (let r = 0, r_ks = Object.keys(reg), l = r_ks.length; r < l; r++) {
 				const ion_id = r_ks[r];
 				const ion = reg[ion_id];
 
@@ -2908,7 +2905,7 @@ function station_v2_run(station_data) {
 			}
 		}
 
-		station[station_new_id] = {Lat,Long,Loc,area};
+		station[station_new_id] = { Lat, Long, Loc, area };
 	}
 }
 
