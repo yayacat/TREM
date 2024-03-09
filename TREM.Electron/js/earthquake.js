@@ -2178,7 +2178,7 @@ function handler(Json) {
 			else if (station_time_json[uuid] == undefined && replay != 0)
 				station_time_json[uuid] = 0;
 
-			station_tooltip = `<div>${keys[index]}(${current_station_data.Loc})無資料</div><div>最近離線時間: ${now_format(new Date(station_time_json[uuid]))}</div>`;
+			station_tooltip = `<div>${keys[index]}(${current_station_data.Loc})無資料</div><div>最近離線時間: ${timeconvert(new Date(station_time_json[uuid])).format("YYYY/MM/DD HH:mm:ss")}</div>`;
 			NA999 = "NA";
 			NA0999 = "NA";
 			size = 8;
