@@ -742,17 +742,11 @@ ipcRenderer.on("TREMIntensityload", (event, json) => {
 	TREM.Intensity.load(json);
 });
 
-ipcRenderer.on("TREMIntensitytime2", (event, time) => {
-	const time2 = document.getElementById("time2");
-	time2.innerText = time;
-});
-
 ipcRenderer.on("TREMIntensitylog2", (event, log) => {
-	const time2 = document.getElementById("log2");
-	time2.innerText = log;
-});
-
-ipcRenderer.on("TREMIntensityappversion2", (event, version) => {
-	const time2 = document.getElementById("app-version2");
-	time2.innerText = version;
+	const time2 = document.getElementById("time2");
+	time2.innerText = log.time;
+	const log2 = document.getElementById("log2");
+	log2.innerText = log.log;
+	const app_version2 = document.getElementById("app-version2");
+	app_version2.innerText = log.ver;
 });

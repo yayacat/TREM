@@ -442,9 +442,10 @@ function station_v2_run(station_data) {
 		const station_id = k_ks[k];
 		const station_ = station_data[station_id];
 
-		if (!station_.work) continue;
+		//	if (!station_.work) continue;
 
 		const station_net = station_.net === "MS-Net" ? "H" : "L";
+		const work = station_.work;
 
 		let station_new_id = "";
 		let station_code = "000";
@@ -497,7 +498,7 @@ function station_v2_run(station_data) {
 			}
 		}
 
-		station[station_new_id] = { Lat, Long, Loc, area };
+		station[station_new_id] = { Lat, Long, Loc, area, work };
 	}
 }
 

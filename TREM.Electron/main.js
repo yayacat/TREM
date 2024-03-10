@@ -250,7 +250,7 @@ function createIntensityWindow() {
 	IntensityWindow.setMenu(null);
 	IntensityWindow.webContents.on("did-finish-load", () => {
 		IntensityWindow.webContents.send("setting", TREM.Configuration._data);
-		// if (!_hide) setTimeout(() => IntensityWindow.show(), 500);
+		if (!_hide) setTimeout(() => IntensityWindow.show(), 500);
 	});
 	IntensityWindow.on("resize", () => {
 		IntensityWindow.webContents.invalidate();
@@ -618,16 +618,8 @@ ipcMain.on("TREMIntensityload", (event, json) => {
 	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensityload", json);
 });
 
-ipcMain.on("TREMIntensitytime2", (event, time) => {
-	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensitytime2", time);
-});
-
 ipcMain.on("TREMIntensitylog2", (event, log) => {
 	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensitylog2", log);
-});
-
-ipcMain.on("TREMIntensityappversion2", (event, version) => {
-	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensityappversion2", version);
 });
 
 ipcMain.on("ReportTREM", () => {

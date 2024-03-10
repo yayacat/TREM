@@ -101,6 +101,7 @@ try {
 let Location;
 let region;
 const station = {};
+let station_data = {};
 let palert_geojson = null;
 let areav2_geojson = null;
 let investigation = false;
@@ -133,6 +134,7 @@ let MaxIntensity2 = -1;
 let testEEWerror = false;
 TREM.win = BrowserWindow.fromId(process.env.window * 1);
 let stationnow = 0;
+let stationnowall = 0;
 let RMTpgaTime = 0;
 let type_Unit = "";
 let link_on = false;
@@ -990,7 +992,6 @@ async function init() {
 					const now_f = now_format(NOW());
 					time.innerText = `${now_f}`;
 					time1.innerText = `${now_f}`;
-					ipcRenderer.send("TREMIntensitytime2", `${now_f}`);
 
 					if (replaytestEEW != 0 && NOW().getTime() - replaytestEEW > 300_000) {
 						testEEWerror = false;
@@ -1067,8 +1068,8 @@ async function init() {
 				// win.on("minimize", () => sleep(true));
 				// win.on("restore", () => sleep(false));
 
-				const stationall = Object.keys(station).length;
-				const stationPercentage = Math.round(stationnow / stationall * 1000) / 10;
+				// const stationall = Object.keys(station).length;
+				const stationPercentage = Math.round(stationnow / stationnowall * 1000) / 10;
 
 				// const formatMemoryUsage = (data) => `${Math.round(data / 1024 / 1024 * 100) / 100} MB`;
 				const memoryData = process.memoryUsage();
@@ -1076,12 +1077,11 @@ async function init() {
 				// const warn = (Warn) ? "⚠️" : "";
 				const error = (testEEWerror) ? "❌" : "";
 				// const unlock = (Unlock) ? "⚡" : "";
-				$("#log").text(`${stationnow}/${stationall} | ${stationPercentage}% | LB(${ws_num},${ws_num_bk}) | ${rss}`);
-				$("#log1").text(`${stationnow}/${stationall} | ${stationPercentage}% | LB(${ws_num},${ws_num_bk}) | ${rss}`);
-				ipcRenderer.send("TREMIntensitylog2", `${stationnow}/${stationall} | ${stationPercentage}% | ${rss}`);
+				$("#log").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${ws_num_bk}) | ${rss}`);
+				$("#log1").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${ws_num_bk}) | ${rss}`);
+				ipcRenderer.send("TREMIntensitylog2", { time: now_format(NOW()), log: `${stationnow}/${stationnowall} | ${stationPercentage}% | ${rss}`, ver: `${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}` });
 				$("#app-version").text(`${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}`);
 				$("#app-version1").text(`${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}`);
-				ipcRenderer.send("TREMIntensityappversion2", `${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}`);
 			}, 500);
 
 		if (!Timers.tsunami)
@@ -2090,6 +2090,7 @@ function handler(Json) {
 	// console.log(station);
 
 	stationnow = 0;
+	stationnowall = 0;
 	Response = {};
 	MAXPGA = { pga: 0, station: "NA", level: 0 };
 
@@ -2154,6 +2155,41 @@ function handler(Json) {
 		const id = uuid.split("-")[2];
 		const current_station_data = station[uuid];
 		const current_data = Json.station ? Json.station[id] : Json[id];
+
+		if (!current_station_data.work && replay == 0) continue;
+
+		stationnowall++;
+
+		if (replay != 0) {
+			const station_ = station_data[id];
+
+			if (station_.info.length > 1) {
+				let latest = station_.info[0];
+
+				for (let i = 0; i < station_.info.length; i++) {
+					const currentTime = new Date(station_.info[i].time);
+
+					if (now > currentTime)
+						latest = station_.info[i];
+				}
+
+				for (let i = 0, ks = Object.keys(TREM.Resources.regionv2), j = ks.length; i < j; i++) {
+					const reg_id = ks[i];
+					const reg = TREM.Resources.regionv2[reg_id];
+
+					for (let r = 0, r_ks = Object.keys(reg), l = r_ks.length; r < l; r++) {
+						const ion_id = r_ks[r];
+						const ion = reg[ion_id];
+
+						if (ion.code === latest.code) {
+							current_station_data.Loc = `${reg_id} ${ion_id}`;
+							current_station_data.Lat = latest.lat;
+							current_station_data.Long = latest.lon;
+						}
+					}
+				}
+			}
+		}
 
 		// if (uuid == "H-979-11336952-11")
 		// 	console.log(current_data);
@@ -2784,12 +2820,12 @@ async function fetchFiles() {
 		dump({ level: 0, message: "Get Location File", origin: "Location" });
 
 		if (setting["Real-time.local"]) {
-			const station_data = require(path.resolve(__dirname, "../station.json"));
+			station_data = require(path.resolve(__dirname, "../station.json"));
 			station_v2_run(station_data);
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
-			const station_data = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/resource/station.json")).json();
+			station_data = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/resource/station.json")).json();
 			station_v2_run(station_data);
 			log("Get Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Station File", origin: "Location" });
@@ -2811,12 +2847,12 @@ async function fetchFilesbackup() {
 		dump({ level: 0, message: "Get Location backup File", origin: "Location" });
 
 		if (setting["Real-time.local"]) {
-			const station_data = require(path.resolve(__dirname, "../station.json"));
+			station_data = require(path.resolve(__dirname, "../station.json"));
 			station_v2_run(station_data);
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
-			const station_data = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/station.json")).json();
+			station_data = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/station.json")).json();
 			station_v2_run(station_data);
 			log("Get Station backup File", 1, "Location", "fetchFilesbackup");
 			dump({ level: 0, message: "Get Station backup File", origin: "Location" });
@@ -2838,12 +2874,12 @@ async function fetchFilesbackup0() {
 		dump({ level: 0, message: "Get Location backup File", origin: "Location" });
 
 		if (setting["Real-time.local"]) {
-			const station_data = require(path.resolve(__dirname, "../station.json"));
+			station_data = require(path.resolve(__dirname, "../station.json"));
 			station_v2_run(station_data);
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
-			const station_data = await (await fetch(`${route.randomBaseFileUrl()}station.json`)).json();
+			station_data = await (await fetch(`${route.randomBaseFileUrl()}station.json`)).json();
 			station_v2_run(station_data);
 			log("Get Station backup File", 1, "Location", "fetchFilesbackup");
 			dump({ level: 0, message: "Get Station backup File", origin: "Location" });
@@ -2858,14 +2894,15 @@ async function fetchFilesbackup0() {
 	}
 }
 
-function station_v2_run(station_data) {
-	for (let k = 0, k_ks = Object.keys(station_data), n = k_ks.length; k < n; k++) {
+function station_v2_run(station_temp) {
+	for (let k = 0, k_ks = Object.keys(station_temp), n = k_ks.length; k < n; k++) {
 		const station_id = k_ks[k];
-		const station_ = station_data[station_id];
+		const station_ = station_temp[station_id];
 
-		if (!station_.work) continue;
+		//	if (!station_.work) continue;
 
 		const station_net = station_.net === "MS-Net" ? "H" : "L";
+		const work = station_.work;
 
 		let station_new_id = "";
 		let station_code = "000";
@@ -2918,7 +2955,7 @@ function station_v2_run(station_data) {
 			}
 		}
 
-		station[station_new_id] = { Lat, Long, Loc, area };
+		station[station_new_id] = { Lat, Long, Loc, area, work };
 	}
 }
 
@@ -4405,6 +4442,7 @@ const stopReplay = function() {
 	WarnAudio = Date.now() + 3000;
 
 	stationnow = 0;
+	stationnowall = 0;
 
 	if (TREM.speech.speaking()) TREM.speech.cancel();
 
