@@ -250,7 +250,7 @@ function createIntensityWindow() {
 	IntensityWindow.setMenu(null);
 	IntensityWindow.webContents.on("did-finish-load", () => {
 		IntensityWindow.webContents.send("setting", TREM.Configuration._data);
-		if (!_hide) setTimeout(() => IntensityWindow.show(), 500);
+		// if (!_hide) setTimeout(() => IntensityWindow.show(), 500);
 	});
 	IntensityWindow.on("resize", () => {
 		IntensityWindow.webContents.invalidate();
@@ -271,8 +271,8 @@ else {
 	});
 	TREM.whenReady().then(() => {
 		trayIcon();
-		createWindow();
 		createIntensityWindow();
+		createWindow();
 	});
 }
 
@@ -603,31 +603,41 @@ ipcMain.on("openURL", (event, url) => {
 });
 
 ipcMain.on("p2p", (event, data, server_ips) => {
-	if (SettingWindow) SettingWindow.webContents.send("p2p", data, server_ips);
+	if (SettingWindow != null)
+		if (SettingWindow.isVisible())
+			SettingWindow.webContents.send("p2p", data, server_ips);
 });
 
 ipcMain.on("p2p6", (event, data, server_ips) => {
-	if (SettingWindow) SettingWindow.webContents.send("p2p6", data, server_ips);
+	if (SettingWindow != null)
+		if (SettingWindow.isVisible())
+			SettingWindow.webContents.send("p2p6", data, server_ips);
 });
 
 ipcMain.on("TREMIntensityhandle", (event, json) => {
-	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensityhandle", json);
+	if (IntensityWindow != null)
+		if (IntensityWindow.isVisible())
+			IntensityWindow.webContents.send("TREMIntensityhandle", json);
 });
 
 ipcMain.on("TREMIntensityload", (event, json) => {
-	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensityload", json);
+	if (IntensityWindow != null)
+		if (IntensityWindow.isVisible())
+			IntensityWindow.webContents.send("TREMIntensityload", json);
 });
 
 ipcMain.on("TREMIntensitylog2", (event, log) => {
-	if (IntensityWindow) IntensityWindow.webContents.send("TREMIntensitylog2", log);
+	if (IntensityWindow != null)
+		if (IntensityWindow.isVisible())
+			IntensityWindow.webContents.send("TREMIntensitylog2", log);
 });
 
 ipcMain.on("ReportTREM", () => {
-	if (MainWindow) MainWindow.webContents.send("ReportTREM");
+	MainWindow.webContents.send("ReportTREM");
 });
 
 ipcMain.on("Olddatabase_report", (event, json) => {
-	if (MainWindow) MainWindow.webContents.send("Olddatabase_report", json);
+	MainWindow.webContents.send("Olddatabase_report", json);
 });
 
 // ipcMain.on("setting_btn_remove_hide", () => {
