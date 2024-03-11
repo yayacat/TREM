@@ -133,7 +133,7 @@ class Route {
    * @returns {`${BaseUrl}/eq/eew`}
    */
 	eew(version) {
-		this.auto_run();
+		// this.auto_run();
 		return this.randomBaseUrl(version) + "/eq/eew";
 	}
 
