@@ -3923,7 +3923,7 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 		roll.prepend(Div);
 		investigation = true;
 	} else {
-		const timed = new Date(report.originTime.replace(/-/g, "/")).getTime() - 5000;
+		const timed = OriginTime - 5000;
 		const timed_hold = String(timed);
 		fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), timed_hold)}/${timed / 1000}.trem`, (err) => {
 			if (!err) {
