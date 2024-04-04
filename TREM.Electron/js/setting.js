@@ -1966,6 +1966,7 @@ let keyhave = false;
 
 async function exptechlogin() {
 	const EMAIL = document.getElementById("exptech.email").value;
+
 	if (!keyhave) {
 		const PASS = document.getElementById("exptech.pass").value;
 		const NAME = `${document.getElementById("exptech.name").value}/TREMV/${app.getVersion()}/${os.release()}`;
@@ -1973,28 +1974,30 @@ async function exptechlogin() {
 		// console.log(PASS);
 		// console.log(NAME);
 		const key = await login({ email: EMAIL, pass: PASS, name: NAME });
+
 		if (key != "") {
 			showDialog("success",
 				TREM.Localization.getString("exptech_login_Title"),
 				TREM.Localization.getString("exptech_login_success"),
 				0, "check", () => {
 					ipcRenderer.send("config:value", "exptech.key", key);
-				},"OK","",() => void 0,0,0,() => {
+				}, "OK", "", () => void 0, 0, 0, () => {
 					ipcRenderer.send("config:value", "exptech.key", key);
 				});
 			// 選取按鈕元素
-			var button = document.getElementById('exptech.login');
+			const button = document.getElementById("exptech.login");
 
 			// 選取 <span> 元素
-			var span = button.querySelector('.filled-tonal-button-label > span');
+			const span = button.querySelector(".filled-tonal-button-label > span");
 
 			// 更改 <span> 文字
-			span.textContent = '登出';
+			span.textContent = "登出";
 			keyhave = true;
 		}
 	} else if (setting["exptech.key"]) {
 		const KEY = setting["exptech.key"];
 		const out = await logout({ email: EMAIL, key: KEY });
+
 		if (out != "") {
 			console.log("ok");
 			showDialog("success",
@@ -2002,17 +2005,17 @@ async function exptechlogin() {
 				TREM.Localization.getString("exptech_logout_success"),
 				0, "check", () => {
 					ipcRenderer.send("config:value", "exptech.key", "");
-				},"OK","",() => void 0,0,0,() => {
+				}, "OK", "", () => void 0, 0, 0, () => {
 					ipcRenderer.send("config:value", "exptech.key", "");
 				});
 			// 選取按鈕元素
-			var button = document.getElementById('exptech.login');
+			const button = document.getElementById("exptech.login");
 
 			// 選取 <span> 元素
-			var span = button.querySelector('.filled-tonal-button-label > span');
+			const span = button.querySelector(".filled-tonal-button-label > span");
 
 			// 更改 <span> 文字
-			span.textContent = '登入';
+			span.textContent = "登入";
 			keyhave = false;
 		}
 	}
@@ -2029,6 +2032,7 @@ async function login(data) {
 			body    : JSON.stringify(data),
 		});
 		const ans = await response.text();
+
 		if (!response.ok) throw new Error(`${response.status} ${ans}`);
 		return ans;
 	} catch (err) {
@@ -2039,7 +2043,7 @@ async function login(data) {
 			0, "error", () => {
 				const key = "";
 				ipcRenderer.send("config:value", "exptech.key", key);
-			},"OK","",() => void 0,0,0,() => {
+			}, "OK", "", () => void 0, 0, 0, () => {
 				const key = "";
 				ipcRenderer.send("config:value", "exptech.key", key);
 			});
@@ -2055,6 +2059,7 @@ async function logout(data) {
 			body    : JSON.stringify(data),
 		});
 		const ans = await response.text();
+
 		if (!response.ok) throw new Error(`${response.status} ${ans}`);
 		return ans;
 	} catch (err) {
@@ -2062,7 +2067,7 @@ async function logout(data) {
 		showDialog("error",
 			TREM.Localization.getString("exptech_logout_Title"),
 			TREM.Localization.getString("exptech_logout_error"),
-			0, "error", () => void 0,"OK","",() => void 0,0,0,() => void 0);
+			0, "error", () => void 0, "OK", "", () => void 0, 0, 0, () => void 0);
 		return "";
 	}
 }

@@ -1211,6 +1211,7 @@ TREM.Report = {
 						});
 					} else {
 						if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download";
+
 						if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "下載";
 						report.download = false;
 						this.cache.set(report.id, report);
