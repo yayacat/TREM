@@ -324,6 +324,10 @@ const Constants = Object.freeze({
 			type  : "toggle",
 			value : false,
 		},
+		"exptech.open": {
+			type  : "toggle",
+			value : false,
+		},
 		"exptech.name": {
 			type  : "string",
 			value : "",
@@ -332,7 +336,7 @@ const Constants = Object.freeze({
 			type  : "string",
 			value : "",
 		},
-		"exptech.pass": {
+		"exptech.key": {
 			type  : "string",
 			value : "",
 		},

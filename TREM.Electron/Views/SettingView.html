@@ -3407,6 +3407,125 @@
                                 </div>
                                 <div class="control-container">
                                     <div class="option-container input-field">
+                                        <div class="option-container">
+                                            <div class="option-label">
+                                                <div class="option-label-title">
+                                                    <span lang="en">Turn on new verification mode</span>
+                                                    <span lang="ja">?</span>
+                                                    <span lang="kr">?</span>
+                                                    <span lang="ru">?</span>
+                                                    <span lang="zh-CN">?</span>
+                                                    <span lang="zh-TW">新驗證模式</span>
+                                                    <span class="option-label-id">exptech.open</span>
+                                                </div>
+                                                <div class="option-label-description">
+                                                    <span lang="en">?</span>
+                                                    <span lang="ja">?</span>
+                                                    <span lang="kr">?</span>
+                                                    <span lang="ru">?</span>
+                                                    <span lang="zh-CN">?</span>
+                                                    <span lang="zh-TW">開啟新驗證模式。</span>
+                                                </div>
+                                            </div>
+                                            <label class="md3 switch">
+                                                <input type="checkbox" id="exptech.open" onclick="CheckSave('exptech.open')">
+                                                <span class="slider">
+                                                    <span class="material-symbols-rounded icon">done</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div class="option-label">
+                                            <div class="option-label-title">
+                                                <span lang="en">name</span>
+                                                <span lang="ja">name</span>
+                                                <span lang="kr">name</span>
+                                                <span lang="ru">name</span> <!-- TODO: Untranslated, remove this comment after translation -->
+                                                <span lang="zh-CN">裝置名</span>
+                                                <span lang="zh-TW">裝置名</span>
+                                                <span class="option-label-id">exptech.name</span>
+                                            </div>
+                                        </div>
+                                        <div class="exptechlogin">
+                                            <div class="left">
+                                                <input class="input-field" id="exptech.name" type="text" onchange="TextSave('exptech.name')" placeholder="為此裝置取名建議不要與exptech旗下其他軟體同名" style="width: 510px;" />
+                                            </div>
+                                            <div class="right">
+                                                <label class="md3 switch">
+                                                    <input type="checkbox" id="exptech.name.Hide" onclick="CheckHide('exptech.name.Hide')">
+                                                    <span class="slider">
+                                                        <span class="material-symbols-rounded icon">done</span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="option-label">
+                                            <div class="option-label-title">
+                                                <span lang="en">email</span>
+                                                <span lang="ja">email</span>
+                                                <span lang="kr">email</span>
+                                                <span lang="ru">email</span> <!-- TODO: Untranslated, remove this comment after translation -->
+                                                <span lang="zh-CN">電子郵件</span>
+                                                <span lang="zh-TW">電子郵件</span>
+                                                <span class="option-label-id">exptech.email</span>
+                                            </div>
+                                            <div class="option-label-description">沒有去exptech申請電子郵件嗎?<a onclick="openURL('https:\/\/api.exptech.com.tw/file/exptech/login.html')">點我前往申請</a></div>
+                                        </div>
+                                        <div class="exptechlogin">
+                                            <div class="left">
+                                                <input class="input-field" id="exptech.email" type="text" onchange="TextSave('exptech.email')" placeholder="...@..." style="width: 510px;" />
+                                            </div>
+                                            <div class="right">
+                                                <label class="md3 switch">
+                                                    <input type="checkbox" id="exptech.email.Hide" onclick="CheckHide('exptech.email.Hide')">
+                                                    <span class="slider">
+                                                        <span class="material-symbols-rounded icon">done</span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="option-label">
+                                            <div class="option-label-title">
+                                                <span lang="en">password</span>
+                                                <span lang="ja">password</span>
+                                                <span lang="kr">password</span>
+                                                <span lang="ru">password</span> <!-- TODO: Untranslated, remove this comment after translation -->
+                                                <span lang="zh-CN">密碼</span>
+                                                <span lang="zh-TW">密碼</span>
+                                                <span class="option-label-id">不儲存密碼</span>
+                                            </div>
+                                        </div>
+                                        <div class="exptechlogin">
+                                            <div class="left">
+                                                <input class="input-field" id="exptech.pass" type="text" placeholder="password..." style="width: 510px;" />
+                                            </div>
+                                            <div class="right">
+                                                <div class="right-inner">
+                                                    <label class="md3 switch">
+                                                        <input type="checkbox" id="exptech.pass.Hide" onclick="CheckHide('exptech.pass.Hide')">
+                                                        <span class="slider">
+                                                            <span class="material-symbols-rounded icon">done</span>
+                                                        </span>
+                                                    </label>
+                                                    <button  class="filled-tonal-button setting-button md3-ripple" id="exptech.login" type="button" onclick="exptechlogin()">
+                                                        <span class="filled-tonal-button-label">
+                                                            <span lang="zh-TW">登入</span>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-title">
+                                    <span lang="en">exptech old</span>
+                                    <span lang="ja">exptech old</span>
+                                    <span lang="kr">exptech old</span>
+                                    <span lang="ru">exptech old</span>
+                                    <span lang="zh-CN">exptech old</span>
+                                    <span lang="zh-TW">exptech old</span>
+                                </div>
+                                <div class="control-container">
+                                    <div class="option-container input-field">
                                         <div class="option-label">
                                             <div class="option-label-title">
                                                 <span lang="en">API Key</span>

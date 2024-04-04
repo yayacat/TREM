@@ -94,7 +94,7 @@ const showDialog
  * @param {int} time time type of the dialog
  * @param {int} containerlock containerlock type of the dialog
  */
-= (type, title, message, button = 0, customIcon, callback = () => void 0, buttonAccepttext, buttonCanceltext, callbackCancel = () => void 0, time = 0, containerlock = 0) => {
+= (type, title, message, button = 0, customIcon, callback = () => void 0, buttonAccepttext, buttonCanceltext, callbackCancel = () => void 0, time = 0, containerlock = 0, callbackEnd = () => void 0) => {
 	if (showDialog_run) return;
 	showDialog_run = true;
 	const container = document.getElementById("modal-overlay");
@@ -190,6 +190,7 @@ const showDialog
 			}
 
 			closeDialog(...args);
+			callbackEnd();
 		};
 
 	$("#modal-overlay").fadeIn(50);

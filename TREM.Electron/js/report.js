@@ -901,6 +901,8 @@ TREM.Report = {
 									report.Max_Level_stationName = Max_Level_stationName;
 								}
 
+								ipcRenderer.send("report-Notification", report);
+
 								let _report_data = [];
 								_report_data = storage.getItem("report_data");
 
@@ -925,8 +927,6 @@ TREM.Report = {
 
 								storage.setItem("report_data", _report_data);
 								ipcRenderer.send("ReportGET");
-
-								ipcRenderer.send("report-Notification", report);
 
 								document.getElementById("report-overview-number").innerText = TREM.Localization.getString(report.loc.startsWith("地震資訊") ? "Report_Title_Local" : (report.no % 1000 ? report.no : "Report_Title_Small"));
 								document.getElementById("report-overview-location").innerText = report.loc;
@@ -1103,8 +1103,6 @@ TREM.Report = {
 						return "err";
 					});
 			} else {
-				ipcRenderer.send("report-Notification", report);
-
 				if (!report.Max_Level) {
 					let Max_Level = 0;
 					let Max_Level_areaName = "";
@@ -1148,6 +1146,8 @@ TREM.Report = {
 					report.Max_Level_areaName = Max_Level_areaName;
 					report.Max_Level_stationName = Max_Level_stationName;
 				}
+
+				ipcRenderer.send("report-Notification", report);
 
 				document.getElementById("report-overview-number").innerText = TREM.Localization.getString(report.loc.startsWith("地震資訊") ? "Report_Title_Local" : (report.no % 1000 ? report.no : "Report_Title_Small"));
 				document.getElementById("report-overview-location").innerText = report.loc;
@@ -1210,8 +1210,8 @@ TREM.Report = {
 							}
 						});
 					} else {
-						document.getElementById("report-replay-downloader-icon").innerText = "download";
-						document.getElementById("report-replay-downloader-text").innerText = "下載";
+						if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download";
+						if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "下載";
 						report.download = false;
 						this.cache.set(report.id, report);
 					}
