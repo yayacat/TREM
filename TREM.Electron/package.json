@@ -27,9 +27,6 @@
       ]
     },
     "dmg": {
-      "arch": [
-        "x64"
-      ],
       "contents": [
         {
           "x": 130,
@@ -44,9 +41,6 @@
       ]
     },
     "win": {
-      "arch": [
-        "x64"
-      ],
       "target": [
         "nsis",
         "portable",
@@ -55,17 +49,17 @@
       "icon": "TREM.ico"
     },
     "linux": {
-      "arch": [
-        "x64",
-        "arm64"
-      ],
       "target": [
         "deb",
         "AppImage",
         "rpm"
       ],
       "category": "Development",
-      "maintainer": "ExpTechTW"
+      "maintainer": "ExpTechTW",
+      "arch": [
+        "x64",
+        "arm64"
+      ]
     },
     "directories": {
       "buildResources": "resources",
