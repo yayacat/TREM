@@ -27,6 +27,9 @@
       ]
     },
     "dmg": {
+      "arch": [
+        "x64"
+      ],
       "contents": [
         {
           "x": 130,
@@ -41,6 +44,9 @@
       ]
     },
     "win": {
+      "arch": [
+        "x64"
+      ],
       "target": [
         "nsis",
         "portable",
