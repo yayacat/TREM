@@ -62,6 +62,33 @@ jobs:
           /home/runner/work/TREM/TREM/TREM.Electron/dev/*.AppImage
           /home/runner/work/TREM/TREM/TREM.Electron/dev/*.rpm
 
+  Linux_arm64:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: TREM.Electron
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Restore dependencies
+      run: npm i
+    - name: Lint
+      run: npm run lint
+    - name: Build
+      run: npm run dist
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Upload Artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: "TREM.Linux_arm64.deb"
+        path: |
+          /home/runner/work/TREM/TREM/TREM.Electron/dev/*.deb
+          /home/runner/work/TREM/TREM/TREM.Electron/dev/*.AppImage
+          /home/runner/work/TREM/TREM/TREM.Electron/dev/*.rpm
   macOS_x64:
     runs-on: macos-latest
     defaults:
