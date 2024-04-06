@@ -89,6 +89,7 @@ jobs:
           /home/runner/work/TREM/TREM/TREM.Electron/dev/*.deb
           /home/runner/work/TREM/TREM/TREM.Electron/dev/*.AppImage
           /home/runner/work/TREM/TREM/TREM.Electron/dev/*.rpm
+          
   macOS_x64:
     runs-on: macos-latest
     defaults:
