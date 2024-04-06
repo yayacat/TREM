@@ -73,7 +73,7 @@
         }
       ],
       "category": "Development",
-      "maintainer": "ExpTechTW",
+      "maintainer": "ExpTechTW"
     },
     "directories": {
       "buildResources": "resources",
