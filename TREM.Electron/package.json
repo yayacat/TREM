@@ -50,16 +50,30 @@
     },
     "linux": {
       "target": [
-        "deb",
-        "AppImage",
-        "rpm"
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "category": "Development",
       "maintainer": "ExpTechTW",
-      "arch": [
-        "x64",
-        "arm64"
-      ]
     },
     "directories": {
       "buildResources": "resources",
