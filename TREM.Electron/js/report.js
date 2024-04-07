@@ -57,6 +57,38 @@ TREM.Report = {
 		if (this.view == "report-list" || skipCheck) {
 			const fragment = new DocumentFragment();
 			const reports = Array.from(this.cache, ([k, v]) => v);
+
+			for (const report of reports)
+				if (!report.originTime) {
+					const now_format = (time) => new Date(time.toLocaleString("en-US", { hourCycle: "h23", timeZone: "Asia/Taipei" })).format("YYYY/MM/DD HH:mm:ss");
+					report.originTime = now_format(new Date(report.time));
+					this.cache.set(report.id, report);
+
+					let _report_data = [];
+					_report_data = storage.getItem("report_data");
+
+					for (let _i = 0; _i < _report_data.length; _i++)
+						if (_report_data[_i].id)
+							if (_report_data[_i].id === report.id)
+								_report_data.splice(_i, 1);
+
+					_report_data.push(report);
+
+					for (let i = 0; i < _report_data.length - 1; i++)
+						for (let _i = 0; _i < _report_data.length - 1; _i++) {
+							const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
+							const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
+
+							if (time_temp < time_1_temp) {
+								const temp = _report_data[_i + 1];
+								_report_data[_i + 1] = _report_data[_i];
+								_report_data[_i] = temp;
+							}
+						}
+
+					storage.setItem("report_data", _report_data);
+				}
+
 			this.reportList = reports
 				.filter(v => this._filterHasNumber ? (v.earthquakeNo ? v.earthquakeNo % 1000 != 0 : v.no % 1000 != 0) : true)
 				.filter(v => this._filterHasReplay ? v.ID?.length : true)
@@ -65,7 +97,7 @@ TREM.Report = {
 				.filter(v => this._filterTREM ? (v.location ? v.location.startsWith("地震資訊") : v.loc.startsWith("地震資訊")) : true)
 				.filter(v => this._filterCWA ? (v.identifier ? (v.identifier.startsWith("CWA") || v.identifier.startsWith("CWB")) : v.id.match(/-/g).length === 3) : true)
 				.filter(v => this._filterDate ? v.originTime.split(" ")[0] == this._filterDateValue : true)
-				.filter(v => this._filterMonth ? (v.originTime.split(" ")[0].split("/")[0] + "/" + v.originTime.split(" ")[0].split("/")[1]) == this._filterMonthValue : true);
+				.filter(v => this._filterMonth ? (v.originTime ? ((v.originTime.split(" ")[0].split("/")[0] + "/" + v.originTime.split(" ")[0].split("/")[1]) == this._filterMonthValue) : false) : false);
 
 			for (const report of reports) {
 				// if (setting["api.key"] == "" && report.data[0].areaIntensity == 0) continue;
