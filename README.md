@@ -40,7 +40,7 @@ TREMV 是一款開源地震速報軟體，提供給您即時的地震資訊，�
 #### Windows
 
 > **Warning**  
-> 此項目當前已不再維護 請參考替代方案 [TREM-Lite](https://github.com/ExpTechTW/TREM-Lite)
+> 此項目當前已不再維護 請參考替代方案 [TREM-tauri](https://github.com/ExpTechTW/TREM-tauri)
 
 #### MacOS
 目前還沒有提供 MacOS 支援，敬請期待 :3
@@ -76,7 +76,7 @@ TREMV 是一款開源地震速報軟體，提供給您即時的地震資訊，�
 - Yowoapple `俄文翻譯`
 - NYJ36 `韓文翻譯`
 - PGpenguin72 `簡體中文翻譯`
-- yayacat `簡體中文翻譯` `社區`
+- yayacat `簡體中文翻譯` `社區` `變體`
 - eggrollpvp `資料處理` `文檔`
 - M789 `圖形設計`
 - JQuake - PeP `音效`
