@@ -39,7 +39,7 @@ function handleWindowControls() {
 	}
 }
 
-const wave_count = +localStorage.getItem("displayWaveCount") ?? 8;
+const wave_count = +localStorage.getItem("displayWaveCount") ?? 12;
 
 console.log(`lb-${route.auto_run()}`);
 let ws = new WebSocket(route.randomWSBaseUrl());
@@ -173,6 +173,8 @@ const Real_time_station_run = () => {
 		Realtimestation4.split("-")[2],
 		Realtimestation5.split("-")[2],
 		Realtimestation.split("-")[2],
+		Realtimestation.split("-")[2],
+		Realtimestation.split("-")[2],
 	]);
 };
 
@@ -205,6 +207,8 @@ const Real_time_station = () => {
 				Realtimestation4.split("-")[2],
 				Realtimestation5.split("-")[2],
 				Realtimestation.split("-")[2],
+				Realtimestation.split("-")[2],
+				Realtimestation.split("-")[2],
 			]);
 		} else if (themedark != app.Configuration.data["theme.dark"]) {
 			themedark = app.Configuration.data["theme.dark"];
@@ -214,6 +218,8 @@ const Real_time_station = () => {
 				Realtimestation3.split("-")[2],
 				Realtimestation4.split("-")[2],
 				Realtimestation5.split("-")[2],
+				Realtimestation.split("-")[2],
+				Realtimestation.split("-")[2],
 				Realtimestation.split("-")[2],
 			]);
 		}
@@ -338,8 +344,12 @@ const charts = [
 	echarts.init(document.getElementById("wave-4"), null, { height: 560 / 6, width: 400 }),
 	echarts.init(document.getElementById("wave-5"), null, { height: 560 / 6, width: 400 }),
 	echarts.init(document.getElementById("wave-6"), null, { height: 560 / 6, width: 400 }),
+	echarts.init(document.getElementById("wave-7"), null, { height: 560 / 6, width: 400 }),
+	echarts.init(document.getElementById("wave-8"), null, { height: 560 / 6, width: 400 }),
 ];
 const chartdata = [
+	[],
+	[],
 	[],
 	[],
 	[],
@@ -359,18 +369,26 @@ for (let i = 0; i < wave_count; i++) {
  * @param {string[]} ids
  */
 const setCharts = (ids) => {
-	for (let i = 0; i < 6; i++)
+	for (let i = 0; i < 8; i++)
 		if (data.stations?.[ids[i]]?.uuid) {
 			if (chartuuids[i] != data.stations[ids[i]].uuid) {
 				chartuuids[i] = data.stations[ids[i]].uuid;
 				chartdata[i] = [];
 			}
 
-			charts[i].setOption({
-				title: {
-					text: `${data.stations[ids[i]].Loc} | ${chartuuids[i]}`,
-				},
-			});
+			if (i >= 5) {
+				charts[i].setOption({
+					title: {
+						text: `${data.stations[ids[i]].Loc} | ${chartuuids[i]} | ${(i == 5) ? "X" : (i == 6) ? "Y" : (i == 7) ? "Z" : ""}`,
+					},
+				});
+			} else {
+				charts[i].setOption({
+					title: {
+						text: `${data.stations[ids[i]].Loc} | ${chartuuids[i]}`,
+					},
+				});
+			}
 		} else {
 			chartuuids.splice(i, 1);
 			charts[i].clear();
@@ -429,49 +447,102 @@ const wave = (wave_data) => {
 
 	let id;
 
-	for (const i in chartuuids)
+	for (const i in chartuuids) {
 		if (parseInt(chartuuids[i].split("-")[2]) === wave_data_id)
 			id = i;
-
-
-	for (let i = 0; i < n; i++) {
-		const calculatedTime = time + (i * timeOffset);
-		chartdata[id].push({
-			name  : now.getTime(),
-			value : [new Date(calculatedTime).getTime(), Math.round(+wave_data.Z[i] * 1000)],
-		});
+		if (parseInt(Realtimestation.split("-")[2]) === wave_data_id)
+			id = 10;
 	}
 
-	while (true)
-		if (chartdata[id].length > (chartuuids[id].startsWith("H") ? 2950 : 1180)) {
-			chartdata[id].shift();
-		} else if (chartdata[id].length == (chartuuids[id].startsWith("H") ? 2950 : 1180)) {
-			break;
-		} else if (chartdata[id].length != (chartuuids[id].startsWith("H") ? 2950 : 1180)) {
-			chartdata[id].shift();
-			chartdata[id].unshift({
-				name  : new Date(time - 60_000).getTime(),
-				value : [new Date(time - 60_000).getTime(), null],
+	if (id == 10) {
+		for (let i = 0; i < n; i++) {
+			const calculatedTime = time + (i * timeOffset);
+			chartdata[5].push({
+				name  : now.getTime(),
+				value : [new Date(calculatedTime).getTime(), Math.round(+wave_data.X[i] * 1000)],
 			});
-			break;
+			chartdata[6].push({
+				name  : now.getTime(),
+				value : [new Date(calculatedTime).getTime(), Math.round(+wave_data.Y[i] * 1000)],
+			});
+			chartdata[7].push({
+				name  : now.getTime(),
+				value : [new Date(calculatedTime).getTime(), Math.round(+wave_data.Z[i] * 1000)],
+			});
 		}
 
-	const values = chartdata[id].map(v => v.value[1]);
-	const maxmin = Math.max(Math.abs(Math.max(...values)), Math.abs(Math.min(...values)));
+		for (let j = 5; j < 8; j++) {
+			while (true)
+				if (chartdata[j].length > (chartuuids[6].startsWith("H") ? 2975 : 2380)) {
+					chartdata[j].shift();
+				} else if (chartdata[j].length == (chartuuids[6].startsWith("H") ? 2975 : 2380)) {
+					break;
+				} else if (chartdata[j].length != (chartuuids[6].startsWith("H") ? 2975 : 2380)) {
+					chartdata[j].shift();
+					chartdata[j].unshift({
+						name  : new Date(time - 120_000).getTime(),
+						value : [new Date(time - 120_000).getTime(), null],
+					});
+					break;
+				}
 
-	charts[id].setOption({
-		animation : false,
-		yAxis     : {
-			max : maxmin < (chartuuids[id].startsWith("H") ? 1 : 1000) ? (chartuuids[id].startsWith("H") ? 1 : 1000) : maxmin,
-			min : -(maxmin < (chartuuids[id].startsWith("H") ? 1 : 1000) ? (chartuuids[id].startsWith("H") ? 1 : 1000) : maxmin),
-		},
-		series: [
-			{
-				type : "line",
-				data : chartdata[id],
+			const values = chartdata[j].map(v => v.value[1]);
+			const maxmin = Math.max(Math.abs(Math.max(...values)), Math.abs(Math.min(...values)));
+
+			charts[j].setOption({
+				animation : false,
+				yAxis     : {
+					max : maxmin < (chartuuids[6].startsWith("H") ? 1 : 1000) ? (chartuuids[6].startsWith("H") ? 1 : 1000) : maxmin,
+					min : -(maxmin < (chartuuids[6].startsWith("H") ? 1 : 1000) ? (chartuuids[6].startsWith("H") ? 1 : 1000) : maxmin),
+				},
+				series: [
+					{
+						type : "line",
+						data : chartdata[j],
+					},
+				],
+			});
+		}
+	} else {
+		for (let i = 0; i < n; i++) {
+			const calculatedTime = time + (i * timeOffset);
+			chartdata[id].push({
+				name  : now.getTime(),
+				value : [new Date(calculatedTime).getTime(), Math.round(+wave_data.Z[i] * 1000)],
+			});
+		}
+
+		while (true)
+			if (chartdata[id].length > (chartuuids[id].startsWith("H") ? 2975 : 2380)) {
+				chartdata[id].shift();
+			} else if (chartdata[id].length == (chartuuids[id].startsWith("H") ? 2975 : 2380)) {
+				break;
+			} else if (chartdata[id].length != (chartuuids[id].startsWith("H") ? 2975 : 2380)) {
+				chartdata[id].shift();
+				chartdata[id].unshift({
+					name  : new Date(time - 120_000).getTime(),
+					value : [new Date(time - 120_000).getTime(), null],
+				});
+				break;
+			}
+
+		const values = chartdata[id].map(v => v.value[1]);
+		const maxmin = Math.max(Math.abs(Math.max(...values)), Math.abs(Math.min(...values)));
+
+		charts[id].setOption({
+			animation : false,
+			yAxis     : {
+				max : maxmin < (chartuuids[id].startsWith("H") ? 1 : 1000) ? (chartuuids[id].startsWith("H") ? 1 : 1000) : maxmin,
+				min : -(maxmin < (chartuuids[id].startsWith("H") ? 1 : 1000) ? (chartuuids[id].startsWith("H") ? 1 : 1000) : maxmin),
 			},
-		],
-	});
+			series: [
+				{
+					type : "line",
+					data : chartdata[id],
+				},
+			],
+		});
+	}
 };
 
 async function init() {
@@ -499,6 +570,8 @@ async function init() {
 		Realtimestation3.split("-")[2],
 		Realtimestation4.split("-")[2],
 		Realtimestation5.split("-")[2],
+		Realtimestation.split("-")[2],
+		Realtimestation.split("-")[2],
 		Realtimestation.split("-")[2],
 	]);
 	for (const chart of charts)

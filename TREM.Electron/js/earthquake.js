@@ -2288,6 +2288,11 @@ function handler(Json) {
 									: (amount > 3) ? "pga2"
 										: "pga1";
 
+			if (setting["Real-time.websocket"] === "yayacat" && Alert) {
+				intensity = Math.round(current_data.i);
+				level_class = IntensityToClassString(intensity);
+			}
+
 			if (intensity > MaxIntensity1) MaxIntensity1 = intensity;
 
 			if (intensity > MaxIntensity2) MaxIntensity2 = intensity;

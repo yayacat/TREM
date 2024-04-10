@@ -193,9 +193,9 @@ function createRTSWindow() {
 	if (RTSWindow instanceof BrowserWindow) return RTSWindow.focus();
 	RTSWindow = TREM.Window.set("rts", new BrowserWindow({
 		title          : TREM.Localization.getString("Setting_Title"),
-		height         : 580,
+		height         : 774,
 		width          : 400,
-		minHeight      : 580,
+		minHeight      : 774,
 		minWidth       : 400,
 		frame          : false,
 		transparent    : true,
