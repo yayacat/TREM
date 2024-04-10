@@ -376,19 +376,18 @@ const setCharts = (ids) => {
 				chartdata[i] = [];
 			}
 
-			if (i >= 5) {
+			if (i >= 5)
 				charts[i].setOption({
 					title: {
 						text: `${data.stations[ids[i]].Loc} | ${chartuuids[i]} | ${(i == 5) ? "X" : (i == 6) ? "Y" : (i == 7) ? "Z" : ""}`,
 					},
 				});
-			} else {
+			else
 				charts[i].setOption({
 					title: {
 						text: `${data.stations[ids[i]].Loc} | ${chartuuids[i]}`,
 					},
 				});
-			}
 		} else {
 			chartuuids.splice(i, 1);
 			charts[i].clear();
@@ -450,6 +449,7 @@ const wave = (wave_data) => {
 	for (const i in chartuuids) {
 		if (parseInt(chartuuids[i].split("-")[2]) === wave_data_id)
 			id = i;
+
 		if (parseInt(Realtimestation.split("-")[2]) === wave_data_id)
 			id = 10;
 	}
