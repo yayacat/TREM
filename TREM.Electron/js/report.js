@@ -331,12 +331,12 @@ TREM.Report = {
 		// 	ipcRenderer.send("testEEW", list);
 		// }
 
-		// if (report.trem.length) {
+		// if (report.trem) {
 		// 	list = list.concat(report.trem);
 		// 	ipcRenderer.send("testEEW", list);
 		// }
 
-		if (!report.download || !report.ID.length || !report.trem.length) {
+		if (!report.download || !report.ID.length || !report.trem) {
 			this.replayHttp = true;
 			const oldtime = new Date(report.originTime.replace(/-/g, "/")).getTime();
 			ipcRenderer.send("testoldtimeEEW", oldtime);
@@ -1410,7 +1410,7 @@ TREM.Report = {
 	},
 	_setuptremget(report) {
 		if (this.report_trem)
-			if (report.trem.length != 0 && Array.isArray(report.trem)) {
+			if (report.trem && Array.isArray(report.trem)) {
 				if (!this.report_trem_data[report.trem[0]]?.trem)
 					fetch(`https://exptech.com.tw/api/v1/earthquake/trem-info/${report.trem[0]}`)
 						.then((res) => {
