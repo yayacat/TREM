@@ -100,7 +100,7 @@ TREM.Report = {
 				.filter(v => this._filterMonth ? (v.originTime ? ((v.originTime.split(" ")[0].split("/")[0] + "/" + v.originTime.split(" ")[0].split("/")[1]) == this._filterMonthValue) : false) : false);
 
 			for (const report of reports) {
-				// if (setting["api.key"] == "" && report.data[0].areaIntensity == 0) continue;
+				// if (setting["exptech.key"] == "" && report.data[0].areaIntensity == 0) continue;
 				const element = this._createReportItem(report);
 
 				if (report.mag) report.magnitudeValue = report.mag;
@@ -1134,7 +1134,7 @@ TREM.Report = {
 						dump({ level: 2, message: err });
 						return "err";
 					});
-			} else {
+			} else if (report.list) {
 				if (!report.Max_Level) {
 					let Max_Level = 0;
 					let Max_Level_areaName = "";

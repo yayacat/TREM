@@ -4,12 +4,18 @@
  * @template {string} [key = ""]
  * @template {number} [random_max_num = 4]
  * @template {number} [random_ws_num = 1~4]
+ * @template {number} [random_api_num = 1~2]
  */
 class Route {
 
 	/**
    * @typedef BaseUrl
    * @type {`https://lb-${number}.exptech.com.tw/api/v${version}`}
+   */
+
+	/**
+   * @typedef BaseApiUrl
+   * @type {`https://api-${number}.exptech.com.tw/api/v${version}`}
    */
 
 	/**
@@ -26,6 +32,7 @@ class Route {
 		this.key = options.key ?? "";
 		this.random_max_num = options.random_max_num ?? 4;
 		this.random_ws_num = this.randomWSNum();
+		this.random_api_num = this.randomAPINum();
 		this.ws_num = -1;
 		this.ws_num_bk = -1;
 	}
@@ -43,11 +50,23 @@ class Route {
 		return this.random_ws_num;
 	}
 
+	auto_api_run() {
+		this.random_api_num = this.randomAPINum();
+		return this.random_api_num;
+	}
+
 	/**
    * @returns {number}
    */
 	randomWSNum() {
 		return Math.ceil(Math.random() * this.random_max_num);
+	}
+
+	/**
+   * @returns {number}
+   */
+	randomAPINum() {
+		return Math.ceil(Math.random() * 2);
 	}
 
 	/**
@@ -74,6 +93,15 @@ class Route {
 	}
 
 	/**
+   * @template {number} version
+   * @param {version} version
+   * @returns {BaseUrl}
+   */
+	randomApiBaseUrl(version = this.version) {
+		return `https://api-${ this.random_api_num }.exptech.com.tw/api/v${ version }`;
+	}
+
+	/**
     * @returns {BaseFileUrl}
     */
 	randomBaseFileUrl() {
@@ -93,7 +121,7 @@ class Route {
    * @returns {`${BaseUrl}/eq/report?limit=${limit}&key=${key}`}
    */
 	earthquakeReportList(limit = "") {
-		return this.randomBaseUrl() + `/eq/report?limit=${limit}${this.key == "" ? "" : `&key=${this.key}`}`;
+		return this.randomApiBaseUrl() + `/eq/report?limit=${limit}${this.key == "" ? "" : `&key=${this.key}`}`;
 	}
 
 	/**
@@ -102,7 +130,7 @@ class Route {
    * @returns {`${BaseUrl}/eq/report/${id}`}
    */
 	earthquakeReport(id) {
-		return this.randomBaseUrl() + `/eq/report/${id}`;
+		return this.randomApiBaseUrl() + `/eq/report/${id}`;
 	}
 
 	/**

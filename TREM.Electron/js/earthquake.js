@@ -1804,7 +1804,7 @@ function PGAMain() {
 						}
 					} else if (!replayD) {
 						const url = route.rtsReplay(1, ReplayTime * 1000);
-						// + "&key=" + setting["api.key"]
+						// + "&key=" + setting["exptech.key"]
 						const controller = new AbortController();
 						setTimeout(() => {
 							controller.abort();
@@ -2038,7 +2038,7 @@ function PGAMainbkup() {
 						}
 					} else if (!replayD) {
 						const url = route.rtsReplay(1, ReplayTime * 1000);
-						// + "&key=" + setting["api.key"]
+						// + "&key=" + setting["exptech.key"]
 						axios({
 							method : "get",
 							url    : url,
@@ -3225,14 +3225,14 @@ function ReportGET(badcatch = false) {
 		// let bodyInfo;
 
 		// if (setting["report.getInfo"])
-		// 	bodyInfo = JSON.stringify({ list, key: setting["api.key"] != "" ? setting["api.key"] : "" });
-		// else if (setting["api.key"] != "")
-		// 	bodyInfo = JSON.stringify({ list, key: setting["api.key"] });
+		// 	bodyInfo = JSON.stringify({ list, key: setting["exptech.key"] != "" ? setting["exptech.key"] : "" });
+		// else if (setting["exptech.key"] != "")
+		// 	bodyInfo = JSON.stringify({ list, key: setting["exptech.key"] });
 		// else
 		// bodyInfo = JSON.stringify({ list });
 
 		if (api_key_verify && setting["report.getInfo"] && !badcatch) {
-			route.setkey(setting["api.key"]);
+			route.setkey(setting["exptech.key"]);
 			const controller1 = new AbortController();
 			setTimeout(() => {
 				controller1.abort();
@@ -3734,7 +3734,7 @@ function Report_GET() {
 					}
 				}
 
-			// if (setting["api.key"] != "") ReportGET();
+			// if (setting["exptech.key"] != "") ReportGET();
 			// else cacheReport(_report_data_GET_temp);
 			cacheReport(_report_data_GET_temp);
 		}
@@ -3831,7 +3831,7 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 	if (replay != 0 && OriginTime > new Date(replay + (NOW().getTime() - replayT)).getTime()) return;
 
 	const Level = report.int ? IntensityI(report.int) : IntensityI(report.data[0]?.areaIntensity);
-	// if (setting["api.key"] == "" && Level == "?") return;
+	// if (setting["exptech.key"] == "" && Level == "?") return;
 	let msg = "";
 	let star = "";
 
@@ -5129,10 +5129,13 @@ function FCMdata(json, Unit) {
 	// const json = JSON.parse(data);
 	console.log(json);
 
+	if (server_timestamp.includes(json.id)) return;
+	server_timestamp.push(json.id);
+
 	if (server_timestamp.includes(json.timestamp) || NOW().getTime() - json.timestamp > 180_000) return;
 	server_timestamp.push(json.timestamp);
 
-	if (server_timestamp.length > 15) server_timestamp.splice(0, 1);
+	if (server_timestamp.length > 30) server_timestamp.splice(0, 1);
 	// eslint-disable-next-line no-empty-function
 	fs.writeFile(path.join(app.getPath("userData"), "server.json"), JSON.stringify(server_timestamp), () => {});
 	// GetData = true;

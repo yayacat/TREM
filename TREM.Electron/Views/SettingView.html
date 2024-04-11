@@ -3407,33 +3407,6 @@
                                 </div>
                                 <div class="control-container">
                                     <div class="option-container input-field">
-                                        <div class="option-container">
-                                            <div class="option-label">
-                                                <div class="option-label-title">
-                                                    <span lang="en">Turn on new verification mode</span>
-                                                    <span lang="ja">?</span>
-                                                    <span lang="kr">?</span>
-                                                    <span lang="ru">?</span>
-                                                    <span lang="zh-CN">?</span>
-                                                    <span lang="zh-TW">新驗證模式</span>
-                                                    <span class="option-label-id">exptech.open</span>
-                                                </div>
-                                                <div class="option-label-description">
-                                                    <span lang="en">?</span>
-                                                    <span lang="ja">?</span>
-                                                    <span lang="kr">?</span>
-                                                    <span lang="ru">?</span>
-                                                    <span lang="zh-CN">?</span>
-                                                    <span lang="zh-TW">開啟新驗證模式。</span>
-                                                </div>
-                                            </div>
-                                            <label class="md3 switch">
-                                                <input type="checkbox" id="exptech.open" onclick="CheckSave('exptech.open')">
-                                                <span class="slider">
-                                                    <span class="material-symbols-rounded icon">done</span>
-                                                </span>
-                                            </label>
-                                        </div>
                                         <div class="option-label">
                                             <div class="option-label-title">
                                                 <span lang="en">name</span>
@@ -3514,124 +3487,37 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="control-title">
-                                    <span lang="en">exptech old</span>
-                                    <span lang="ja">exptech old</span>
-                                    <span lang="kr">exptech old</span>
-                                    <span lang="ru">exptech old</span>
-                                    <span lang="zh-CN">exptech old</span>
-                                    <span lang="zh-TW">exptech old</span>
-                                </div>
-                                <div class="control-container">
-                                    <div class="option-container input-field">
-                                        <div class="option-label">
-                                            <div class="option-label-title">
-                                                <span lang="en">API Key</span>
-                                                <span lang="ja">API キー</span>
-                                                <span lang="kr">API 키</span>
-                                                <span lang="ru">API Key</span> <!-- TODO: Untranslated, remove this comment after translation -->
-                                                <span lang="zh-CN">API 秘钥</span>
-                                                <span lang="zh-TW">API 金鑰</span>
-                                                <span class="option-label-id">api.key</span>
+                                        <div class="option-container">
+                                            <div class="option-label">
+                                                <div class="option-label-title">
+                                                    <span lang="en">live streaming mode</span>
+                                                    <span lang="ja">?</span>
+                                                    <span lang="kr">?</span>
+                                                    <span lang="ru">?</span>
+                                                    <span lang="zh-CN">?</span>
+                                                    <span lang="zh-TW">rtw獨立key</span>
+                                                    <span class="option-label-id">rtw.key.only</span>
+                                                </div>
+                                                <div class="option-label-description">
+                                                    <span lang="en">?</span>
+                                                    <span lang="ja">?</span>
+                                                    <span lang="kr">?</span>
+                                                    <span lang="ru">?</span>
+                                                    <span lang="zh-CN">?</span>
+                                                    <span lang="zh-TW">與rts獨立分開key。</span>
+                                                </div>
                                             </div>
-                                            <div class="option-label-description">
-                                                <span lang="en">With a personal API Key, you can have elevated access to more content and avoid being rate-limited from using a public key.
-                                                    Personal API Keys can be obtained by making applications to ExpTech.</span>
-                                                <span lang="ja">個人用 API キーを使用すると、より多くのコンテンツへのアクセスが可能になり、公開APIキーの使用によるレートリミットを回避できます。
-                                                    個人用 API キーは、 ExpTech に申請することで取得できます。</span>
-                                                <span lang="kr">개인 API키를 사용하면 더 많은 정보에 접근할 수 있고, 공용 키 사용으로 인한 속도 제한을 피할 수 있습니다.
-                                                    개인 API키는 ExpTech에 신청하여 발급받을 수 있습니다.</span>
-                                                <span lang="ru">With a personal API Key, you can have elevated access to more content and avoid being rate-limited from using a public key.
-                                                    Personal API Keys can be obtained by making applications to ExpTech.</span> <!-- TODO: Untranslated, remove this comment after translation -->
-                                                <span lang="zh-CN">使用个人 API 秘钥，您可以获得对更多内容的访问权限，并避免因使用公钥而受到速率限制。
-                                                    个人 API 秘钥可以通过向 ExpTech 申请获得。</span>
-                                                <span lang="zh-TW">使用私有 API 金鑰，你將可以獲得對更多內容的權限，並可避免因使用公共金鑰而受到速率限制。
-                                                    私有 API 金鑰可以通過向 ExpTech 提出申請來獲得。</span>
-                                            </div>
-                                            <div class="option-label-description" onclick="openURL('https:\/\/api.exptech.com.tw/file/exptech/login.html')">點我前往exptech申請</div>
-                                        </div>
-                                        <div class="tremkey">
-                                            <div class="left">
-                                                <input class="input-field" id="api.key" type="text" onchange="TextSave('api.key')" placeholder="46XXXX95-XXXX-XXXX-8XX3-XXXXX..." style="width: 510px;" />
-                                            </div>
-                                            <div class="right">
-                                                <label class="md3 switch">
-                                                    <input type="checkbox" id="api.key.Hide" onclick="CheckHide('api.key.Hide')">
-                                                    <span class="slider">
-                                                        <span class="material-symbols-rounded icon">done</span>
-                                                    </span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="option-container">
-                                        <div class="option-label">
-                                            <div class="option-label-title">
-                                                <span lang="en">live streaming mode</span>
-                                                <span lang="ja">?</span>
-                                                <span lang="kr">?</span>
-                                                <span lang="ru">?</span>
-                                                <span lang="zh-CN">?</span>
-                                                <span lang="zh-TW">rtw獨立key</span>
-                                                <span class="option-label-id">rtw.key.only</span>
-                                            </div>
-                                            <div class="option-label-description">
-                                                <span lang="en">?</span>
-                                                <span lang="ja">?</span>
-                                                <span lang="kr">?</span>
-                                                <span lang="ru">?</span>
-                                                <span lang="zh-CN">?</span>
-                                                <span lang="zh-TW">與rts獨立分開key。</span>
-                                            </div>
-                                        </div>
-                                        <label class="md3 switch">
-                                            <input type="checkbox" id="rtw.key.only" onclick="CheckSave('rtw.key.only')">
-                                            <span class="slider">
-                                                <span class="material-symbols-rounded icon">done</span>
-                                            </span>
-                                        </label>
-                                    </div>
-                                    <div class="option-container input-field">
-                                        <div class="option-label">
-                                            <div class="option-label-title">
-                                                <span lang="en">rtw API Key</span>
-                                                <span lang="ja">rtw API キー</span>
-                                                <span lang="kr">rtw API 키</span>
-                                                <span lang="ru">rtw API Key</span> <!-- TODO: Untranslated, remove this comment after translation -->
-                                                <span lang="zh-CN">rtw API 秘钥</span>
-                                                <span lang="zh-TW">rtw API 金鑰</span>
-                                                <span class="option-label-id">rtw.api.key</span>
-                                            </div>
-                                            <div class="option-label-description">
-                                                <span lang="en">With a personal API Key, you can have elevated access to more content and avoid being rate-limited from using a public key.
-                                                    Personal API Keys can be obtained by making applications to ExpTech.</span>
-                                                <span lang="ja">個人用 API キーを使用すると、より多くのコンテンツへのアクセスが可能になり、公開APIキーの使用によるレートリミットを回避できます。
-                                                    個人用 API キーは、 ExpTech に申請することで取得できます。</span>
-                                                <span lang="kr">개인 API키를 사용하면 더 많은 정보에 접근할 수 있고, 공용 키 사용으로 인한 속도 제한을 피할 수 있습니다.
-                                                    개인 API키는 ExpTech에 신청하여 발급받을 수 있습니다.</span>
-                                                <span lang="ru">With a personal API Key, you can have elevated access to more content and avoid being rate-limited from using a public key.
-                                                    Personal API Keys can be obtained by making applications to ExpTech.</span> <!-- TODO: Untranslated, remove this comment after translation -->
-                                                <span lang="zh-CN">使用个人 API 秘钥，您可以获得对更多内容的访问权限，并避免因使用公钥而受到速率限制。
-                                                    个人 API 秘钥可以通过向 ExpTech 申请获得。</span>
-                                                <span lang="zh-TW">使用私有 API 金鑰，你將可以獲得對更多內容的權限，並可避免因使用公共金鑰而受到速率限制。
-                                                    私有 API 金鑰可以通過向 ExpTech 提出申請來獲得。</span>
-                                            </div>
-                                            <div class="option-label-description" onclick="openURL('https:\/\/api.exptech.com.tw/file/exptech/login.html')">點我前往exptech申請</div>
-                                        </div>
-                                        <div class="tremkey">
-                                            <div class="left">
-                                                <input class="input-field" id="rtw.api.key" type="text" onchange="TextSave('rtw.api.key')" placeholder="46XXXX95-XXXX-XXXX-8XX3-XXXXX..." style="width: 510px;" />
-                                            </div>
-                                            <div class="right">
-                                                <label class="md3 switch">
-                                                    <input type="checkbox" id="rtw.api.key.Hide" onclick="CheckHide('rtw.api.key.Hide')">
-                                                    <span class="slider">
-                                                        <span class="material-symbols-rounded icon">done</span>
-                                                    </span>
-                                                </label>
-                                            </div>
+                                            <label class="md3 switch">
+                                                <input type="checkbox" id="rtw.key.only" onclick="CheckSave('rtw.key.only')">
+                                                <span class="slider">
+                                                    <span class="material-symbols-rounded icon">done</span>
+                                                </span>
+                                            </label>
+                                            <button  class="filled-tonal-button setting-button md3-ripple" id="exptech.rtw.login" type="button" onclick="exptechrtwlogin()">
+                                                <span class="filled-tonal-button-label">
+                                                    <span lang="zh-TW">登入</span>
+                                                </span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

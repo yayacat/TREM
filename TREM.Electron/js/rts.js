@@ -94,7 +94,7 @@ const connect = (retryTimeout) => {
 	};
 
 	ws.onopen = function() {
-		const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.api.key"] != "" ? app.Configuration.data["rtw.api.key"] : "") : (app.Configuration.data["api.key"] != "" ? app.Configuration.data["api.key"] : "");
+		const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.exptech.key"] != "" ? app.Configuration.data["rtw.exptech.key"] : "") : (app.Configuration.data["exptech.key"] != "" ? app.Configuration.data["exptech.key"] : "");
 		ws.send(JSON.stringify({
 			type    : "start",
 			key     : key,
@@ -150,7 +150,7 @@ const Real_time_station_run = () => {
 		Realtimestation5,
 		Realtimestation,
 	];
-	const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.api.key"] != "" ? app.Configuration.data["rtw.api.key"] : "") : (app.Configuration.data["api.key"] != "" ? app.Configuration.data["api.key"] : "");
+	const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.exptech.key"] != "" ? app.Configuration.data["rtw.exptech.key"] : "") : (app.Configuration.data["exptech.key"] != "" ? app.Configuration.data["exptech.key"] : "");
 	ws.send(JSON.stringify({
 		type    : "start",
 		key     : key,
@@ -436,11 +436,12 @@ const setCharts = (ids) => {
 const wave = (wave_data) => {
 	// console.log(wave_data);
 
-	const time = wave_data.time;
+	// const time = wave_data.time;
 	const wave_data_id = wave_data.id;
 	const n = wave_data.Z.length;
 	const timeOffset = 500 / n;
 	const now = new Date(Date.now());
+	const time = Date.now();
 
 	const arr = [];
 
@@ -473,11 +474,11 @@ const wave = (wave_data) => {
 
 		for (let j = 5; j < 8; j++) {
 			while (true)
-				if (chartdata[j].length > (chartuuids[6].startsWith("H") ? 2975 : 2380)) {
+				if (chartdata[j].length > (chartuuids[6].startsWith("H") ? 5950 : 2380)) {
 					chartdata[j].shift();
-				} else if (chartdata[j].length == (chartuuids[6].startsWith("H") ? 2975 : 2380)) {
+				} else if (chartdata[j].length == (chartuuids[6].startsWith("H") ? 5950 : 2380)) {
 					break;
-				} else if (chartdata[j].length != (chartuuids[6].startsWith("H") ? 2975 : 2380)) {
+				} else if (chartdata[j].length != (chartuuids[6].startsWith("H") ? 5950 : 2380)) {
 					chartdata[j].shift();
 					chartdata[j].unshift({
 						name  : new Date(time - 120_000).getTime(),
@@ -513,11 +514,11 @@ const wave = (wave_data) => {
 		}
 
 		while (true)
-			if (chartdata[id].length > (chartuuids[id].startsWith("H") ? 2975 : 2380)) {
+			if (chartdata[id].length > (chartuuids[id].startsWith("H") ? 5950 : 2380)) {
 				chartdata[id].shift();
-			} else if (chartdata[id].length == (chartuuids[id].startsWith("H") ? 2975 : 2380)) {
+			} else if (chartdata[id].length == (chartuuids[id].startsWith("H") ? 5950 : 2380)) {
 				break;
-			} else if (chartdata[id].length != (chartuuids[id].startsWith("H") ? 2975 : 2380)) {
+			} else if (chartdata[id].length != (chartuuids[id].startsWith("H") ? 5950 : 2380)) {
 				chartdata[id].shift();
 				chartdata[id].unshift({
 					name  : new Date(time - 120_000).getTime(),

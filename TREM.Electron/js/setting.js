@@ -50,7 +50,7 @@ function handleWindowControls() {
 
 document.getElementById("client-version").innerText = `${app.getVersion()}`;
 document.getElementById("client-os").innerText = `${os.version()} (${os.release()})`;
-// document.getElementById("client-key").title = `${setting["api.key"]}`;
+// document.getElementById("client-key").title = `${setting["exptech.key"]}`;
 
 const openURL = url => {
 	ipcRenderer.send("openURL", url);
@@ -82,6 +82,9 @@ ipcRenderer.on("settingError", (event, error) => {
 });
 
 const station = {};
+
+let keyhave = false;
+let keyhave_rtw = false;
 
 /**
  * 初始化設定
@@ -139,18 +142,6 @@ function init() {
 						else
 							$("#intensity-palette-container").addClass("hide");
 
-					if (id == "api.key.Hide")
-						if (setting[id])
-							document.getElementById("api.key").type = "password";
-						else
-							document.getElementById("api.key").type = "text";
-
-					if (id == "rtw.api.key.Hide")
-						if (setting[id])
-							document.getElementById("rtw.api.key").type = "password";
-						else
-							document.getElementById("rtw.api.key").type = "text";
-
 					if (id == "exptech.name.Hide")
 						if (setting[id])
 							document.getElementById("exptech.name").type = "password";
@@ -182,7 +173,7 @@ function init() {
 				const element = document.getElementById(id);
 
 				if (element) {
-					// if (id == "api.key")
+					// if (id == "exptech.key")
 					// 	element.placeholder = "•".repeat(setting[id].length);
 					// else
 					element.value = setting[id];
@@ -428,13 +419,37 @@ function init() {
 	// #endregion
 
 	// document.getElementById("client-key").addEventListener("click", () => {
-	// 	navigator.clipboard.writeText(`${setting["api.key"]}`).then(() => {
-	// 		console.debug(`${setting["api.key"]}`);
+	// 	navigator.clipboard.writeText(`${setting["exptech.key"]}`).then(() => {
+	// 		console.debug(`${setting["exptech.key"]}`);
 	// 		console.debug("複製成功");
 	// 	});
 	// });
 
 	stream_mode(setting["stream.mode"]);
+
+	if (setting["exptech.key"]) {
+		// 選取按鈕元素
+		const button = document.getElementById("exptech.login");
+
+		// 選取 <span> 元素
+		const span = button.querySelector(".filled-tonal-button-label > span");
+
+		// 更改 <span> 文字
+		span.textContent = "登出";
+		keyhave = true;
+	}
+
+	if (setting["rtw.exptech.key"]) {
+		// 選取按鈕元素
+		const button = document.getElementById("exptech.rtw.login");
+
+		// 選取 <span> 元素
+		const span = button.querySelector(".filled-tonal-button-label > span");
+
+		// 更改 <span> 文字
+		span.textContent = "登出";
+		keyhave_rtw = true;
+	}
 }
 
 function station_v2_run(station_data) {
@@ -766,18 +781,6 @@ function CheckSave(id) {
 function CheckHide(id) {
 	const value = document.getElementById(id).checked;
 
-	if (id == "api.key.Hide")
-		if (value)
-			document.getElementById("api.key").type = "password";
-		else
-			document.getElementById("api.key").type = "text";
-
-	if (id == "rtw.api.key.Hide")
-		if (value)
-			document.getElementById("rtw.api.key").type = "password";
-		else
-			document.getElementById("rtw.api.key").type = "text";
-
 	if (id == "exptech.name.Hide")
 		if (value)
 			document.getElementById("exptech.name").type = "password";
@@ -803,7 +806,7 @@ function TextSave(id) {
 	log(`Value Changed ${id}: ${setting[id]} -> ${value}`, 1, "Setting", "TextSave");
 	dump({ level: 0, message: `Value Changed ${id}: ${setting[id]} -> ${value}`, origin: "Setting" });
 
-	if (id == "api.key")
+	if (id == "exptech.key")
 		if (value.length == 30)
 			ipcRenderer.send("config:value", id, value);
 		else if (value.length == 0)
@@ -1962,8 +1965,6 @@ ipcRenderer.on("p2p6", (event, data, server_ips) => {
 	p2p_out_num.append(p2p_out_num_span);
 });
 
-let keyhave = false;
-
 async function exptechlogin() {
 	const EMAIL = document.getElementById("exptech.email").value;
 
@@ -1973,7 +1974,7 @@ async function exptechlogin() {
 		// console.log(EMAIL);
 		// console.log(PASS);
 		// console.log(NAME);
-		const key = await login({ email: EMAIL, pass: PASS, name: NAME });
+		const key = await login({ email: EMAIL, pass: PASS, name: NAME }, "rts");
 
 		if (key != "") {
 			showDialog("success",
@@ -1996,7 +1997,7 @@ async function exptechlogin() {
 		}
 	} else if (setting["exptech.key"]) {
 		const KEY = setting["exptech.key"];
-		const out = await logout({ email: EMAIL, key: KEY });
+		const out = await logout(KEY);
 
 		if (out != "") {
 			console.log("ok");
@@ -2019,12 +2020,68 @@ async function exptechlogin() {
 			keyhave = false;
 		}
 	}
+}
 
+async function exptechrtwlogin() {
+	const EMAIL = document.getElementById("exptech.email").value;
+
+	if (!keyhave_rtw) {
+		const PASS = document.getElementById("exptech.pass").value;
+		const NAME = `${document.getElementById("exptech.name").value}/TREMV-rtw/${app.getVersion()}/${os.release()}`;
+		// console.log(EMAIL);
+		// console.log(PASS);
+		// console.log(NAME);
+		const key = await login({ email: EMAIL, pass: PASS, name: NAME }, "rtw");
+
+		if (key != "") {
+			showDialog("success",
+				TREM.Localization.getString("exptech_rtw_login_Title"),
+				TREM.Localization.getString("exptech_rtw_login_success"),
+				0, "check", () => {
+					ipcRenderer.send("config:value", "rtw.exptech.key", key);
+				}, "OK", "", () => void 0, 0, 0, () => {
+					ipcRenderer.send("config:value", "rtw.exptech.key", key);
+				});
+			// 選取按鈕元素
+			const button = document.getElementById("exptech.rtw.login");
+
+			// 選取 <span> 元素
+			const span = button.querySelector(".filled-tonal-button-label > span");
+
+			// 更改 <span> 文字
+			span.textContent = "登出";
+			keyhave_rtw = true;
+		}
+	} else if (setting["rtw.exptech.key"]) {
+		const KEY = setting["rtw.exptech.key"];
+		const out = await logout(KEY);
+
+		if (out != "") {
+			console.log("ok");
+			showDialog("success",
+				TREM.Localization.getString("exptech_rtw_logout_Title"),
+				TREM.Localization.getString("exptech_rtw_logout_success"),
+				0, "check", () => {
+					ipcRenderer.send("config:value", "rtw.exptech.key", "");
+				}, "OK", "", () => void 0, 0, 0, () => {
+					ipcRenderer.send("config:value", "rtw.exptech.key", "");
+				});
+			// 選取按鈕元素
+			const button = document.getElementById("exptech.rtw.login");
+
+			// 選取 <span> 元素
+			const span = button.querySelector(".filled-tonal-button-label > span");
+
+			// 更改 <span> 文字
+			span.textContent = "登入";
+			keyhave_rtw = false;
+		}
+	}
 }
 
 const BASE_URL = "https://api.exptech.com.tw/api/v3/et/";
 
-async function login(data) {
+async function login(data, name) {
 	try {
 		const response = await fetch(`${BASE_URL}login`, {
 			method  : "POST",
@@ -2037,26 +2094,38 @@ async function login(data) {
 		return ans;
 	} catch (err) {
 		console.log(err);
-		showDialog("error",
-			TREM.Localization.getString("exptech_login_Title"),
-			TREM.Localization.getString("exptech_login_error"),
-			0, "error", () => {
-				const key = "";
-				ipcRenderer.send("config:value", "exptech.key", key);
-			}, "OK", "", () => void 0, 0, 0, () => {
-				const key = "";
-				ipcRenderer.send("config:value", "exptech.key", key);
-			});
+
+		if (name == "rts")
+			showDialog("error",
+				TREM.Localization.getString("exptech_login_Title"),
+				TREM.Localization.getString("exptech_login_error"),
+				0, "error", () => {
+					const key = "";
+					ipcRenderer.send("config:value", "exptech.key", key);
+				}, "OK", "", () => void 0, 0, 0, () => {
+					const key = "";
+					ipcRenderer.send("config:value", "exptech.key", key);
+				});
+		else if (name == "rtw")
+			showDialog("error",
+				TREM.Localization.getString("exptech_rtw_login_Title"),
+				TREM.Localization.getString("exptech_rtw_login_error"),
+				0, "error", () => {
+					const key = "";
+					ipcRenderer.send("config:value", "rtw.exptech.key", key);
+				}, "OK", "", () => void 0, 0, 0, () => {
+					const key = "";
+					ipcRenderer.send("config:value", "rtw.exptech.key", key);
+				});
 		return "";
 	}
 }
 
-async function logout(data) {
+async function logout(KEY, name) {
 	try {
 		const response = await fetch(`${BASE_URL}logout`, {
-			method  : "POST",
-			headers : { "Content-Type": "application/json" },
-			body    : JSON.stringify(data),
+			method  : "DELETE",
+			headers : { Authorization: `Basic ${KEY}` },
 		});
 		const ans = await response.text();
 
@@ -2064,10 +2133,17 @@ async function logout(data) {
 		return ans;
 	} catch (err) {
 		console.log(err);
-		showDialog("error",
-			TREM.Localization.getString("exptech_logout_Title"),
-			TREM.Localization.getString("exptech_logout_error"),
-			0, "error", () => void 0, "OK", "", () => void 0, 0, 0, () => void 0);
+
+		if (name == "rts")
+			showDialog("error",
+				TREM.Localization.getString("exptech_logout_Title"),
+				TREM.Localization.getString("exptech_logout_error"),
+				0, "error", () => void 0, "OK", "", () => void 0, 0, 0, () => void 0);
+		else if (name == "rtw")
+			showDialog("error",
+				TREM.Localization.getString("exptech_rtw_logout_Title"),
+				TREM.Localization.getString("exptech_rtw_logout_error"),
+				0, "error", () => void 0, "OK", "", () => void 0, 0, 0, () => void 0);
 		return "";
 	}
 }

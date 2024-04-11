@@ -832,8 +832,8 @@ ipcMain.on("config:value", (event, key, value) => {
 			break;
 		}
 
-		case "api.key": {
-			TREM.Configuration.data["api.key"] = value;
+		case "exptech.key": {
+			TREM.Configuration.data["exptech.key"] = value;
 			emitAllWindow("setting", TREM.Configuration._data);
 			emitAllWindow("apikey");
 			break;
