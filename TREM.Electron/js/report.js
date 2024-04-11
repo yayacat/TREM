@@ -771,8 +771,8 @@ TREM.Report = {
 			document.getElementById("report-replay").value = report.identifier;
 			document.getElementById("report-replay-downloader").value = report.identifier;
 
-			if (report.trem[0]) {
-				document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem[0]}`;
+			if (report.trem) {
+				document.getElementById("report-TREM").value = `https://api.exptech.com.tw/file/trem_info.html?id=${report.trem}`;
 				document.getElementById("report-TREM").style.display = "";
 			} else {
 				document.getElementById("report-TREM").style.display = "none";
@@ -995,8 +995,8 @@ TREM.Report = {
 								// document.getElementById("report-replay").value = report.id;
 								// document.getElementById("report-replay-downloader").value = report.id;
 
-								// if (report.trem[0]) {
-								// 	document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem[0]}`;
+								// if (report.trem) {
+								// 	document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem}`;
 								// 	document.getElementById("report-TREM").style.display = "";
 								// } else {
 								// 	document.getElementById("report-TREM").style.display = "none";
@@ -1216,8 +1216,8 @@ TREM.Report = {
 				// document.getElementById("report-replay").value = report.id;
 				// document.getElementById("report-replay-downloader").value = report.id;
 
-				// if (report.trem[0]) {
-				// 	document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem[0]}`;
+				// if (report.trem) {
+				// 	document.getElementById("report-TREM").value = `https://exptech.com.tw/api/v1/file/trem-info.html?id=${report.trem}`;
 				// 	document.getElementById("report-TREM").style.display = "";
 				// } else {
 				// 	document.getElementById("report-TREM").style.display = "none";
@@ -1411,16 +1411,16 @@ TREM.Report = {
 	_setuptremget(report) {
 		if (this.report_trem)
 			if (report.trem && Array.isArray(report.trem)) {
-				if (!this.report_trem_data[report.trem[0]]?.trem)
-					fetch(`https://exptech.com.tw/api/v1/earthquake/trem-info/${report.trem[0]}`)
+				if (!this.report_trem_data[report.trem]?.trem)
+					fetch(`https://exptech.com.tw/api/v1/earthquake/trem-info/${report.trem}`)
 						.then((res) => {
 							if (res.ok) {
 								console.debug(res);
 
 								res.json().then(res1 => {
 									console.debug(res1);
-									this._report_trem_data[report.trem[0]] = res1;
-									this.report_trem_data[report.trem[0]] = this._report_trem_data[report.trem[0]];
+									this._report_trem_data[report.trem] = res1;
+									this.report_trem_data[report.trem] = this._report_trem_data[report.trem];
 									storage.setItem("report_trem_data", this._report_trem_data);
 									this._setuptremmarker(report);
 								});
@@ -1458,16 +1458,16 @@ TREM.Report = {
 							this._setupzoomPredict();
 						});
 
-				if (!this.report_trem_data[report.trem[0]])
-					fetch(`https://exptech.com.tw/api/v1/file?path=/trem_report/${report.trem[0]}.json`)
+				if (!this.report_trem_data[report.trem])
+					fetch(`https://exptech.com.tw/api/v1/file?path=/trem_report/${report.trem}.json`)
 						.then((res) => {
 							if (res.ok) {
 								console.debug(res);
 
 								res.json().then(res1 => {
 									console.debug(res1);
-									this._report_trem_data[report.trem[0]] = res1;
-									this.report_trem_data[report.trem[0]] = this._report_trem_data[report.trem[0]];
+									this._report_trem_data[report.trem] = res1;
+									this.report_trem_data[report.trem] = this._report_trem_data[report.trem];
 									storage.setItem("report_trem_data", this._report_trem_data);
 									this._setuptremmarker(report);
 								});
@@ -1504,16 +1504,16 @@ TREM.Report = {
 							dump({ level: 2, message: err });
 							this._setupzoomPredict();
 						});
-				else if (!this.report_trem_data[report.trem[0]].trem || !this.report_trem_data[report.trem[0]].eew || !this.report_trem_data[report.trem[0]].note?.rf)
-					fetch(`https://exptech.com.tw/api/v1/file?path=/trem_report/${report.trem[0]}.json`)
+				else if (!this.report_trem_data[report.trem].trem || !this.report_trem_data[report.trem].eew || !this.report_trem_data[report.trem].note?.rf)
+					fetch(`https://exptech.com.tw/api/v1/file?path=/trem_report/${report.trem}.json`)
 						.then((res) => {
 							if (res.ok) {
 								console.debug(res);
 
 								res.json().then(res1 => {
 									console.debug(res1);
-									this._report_trem_data[report.trem[0]] = res1;
-									this.report_trem_data[report.trem[0]] = this._report_trem_data[report.trem[0]];
+									this._report_trem_data[report.trem] = res1;
+									this.report_trem_data[report.trem] = this._report_trem_data[report.trem];
 									storage.setItem("report_trem_data", this._report_trem_data);
 									this._setuptremmarker(report);
 								});
@@ -1561,9 +1561,9 @@ TREM.Report = {
 	_setuptremmarker(report) {
 		this.report_trem_station = {};
 
-		if (this.report_trem_data[report.trem[0]]) {
+		if (this.report_trem_data[report.trem]) {
 			let Station_i0 = 0;
-			const res = this.report_trem_data[report.trem[0]];
+			const res = this.report_trem_data[report.trem];
 
 			for (let index0 = 0; index0 < res.station.length; index0++) {
 				const info = res.station[index0];
