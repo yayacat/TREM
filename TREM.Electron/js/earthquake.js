@@ -5129,9 +5129,6 @@ function FCMdata(json, Unit) {
 	// const json = JSON.parse(data);
 	console.log(json);
 
-	if (server_timestamp.includes(json.id)) return;
-	server_timestamp.push(json.id);
-
 	if (server_timestamp.includes(json.timestamp) || NOW().getTime() - json.timestamp > 180_000) return;
 	server_timestamp.push(json.timestamp);
 
