@@ -5702,7 +5702,7 @@ TREM.Earthquake.on("eew", (data) => {
 
 		eewt.id = data.id;
 
-		if (data.type != "trem-eew" || data.author != "trem")
+		if (data.author != "trem")
 			if (setting["audio.eew"] && Alert) {
 				log("Playing Audio > eew", 1, "Audio", "eew");
 				dump({ level: 0, message: "Playing Audio > eew", origin: "Audio" });
@@ -5731,7 +5731,7 @@ TREM.Earthquake.on("eew", (data) => {
 			}
 	}
 
-	if (data.type != "trem-eew" || data.author != "trem")
+	if (data.author != "trem")
 		if (MaxIntensity.value >= 5) {
 			data.Alert = true;
 
@@ -5788,7 +5788,7 @@ TREM.Earthquake.on("eew", (data) => {
 		eew[data.id].arrive = "";
 	}
 
-	if (data.type != "trem-eew" || data.author != "trem")
+	if (data.author != "trem")
 		if (eew[data.id].Second == -1 || eew[data.id].value < eew[data.id].Second)
 			if (setting["audio.eew"] && Alert)
 				if (eew[data.id].arrive == "") {
@@ -6048,7 +6048,7 @@ TREM.Earthquake.on("eew", (data) => {
 					log(error, 3, "Webhook", "eew");
 					dump({ level: 2, message: error, origin: "Webhook" });
 				});
-			} else if (setting["trem-eew.No-Notification"] && (data.type != "trem-eew" || data.author != "trem")) {
+			} else if (setting["trem-eew.No-Notification"] && (data.author != "trem")) {
 				const Now1 = NOW().getFullYear()
 					+ "/" + (NOW().getMonth() + 1)
 					+ "/" + NOW().getDate()
@@ -6315,7 +6315,7 @@ function main(data) {
 		showDialogtime.close();
 	}
 
-	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && (data.type == "trem-eew" || data.author == "trem")) || (data.type != "trem-eew" || data.author != "trem"))) {
+	if (TREM.EEW.get(INFO[TINFO]?.ID).Cancel == undefined && ((setting["trem.ps"] && (data.type == "trem-eew" || data.author == "trem")) || (data.author != "trem"))) {
 		if (data.depth != null) {
 
 			/**
