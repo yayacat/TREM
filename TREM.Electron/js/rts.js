@@ -63,7 +63,6 @@ let chartuuids = [
 	Realtimestation,
 ];
 
-let WS_rtw;
 let ServerT_rtw = 0;
 
 function reconnect() {
@@ -82,15 +81,13 @@ function reconnect() {
 
 const connect = (retryTimeout) => {
 	ws.onclose = function() {
+		ServerT_rtw = 1;
 		console.log(`WebSocket closed. Reconnect after ${retryTimeout / 1000}s`);
-		WS_rtw = false;
-		reconnect();
 	};
 
 	ws.onerror = function(err) {
+		ServerT_rtw = 1;
 		console.log(err);
-		WS_rtw = false;
-		reconnect();
 	};
 
 	ws.onopen = function() {
@@ -114,8 +111,6 @@ const connect = (retryTimeout) => {
 
 	ws.onmessage = function(raw) {
 		const parsed = JSON.parse(raw.data);
-		WS_rtw = true;
-		ServerT_rtw = Date.now();
 
 		// console.log(parsed);
 
@@ -123,6 +118,7 @@ const connect = (retryTimeout) => {
 			case "data": {
 				switch (parsed.data.type) {
 					case "rtw": {
+						ServerT_rtw = Date.now();
 						wave(parsed.data);
 						break;
 					}
@@ -551,7 +547,8 @@ async function init() {
 
 	if (!timer.WS_rtw)
 		timer.WS_rtw = setInterval(() => {
-			if ((Date.now() - ServerT_rtw > 60_000 && ServerT_rtw != 0) && !WS_rtw) reconnect();
+			if ((Date.now() - ServerT_rtw > 3_000 && ServerT_rtw != 0)) reconnect();
+			else if (ServerT_rtw == 0) reconnect();
 		}, 3000);
 	await (async () => {
 		await fetch_files();
