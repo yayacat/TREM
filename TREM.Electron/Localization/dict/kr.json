@@ -43,6 +43,8 @@
     "Report_Intensity_Title": "최대진도",
     "Setting": "환경",
     "Setting_Open": "설정 열기",
+    "RTS_Open": null,
+    "Intensity_Open": null,
     "general_locale": "표시 언어",
     "check_For_Updates": null,
     "open_Devtool_F10": null,

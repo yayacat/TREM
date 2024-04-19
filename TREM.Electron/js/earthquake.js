@@ -3216,6 +3216,14 @@ function ReportGET(badcatch = false) {
 			_report_data = _report_data_temp;
 		}
 
+		// for (let i_ = 0; i_ < _report_data.length; i_++)
+		// 	if (_report_data[i_])
+		// 		if (_report_data[i_].id)
+		// 			if (_report_data[i_].id.startsWith("CWB"))
+		// 				_report_data.splice(i_, 1);
+
+		// storage.setItem("report_data", _report_data);
+
 		// if (_report_data.length != 0)
 		// 	for (let i = 0; i < 50; i++) {
 		// 		const md5 = crypto.createHash("md5");
@@ -3237,7 +3245,7 @@ function ReportGET(badcatch = false) {
 			setTimeout(() => {
 				controller1.abort();
 			}, 5_000);
-			fetch(route.earthquakeReportList(50), { signal: controller1.signal })
+			fetch(route.earthquakeReportList(setting["cache.report"]), { signal: controller1.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
 						console.debug(ans0);
@@ -3246,7 +3254,13 @@ function ReportGET(badcatch = false) {
 
 							if (ans.length != 0) {
 								for (let i = 0; i < ans.length; i++) {
-									const id = ans[i].id;
+									let id = ans[i].id;
+
+									if (id.startsWith("CWB")) {
+										id = id.match(/CWB-EQ(.*)/)[1];
+										ans[i].id = id;
+									}
+
 									ans[i].no = id.split("-")[0];
 
 									for (let _i = 0; _i < _report_data.length; _i++)
@@ -3272,7 +3286,8 @@ function ReportGET(badcatch = false) {
 
 												}
 
-												if (!_report_data[_i].no) _report_data[_i].no = _report_data[_i].id.split("-")[0];
+												if (_report_data && _report_data[_i] && !_report_data[_i].no && _report_data[_i].id !== undefined)
+													_report_data[_i].no = _report_data[_i].id.split("-")[0];
 
 											} else if (_report_data[_i].identifier) {
 												if (_report_data[_i].identifier === id)
@@ -3429,7 +3444,7 @@ function ReportGET(badcatch = false) {
 			setTimeout(() => {
 				controller.abort();
 			}, 5_000);
-			fetch(route.earthquakeReportList(50), { signal: controller.signal })
+			fetch(route.earthquakeReportList(setting["cache.report"]), { signal: controller.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
 						console.debug(ans0);
@@ -3438,7 +3453,13 @@ function ReportGET(badcatch = false) {
 
 							if (ans.length != 0) {
 								for (let i = 0; i < ans.length; i++) {
-									const id = ans[i].id;
+									let id = ans[i].id;
+
+									if (id.startsWith("CWB")) {
+										id = id.match(/CWB-EQ(.*)/)[1];
+										ans[i].id = id;
+									}
+
 									ans[i].no = id.split("-")[0];
 
 									for (let _i = 0; _i < _report_data.length; _i++)
@@ -3464,7 +3485,8 @@ function ReportGET(badcatch = false) {
 
 												}
 
-												if (!_report_data[_i].no) _report_data[_i].no = _report_data[_i].id.split("-")[0];
+												if (_report_data && _report_data[_i] && !_report_data[_i].no && _report_data[_i].id !== undefined)
+													_report_data[_i].no = _report_data[_i].id.split("-")[0];
 
 											} else if (_report_data[_i].identifier) {
 												if (_report_data[_i].identifier === id)

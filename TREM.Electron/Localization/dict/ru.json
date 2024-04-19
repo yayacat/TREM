@@ -43,6 +43,8 @@
     "Report_Intensity_Title": "Макс интенси",
     "Setting": "Параметр",
     "Setting_Open": "Открыть настройки",
+    "RTS_Open": null,
+    "Intensity_Open": null,
     "general_locale": "Язык дисплея",
     "check_For_Updates": null,
     "open_Devtool_F10": null,

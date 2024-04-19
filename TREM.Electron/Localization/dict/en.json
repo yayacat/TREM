@@ -43,6 +43,8 @@
     "Report_Intensity_Title": "Max Int.",
     "Setting": "Settings",
     "Setting_Open": "Open Settings",
+    "RTS_Open": "Open RTS",
+    "Intensity_Open": "Open Intensity",
     "general_locale": "Display Language",
     "check_For_Updates": "check For Updates",
     "open_Devtool_F10": null,

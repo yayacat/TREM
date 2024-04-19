@@ -58,36 +58,36 @@ TREM.Report = {
 			const fragment = new DocumentFragment();
 			const reports = Array.from(this.cache, ([k, v]) => v);
 
-			for (const report of reports)
-				if (!report.originTime) {
-					const now_format = (time) => new Date(time.toLocaleString("en-US", { hourCycle: "h23", timeZone: "Asia/Taipei" })).format("YYYY/MM/DD HH:mm:ss");
-					report.originTime = now_format(new Date(report.time));
-					this.cache.set(report.id, report);
+			// for (const report of reports)
+			// 	if (!report.originTime) {
+			// 		const now_format = (time) => new Date(time.toLocaleString("en-US", { hourCycle: "h23", timeZone: "Asia/Taipei" })).format("YYYY/MM/DD HH:mm:ss");
+			// 		report.originTime = now_format(new Date(report.time));
+			// 		this.cache.set(report.id, report);
 
-					let _report_data = [];
-					_report_data = storage.getItem("report_data");
+			// 		let _report_data = [];
+			// 		_report_data = storage.getItem("report_data");
 
-					for (let _i = 0; _i < _report_data.length; _i++)
-						if (_report_data[_i].id)
-							if (_report_data[_i].id === report.id)
-								_report_data.splice(_i, 1);
+			// 		for (let _i = 0; _i < _report_data.length; _i++)
+			// 			if (_report_data[_i].id)
+			// 				if (_report_data[_i].id === report.id)
+			// 					_report_data.splice(_i, 1);
 
-					_report_data.push(report);
+			// 		_report_data.push(report);
 
-					for (let i = 0; i < _report_data.length - 1; i++)
-						for (let _i = 0; _i < _report_data.length - 1; _i++) {
-							const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
-							const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
+			// 		for (let i = 0; i < _report_data.length - 1; i++)
+			// 			for (let _i = 0; _i < _report_data.length - 1; _i++) {
+			// 				const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
+			// 				const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
 
-							if (time_temp < time_1_temp) {
-								const temp = _report_data[_i + 1];
-								_report_data[_i + 1] = _report_data[_i];
-								_report_data[_i] = temp;
-							}
-						}
+			// 				if (time_temp < time_1_temp) {
+			// 					const temp = _report_data[_i + 1];
+			// 					_report_data[_i + 1] = _report_data[_i];
+			// 					_report_data[_i] = temp;
+			// 				}
+			// 			}
 
-					storage.setItem("report_data", _report_data);
-				}
+			// 		storage.setItem("report_data", _report_data);
+			// 	}
 
 			this.reportList = reports
 				.filter(v => this._filterHasNumber ? (v.earthquakeNo ? v.earthquakeNo % 1000 != 0 : v.no % 1000 != 0) : true)
@@ -369,8 +369,10 @@ TREM.Report = {
 				if (time > _end_time) {
 					clearInterval(this.clock);
 					console.debug("Finish!");
-					document.getElementById("report-replay-downloader-icon").innerText = "download_done";
-					document.getElementById("report-replay-downloader-text").innerText = "下載完成!";
+
+					if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download_done";
+
+					if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "下載完成!";
 					downloader_progress.style.display = "none";
 					report.download = true;
 					this.cache.set(report.identifier, report);
@@ -488,8 +490,9 @@ TREM.Report = {
 		const time_hold = String(time / 1000);
 
 		fs.rm(path.join(path.join(app.getPath("userData"), "replay_data"), time_hold), { recursive: true }, () => {
-			document.getElementById("report-replay-downloader-icon").innerText = "download";
-			document.getElementById("report-replay-downloader-text").innerText = "下載";
+			if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download";
+
+			if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "下載";
 			document.getElementById("downloader_progress").style.display = "none";
 			report.download = false;
 			this.cache.set(report.identifier, report);
@@ -784,21 +787,24 @@ TREM.Report = {
 
 			fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${time_hold}.trem`, (err) => {
 				if (!err) {
-					document.getElementById("report-replay-downloader-icon").innerText = "download_done";
-					document.getElementById("report-replay-downloader-text").innerText = "已下載!";
+					if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download_done";
+
+					if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "已下載!";
 					report.download = true;
 					this.cache.set(report.identifier, report);
 					fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${_end_timed}.trem`, (err) => {
 						if (err) {
-							document.getElementById("report-replay-downloader-icon").innerText = "download";
-							document.getElementById("report-replay-downloader-text").innerText = "下載中...";
+							if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download";
+
+							if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "下載中...";
 							report.download = false;
 							this.cache.set(report.identifier, report);
 						}
 					});
 				} else {
-					document.getElementById("report-replay-downloader-icon").innerText = "download";
-					document.getElementById("report-replay-downloader-text").innerText = "下載";
+					if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download";
+
+					if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "下載";
 					report.download = false;
 					this.cache.set(report.identifier, report);
 				}
@@ -1008,21 +1014,24 @@ TREM.Report = {
 
 								fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${time_hold}.trem`, (err) => {
 									if (!err) {
-										document.getElementById("report-replay-downloader-icon").innerText = "download_done";
-										document.getElementById("report-replay-downloader-text").innerText = "已下載!";
+										if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download_done";
+
+										if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "已下載!";
 										report.download = true;
 										this.cache.set(report.id, report);
 										fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${_end_timed}.trem`, (err) => {
 											if (err) {
-												document.getElementById("report-replay-downloader-icon").innerText = "download";
-												document.getElementById("report-replay-downloader-text").innerText = "下載中...";
+												if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download";
+
+												if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "下載中...";
 												report.download = false;
 												this.cache.set(report.id, report);
 											}
 										});
 									} else {
-										document.getElementById("report-replay-downloader-icon").innerText = "download";
-										document.getElementById("report-replay-downloader-text").innerText = "下載";
+										if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download";
+
+										if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "下載";
 										report.download = false;
 										this.cache.set(report.id, report);
 									}
@@ -1229,14 +1238,16 @@ TREM.Report = {
 
 				fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${time_hold}.trem`, (err) => {
 					if (!err) {
-						document.getElementById("report-replay-downloader-icon").innerText = "download_done";
-						document.getElementById("report-replay-downloader-text").innerText = "已下載!";
+						if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download_done";
+
+						if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "已下載!";
 						report.download = true;
 						this.cache.set(report.id, report);
 						fs.access(`${path.join(path.join(app.getPath("userData"), "replay_data"), time_hold)}/${_end_timed}.trem`, (err) => {
 							if (err) {
-								document.getElementById("report-replay-downloader-icon").innerText = "download";
-								document.getElementById("report-replay-downloader-text").innerText = "下載中...";
+								if (document.getElementById("report-replay-downloader-icon")) document.getElementById("report-replay-downloader-icon").innerText = "download";
+
+								if (document.getElementById("report-replay-downloader-text")) document.getElementById("report-replay-downloader-text").innerText = "下載中...";
 								report.download = false;
 								this.cache.set(report.id, report);
 							}

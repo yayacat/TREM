@@ -6,7 +6,7 @@ const os = require("os");
 const logger = require("electron-log");
 const path = require("path");
 const pushReceiver = require("electron-fcm-push-receiver");
-const exectest = require('child_process').exec;
+const exectest = require("child_process").exec;
 const remote = require("@electron/remote/main");
 const get_Version = TREM.getVersion();
 
@@ -19,8 +19,8 @@ TREM.isQuiting = TREM.Configuration.data["windows.tray"];
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.logger = logger;
-TREM.commandLine.appendSwitch('disable-http2');
-autoUpdater.requestHeaders = {'Cache-Control' : 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'};
+TREM.commandLine.appendSwitch("disable-http2");
+autoUpdater.requestHeaders = { "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" };
 
 // Object.defineProperty(TREM, 'isPackaged', {
 // 	get() {
@@ -36,16 +36,18 @@ let _hide = TREM.Configuration.data["windows.minimize"];
 let _devMode = false;
 
 if (process.argv.includes("--start")) _hide = true;
+
 if (process.argv.includes("--dev") && process.argv.includes("--key")) {
 	_devMode = true;
 	TREM.Configuration.data["dev.mode"] = _devMode;
-}else{
+} else {
 	_devMode = false;
 	TREM.Configuration.data["dev.mode"] = _devMode;
 }
 
 emitAllWindow("setting", TREM.Configuration._data);
 const latestLog = path.join(TREM.getPath("logs"), "latest.log");
+
 if (fs.existsSync(latestLog)) {
 	const filetime = fs.statSync(latestLog).mtime;
 	const filename = (new Date(filetime.getTime() - (filetime.getTimezoneOffset() * 60000))).toISOString().slice(0, -1).replace(/:+|\.+/g, "-");
@@ -55,9 +57,10 @@ if (fs.existsSync(latestLog)) {
 if (!fs.existsSync(path.join(TREM.getPath("userData"), "server.json")))
 	fs.writeFileSync(path.join(TREM.getPath("userData"), "server.json"), JSON.stringify([]));
 
-fs.readFile(path.join(TREM.getPath("userData"), "server.json"), function (err, data) {
+fs.readFile(path.join(TREM.getPath("userData"), "server.json"), (err, data) => {
 	if (err) throw err;
 	console.log(data.toString());
+
 	if (data.toString() == "")
 		fs.writeFileSync(path.join(TREM.getPath("userData"), "server.json"), JSON.stringify([]));
 });
@@ -77,14 +80,17 @@ if (!TREM.Configuration.data["compatibility.3DAPI"]) {
  * @type {BrowserWindow}
  */
 let MainWindow = TREM.Window.get("main");
+
 /**
  * @type {BrowserWindow}
  */
 let SettingWindow = TREM.Window.get("setting");
+
 /**
  * @type {BrowserWindow}
  */
 let RTSWindow = TREM.Window.get("rts");
+
 /**
  * @type {BrowserWindow}
  */
@@ -132,9 +138,11 @@ function createWindow() {
 	MainWindow.setMenu(null);
 	MainWindow.webContents.on("did-finish-load", () => {
 		MainWindow.webContents.send("setting", TREM.Configuration._data);
+
 		if (!_hide) setTimeout(() => MainWindow.show(), 500);
 	});
 	pushReceiver.setup(MainWindow.webContents);
+
 	if (process.platform === "win32")
 		TREM.setAppUserModelId("TREMV | 臺灣即時地震監測變體");
 	MainWindow.on("resize", () => {
@@ -144,11 +152,13 @@ function createWindow() {
 		if (TREM.isQuiting) {
 			event.preventDefault();
 			MainWindow.hide();
+
 			if (SettingWindow)
 				SettingWindow.close();
 			event.returnValue = false;
-		} else
+		} else {
 			TREM.exit(0);
+		}
 	});
 	MainWindow.on("unresponsive", () => {
 		restart();
@@ -263,9 +273,10 @@ function createIntensityWindow() {
 }
 
 const shouldQuit = TREM.requestSingleInstanceLock();
-if (!shouldQuit)
+
+if (!shouldQuit) {
 	TREM.quit();
-else {
+} else {
 	TREM.on("second-instance", (event, argv, cwd) => {
 		if (MainWindow != null) MainWindow.show();
 	});
@@ -277,12 +288,12 @@ else {
 }
 
 function isNetworkError(errorObject) {
-    return errorObject.message === "net::ERR_INTERNET_DISCONNECTED" ||
-        errorObject.message === "net::ERR_PROXY_CONNECTION_FAILED" ||
-        errorObject.message === "net::ERR_CONNECTION_RESET" ||
-        errorObject.message === "net::ERR_CONNECTION_CLOSE" ||
-        errorObject.message === "net::ERR_NAME_NOT_RESOLVED" ||
-        errorObject.message === "net::ERR_CONNECTION_TIMED_OUT";
+	return errorObject.message === "net::ERR_INTERNET_DISCONNECTED"
+        || errorObject.message === "net::ERR_PROXY_CONNECTION_FAILED"
+        || errorObject.message === "net::ERR_CONNECTION_RESET"
+        || errorObject.message === "net::ERR_CONNECTION_CLOSE"
+        || errorObject.message === "net::ERR_NAME_NOT_RESOLVED"
+        || errorObject.message === "net::ERR_CONNECTION_TIMED_OUT";
 }
 
 let update_time = 0;
@@ -292,15 +303,15 @@ function checkForUpdates(auto = true) {
 		if (update_time !== 0 || !auto)
 			autoUpdater.checkForUpdates().catch((error) => {
 				if (isNetworkError(error)) {
-					console.log('Network Error');
+					console.log("Network Error");
 					console.log(error);
 				} else {
-					console.log('Unknown Error');
+					console.log("Unknown Error");
 					console.log(error == null ? "unknown" : (error.stack || error).toString());
 				}
 			});
 	} catch (error) {
-		console.error('Error while on checkForUpdates: ', error);
+		console.error("Error while on checkForUpdates: ", error);
 	}
 }
 
@@ -308,21 +319,21 @@ function downloadUpdate(cancellationToken) {
 	try {
 		autoUpdater.downloadUpdate(cancellationToken).catch((error) => {
 			if (isNetworkError(error)) {
-				console.log('Network Error');
+				console.log("Network Error");
 				console.log(error);
 			} else {
-				console.log('Unknown Error');
+				console.log("Unknown Error");
 				console.log(error == null ? "unknown" : (error.stack || error).toString());
 			}
 		});
 	} catch (error) {
-		console.error('Error while on downloadUpdate: ', error);
+		console.error("Error while on downloadUpdate: ", error);
 	}
 }
 
 TREM.on("ready", () => {
 	if (TREM.Configuration.data["update.time"] != undefined) {
-		if (TREM.Configuration.data["update.time"] != 0){
+		if (TREM.Configuration.data["update.time"] != 0) {
 			checkForUpdates();
 			update_time = TREM.Configuration.data["update.time"] * 3600000;
 			setInterval(() => {
@@ -352,10 +363,10 @@ TREM.on("ready", () => {
 
 async function heliarun() {
 	try {
-		const { create_Helia, helia_unixfs, multiformats_CID, multiformats_base64 } = await import('./helia.mjs');
+		const { create_Helia, helia_unixfs, multiformats_CID, multiformats_base64 } = await import("./helia.mjs");
 		const helia = await create_Helia();
 		const libp2p = helia.libp2p;
-		const fs = helia_unixfs(helia);
+		const fsa = helia_unixfs(helia);
 		// const keychain = libp2p.keychain;
 		const id = libp2p.peerId;
 		const Multi = libp2p.getMultiaddrs();
@@ -364,7 +375,7 @@ async function heliarun() {
 		console.log(id);
 		console.log(Multi);
 		// console.log(peerId);
-		const bafyFoo = fs.cat(multiformats_CID().parse('mAYAEEiCTojlxqRTl6svwqNJRVM2jCcPBxy+7mRTUfGDzy2gViA', multiformats_base64().decoder));
+		const bafyFoo = fsa.cat(multiformats_CID().parse("mAYAEEiCTojlxqRTl6svwqNJRVM2jCcPBxy+7mRTUfGDzy2gViA", multiformats_base64().decoder));
 		// console.log(bafyFoo);
 
 		setInterval(() => {
@@ -385,14 +396,13 @@ async function heliarun() {
 	}
 }
 
-TREM.on('activate', function () {
-	if (MainWindow === null) {
+TREM.on("activate", () => {
+	if (MainWindow === null)
 		createWindow();
-	} else if (MainWindow.isMinimized()) {
+	else if (MainWindow.isMinimized())
 		MainWindow.restore();
-	} else if (!MainWindow.isVisible()) {
+	else if (!MainWindow.isVisible())
 		MainWindow.show();
-	}
 });
 
 autoUpdater.on("update-available", (info) => {
@@ -453,6 +463,7 @@ autoUpdater.on("download-progress", (progressObj) => {
 autoUpdater.on("update-downloaded", (info) => {
 	if (MainWindow)
 		MainWindow.setProgressBar(0);
+
 	if (TREM.Configuration.data["update.mode"] == "install")
 		autoUpdater.quitAndInstall();
 });
@@ -462,7 +473,7 @@ TREM.on("before-quit", () => {
 		tray.destroy();
 });
 
-TREM.on("render-process-gone", (e,w,d) => {
+TREM.on("render-process-gone", (e, w, d) => {
 	if (d.reason == "crashed")
 		w.reload();
 });
@@ -475,6 +486,7 @@ ipcMain.on("toggleFullscreen", () => {
 ipcMain.on("openDevtool", () => {
 	if (_devMode) {
 		const currentWindow = BrowserWindow.getFocusedWindow();
+
 		if (currentWindow)
 			currentWindow.webContents.openDevTools({ mode: "detach" });
 	}
@@ -482,6 +494,7 @@ ipcMain.on("openDevtool", () => {
 
 ipcMain.on("openDevtoolF10", () => {
 	const currentWindow = BrowserWindow.getFocusedWindow();
+
 	if (currentWindow)
 		currentWindow.webContents.openDevTools({ mode: "detach" });
 });
@@ -489,6 +502,7 @@ ipcMain.on("openDevtoolF10", () => {
 ipcMain.on("reloadpage", () => {
 	// restart();
 	const currentWindow = BrowserWindow.getFocusedWindow();
+
 	if (currentWindow == MainWindow) currentWindow.webContents.reload();
 });
 
@@ -498,20 +512,19 @@ ipcMain.on("Mainreloadpage", () => {
 
 ipcMain.on("openFileWindow", (event, arg) => {
 	dialog.showOpenDialog(MainWindow, {
-		properties: ['openFile']
+		properties: ["openFile"],
 	}).then(result => {
 		console.log(result.canceled);
 		console.log(result.filePaths);
 
-		if (result.canceled) {
+		if (result.canceled)
 			dialog.showMessageBox(MainWindow, {
-				title    : "取消???",
-				message  : "你為什麼點取消???",
-				type     : "error",
+				title   : "取消???",
+				message : "你為什麼點取消???",
+				type    : "error",
 			});
-		} else {
+		else
 			if (MainWindow) MainWindow.webContents.send("readReplayFile", result.filePaths);
-		}
 	}).catch(err => {
 		console.log(err);
 	});
@@ -551,13 +564,12 @@ ipcMain.on("openUpdateFolder", (event, arg) => {
 	const homedir = os.homedir();
 	let result;
 
-	if (process.platform === "win32") {
+	if (process.platform === "win32")
 		result = process.env.LOCALAPPDATA || path.join(homedir, "AppData", "Local");
-	} else if (process.platform === "darwin") {
+	else if (process.platform === "darwin")
 		result = path.join(homedir, "Library", "Application Support", "Caches");
-	} else {
+	else
 		result = process.env.XDG_CACHE_HOME || path.join(homedir, ".cache");
-	}
 
 	shell.openPath(path.join(result, `${process.env.npm_package_name}-updater`));
 });
@@ -584,7 +596,9 @@ ipcMain.on("restart", () => {
 
 ipcMain.on("hide", () => {
 	const currentWindow = BrowserWindow.getFocusedWindow();
+
 	if (currentWindow == MainWindow) MainWindow.hide();
+
 	if (currentWindow == IntensityWindow) IntensityWindow.hide();
 });
 
@@ -696,23 +710,23 @@ ipcMain.on("Olddatabase_tsunami", (event, json) => {
 	emitAllWindow("Olddatabase_tsunami", json);
 });
 
-ipcMain.on('startPushReceiver', (event, arg) => {
-    pushReceiver.setup(MainWindow.webContents);
+ipcMain.on("startPushReceiver", (event, arg) => {
+	pushReceiver.setup(MainWindow.webContents);
 });
 
-ipcMain.on('linkpathtest', (event, cmdPath, cmdStr) => {
-	const workerProcess = exectest(cmdStr, {cwd: cmdPath});
+ipcMain.on("linkpathtest", (event, cmdPath, cmdStr) => {
+	const workerProcess = exectest(cmdStr, { cwd: cmdPath });
 
-	workerProcess.stdout.on('data', function (data) {
-		console.log('stdout: ' + data);
+	workerProcess.stdout.on("data", (data) => {
+		console.log("stdout: " + data);
 	});
 
-	workerProcess.stderr.on('data', function (data) {
-		console.log('stderr: ' + data);
+	workerProcess.stderr.on("data", (data) => {
+		console.log("stderr: " + data);
 	});
 
-	workerProcess.on('close', function (code) {
-		console.log('out code:' + code);
+	workerProcess.on("close", (code) => {
+		console.log("out code:" + code);
 	});
 });
 
@@ -770,8 +784,11 @@ ipcMain.on("config:value", (event, key, value) => {
 
 		case "general.locale": {
 			TREM.Localization.setLocale(value);
+
 			if (MainWindow) MainWindow.setTitle(TREM.Localization.getString("Application_Title"));
+
 			if (SettingWindow) SettingWindow.setTitle(TREM.Localization.getString("Setting_Title"));
+
 			if (RTSWindow) RTSWindow.setTitle(TREM.Localization.getString("Setting_Title"));
 			trayIcon();
 			emitAllWindow("config:locale", value);
@@ -814,6 +831,7 @@ ipcMain.on("config:value", (event, key, value) => {
 		case "cache.report": {
 			TREM.Configuration.data["cache.report"] = value;
 			emitAllWindow("setting", TREM.Configuration._data);
+
 			if (MainWindow) MainWindow.webContents.send("ReportGET");
 			break;
 		}
@@ -821,6 +839,7 @@ ipcMain.on("config:value", (event, key, value) => {
 		case "report.getInfo": {
 			TREM.Configuration.data["report.getInfo"] = value;
 			emitAllWindow("setting", TREM.Configuration._data);
+
 			if (MainWindow) MainWindow.webContents.send("ReportGET");
 			break;
 		}
@@ -842,6 +861,7 @@ ipcMain.on("config:value", (event, key, value) => {
 		default:
 			break;
 	}
+
 	if (key.startsWith("theme.int"))
 		emitAllWindow("config:color", key, value);
 
@@ -856,6 +876,7 @@ ipcMain.on("config:open", () => {
 ipcMain.on("screenshotEEW", async (event, json) => {
 	// return;
 	const folder = path.join(TREM.getPath("userData"), "EEW");
+
 	if (!fs.existsSync(folder))
 		fs.mkdirSync(folder);
 	// const list = fs.readdirSync(folder);
@@ -875,6 +896,7 @@ ipcMain.on("screenshotEEW", async (event, json) => {
 ipcMain.on("screenshotEEWI", async (event, json) => {
 	// return;
 	const folder = path.join(TREM.getPath("userData"), "EEW");
+
 	if (!fs.existsSync(folder))
 		fs.mkdirSync(folder);
 	const filename = `${json.Function}_${json.ID}_${json.Version}_${json.Time}_${json.Shot}.png`;
@@ -883,8 +905,10 @@ ipcMain.on("screenshotEEWI", async (event, json) => {
 
 ipcMain.on("screenshot", async () => {
 	const currentWindow = BrowserWindow.getFocusedWindow();
+
 	if (currentWindow) {
 		const folder = path.join(TREM.getPath("userData"), "Screenshots");
+
 		if (!fs.existsSync(folder))
 			fs.mkdirSync(folder);
 		const filename = "screenshot" + Date.now() + ".png";
@@ -924,30 +948,34 @@ function emitAllWindow(channel, ...args) {
 			}
 }
 
-function changelocale(value){
-	TREM.Configuration.data['general.locale'] = value;
+function changelocale(value) {
+	TREM.Configuration.data["general.locale"] = value;
 	TREM.Localization.setLocale(value);
-	if (MainWindow){
+
+	if (MainWindow)
 		MainWindow.setTitle(TREM.Localization.getString("Application_Title"));
-	}
-	if (SettingWindow){
+
+	if (SettingWindow)
 		SettingWindow.setTitle(TREM.Localization.getString("Setting_Title"));
-	}
-	if (RTSWindow){
+
+	if (RTSWindow)
 		RTSWindow.setTitle(TREM.Localization.getString("Setting_Title"));
-	}
+
 	trayIcon();
+
 	if (!SettingWindow) {
 		createSettingWindow();
 		emitAllWindow("config:locale", value);
 		SettingWindow.close();
 	}
+
 	if (!RTSWindow) {
 		createRTSWindow();
 		emitAllWindow("config:locale", value);
 		RTSWindow.close();
-	} else
+	} else {
 		emitAllWindow("config:locale", value);
+	}
 }
 
 function trayIcon() {
@@ -955,6 +983,7 @@ function trayIcon() {
 		tray.destroy();
 		tray = null;
 	}
+
 	const iconPath = path.join(__dirname, "TREM.ico");
 	tray = new Tray(nativeImage.createFromPath(iconPath));
 	tray.setIgnoreDoubleClickEvents(true);
@@ -991,9 +1020,36 @@ function trayIcon() {
 			},
 		},
 		{
-			label : TREM.Localization.getString("Setting"),
-			type  : "submenu",
-			submenu: [
+			label : TREM.Localization.getString("RTS_Open"),
+			type  : "normal",
+			click : () => {
+				BrowserWindow.fromId(process.env.window * 1).setAlwaysOnTop(false);
+				BrowserWindow.fromId(process.env.intensitywindow * 1).setAlwaysOnTop(false);
+				ipcMain.emit("openRTSWindow");
+			},
+		},
+		{
+			label : TREM.Localization.getString("Intensity_Open"),
+			type  : "normal",
+			click : () => {
+				BrowserWindow.fromId(process.env.window * 1).setAlwaysOnTop(false);
+				BrowserWindow.fromId(process.env.intensitywindow * 1).setAlwaysOnTop(false);
+				ipcMain.emit("openIntensityWindow");
+			},
+		},
+		{
+			label : TREM.Localization.getString("FileWindow_Open"),
+			type  : "normal",
+			click : () => {
+				BrowserWindow.fromId(process.env.window * 1).setAlwaysOnTop(false);
+				BrowserWindow.fromId(process.env.intensitywindow * 1).setAlwaysOnTop(false);
+				ipcMain.emit("openFileWindow");
+			},
+		},
+		{
+			label   : TREM.Localization.getString("Setting"),
+			type    : "submenu",
+			submenu : [
 				{
 					label : TREM.Localization.getString("Setting_Open"),
 					type  : "normal",
@@ -1001,65 +1057,65 @@ function trayIcon() {
 						BrowserWindow.fromId(process.env.window * 1).setAlwaysOnTop(false);
 						BrowserWindow.fromId(process.env.intensitywindow * 1).setAlwaysOnTop(false);
 						ipcMain.emit("openChildWindow");
-					}
+					},
 				},
 				{
-					label: TREM.Localization.getString("general_locale"),
-					submenu: [
+					label   : TREM.Localization.getString("general_locale"),
+					submenu : [
 
 						{
-							label: '繁體中文 (zh-TW)',
+							label : "繁體中文 (zh-TW)",
 							click : () => {
-								changelocale('zh-TW');
-							}
+								changelocale("zh-TW");
+							},
 						},
 						{
-							label: 'English (en)',
+							label : "English (en)",
 							click : () => {
-								changelocale('en');
-							}
+								changelocale("en");
+							},
 						},
 						{
-							label: '日本語 (ja)',
+							label : "日本語 (ja)",
 							click : () => {
-								changelocale('ja');
-							}
+								changelocale("ja");
+							},
 						},
 						{
-							label: '한국어 (kr)',
+							label : "한국어 (kr)",
 							click : () => {
-								changelocale('kr');
-							}
+								changelocale("kr");
+							},
 						},
 						{
-							label: 'Русский (ru)',
+							label : "Русский (ru)",
 							click : () => {
-								changelocale('ru');
-							}
+								changelocale("ru");
+							},
 						},
 						{
-							label: '简体中文 (zh-CN)',
+							label : "简体中文 (zh-CN)",
 							click : () => {
-								changelocale('zh-CN');
-							}
+								changelocale("zh-CN");
+							},
 						},
-					]
+					],
 				},
 				{
 					label : TREM.Localization.getString("check_For_Updates"),
 					type  : "normal",
 					click : () => {
 						checkForUpdates(false);
-					}
+					},
 				},
 				{
 					label : TREM.Localization.getString("open_Devtool_F10"),
 					type  : "normal",
 					click : () => {
 						MainWindow.webContents.openDevTools({ mode: "detach" });
-					}
-				}
-			]
+					},
+				},
+			],
 		},
 		{
 			label : TREM.Localization.getString("Tray_Reload"),
@@ -1090,47 +1146,49 @@ function trayIcon() {
 
 // #region override prototype
 if (!Date.prototype.format)
-	Date.prototype.format =
+	Date.prototype.format
+
 	/**
 	 * Format DateTime into string with provided formatting string.
 	 * @param {string} format The formatting string to use.
 	 * @returns {string} The formatted string.
 	 */
-	function(format) {
-		/**
-		 * @type {Date}
-		 */
-		const me = this;
-		return format.replace(/a|A|Z|S(SS)?|ss?|mm?|HH?|hh?|D{1,2}|M{1,2}|YY(YY)?|'([^']|'')*'/g, (str) => {
-			let c1 = str.charAt(0);
-			const ret = str.charAt(0) == "'"
-				? (c1 = 0) || str.slice(1, -1).replace(/''/g, "'")
-				: str == "a"
-					? (me.getHours() < 12 ? "am" : "pm")
-					: str == "A"
-						? (me.getHours() < 12 ? "AM" : "PM")
-						: str == "Z"
-							? (("+" + -me.getTimezoneOffset() / 60).replace(/^\D?(\D)/, "$1").replace(/^(.)(.)$/, "$10$2") + "00")
-							: c1 == "S"
-								? me.getMilliseconds()
-								: c1 == "s"
-									? me.getSeconds()
-									: c1 == "H"
-										? me.getHours()
-										: c1 == "h"
-											? (me.getHours() % 12) || 12
-											: c1 == "D"
-												? me.getDate()
-												: c1 == "m"
-													? me.getMinutes()
-													: c1 == "M"
-														? me.getMonth() + 1
-														: ("" + me.getFullYear()).slice(-str.length);
-			return c1 && str.length < 4 && ("" + ret).length < str.length
-				? ("00" + ret).slice(-str.length)
-				: ret;
-		});
-	};
+	= function(format) {
+
+			/**
+			 * @type {Date}
+			 */
+			const me = this;
+			return format.replace(/a|A|Z|S(SS)?|ss?|mm?|HH?|hh?|D{1,2}|M{1,2}|YY(YY)?|'([^']|'')*'/g, (str) => {
+				let c1 = str.charAt(0);
+				const ret = str.charAt(0) == "'"
+					? (c1 = 0) || str.slice(1, -1).replace(/''/g, "'")
+					: str == "a"
+						? (me.getHours() < 12 ? "am" : "pm")
+						: str == "A"
+							? (me.getHours() < 12 ? "AM" : "PM")
+							: str == "Z"
+								? (("+" + -me.getTimezoneOffset() / 60).replace(/^\D?(\D)/, "$1").replace(/^(.)(.)$/, "$10$2") + "00")
+								: c1 == "S"
+									? me.getMilliseconds()
+									: c1 == "s"
+										? me.getSeconds()
+										: c1 == "H"
+											? me.getHours()
+											: c1 == "h"
+												? (me.getHours() % 12) || 12
+												: c1 == "D"
+													? me.getDate()
+													: c1 == "m"
+														? me.getMinutes()
+														: c1 == "M"
+															? me.getMonth() + 1
+															: ("" + me.getFullYear()).slice(-str.length);
+				return c1 && str.length < 4 && ("" + ret).length < str.length
+					? ("00" + ret).slice(-str.length)
+					: ret;
+			});
+		};
 
 if (!String.prototype.format)
 	String.prototype.format = function() {

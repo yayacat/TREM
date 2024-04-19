@@ -43,6 +43,8 @@
     "Report_Intensity_Title": "最大震度",
     "Setting": "設定",
     "Setting_Open": "設定を開く",
+    "RTS_Open": "RTSを開く",
+    "Intensity_Open": "Intensityを開く",
     "general_locale": "表示言語",
     "check_For_Updates": "アップデートを確認",
     "open_Devtool_F10": null,
