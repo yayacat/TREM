@@ -616,6 +616,16 @@ ipcMain.on("openURL", (event, url) => {
 		shell.openExternal(url);
 });
 
+ipcMain.on("rtw", (event, data) => {
+	if (RTSWindow != null)
+		if (RTSWindow.isVisible())
+			RTSWindow.webContents.send("rtw", data);
+});
+
+ipcMain.on("apikey", (event, data) => {
+	MainWindow.webContents.send("apikey", data);
+});
+
 ipcMain.on("p2p", (event, data, server_ips) => {
 	if (SettingWindow != null)
 		if (SettingWindow.isVisible())

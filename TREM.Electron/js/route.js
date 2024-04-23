@@ -162,7 +162,7 @@ class Route {
    */
 	eew(version) {
 		// this.auto_run();
-		return this.randomBaseUrl(version) + "/eq/eew";
+		return this.randomBaseUrl(version) + "/eq/eew?type=all";
 	}
 
 	/**

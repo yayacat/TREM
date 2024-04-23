@@ -40,9 +40,13 @@ function handleWindowControls() {
 }
 
 const wave_count = +localStorage.getItem("displayWaveCount") ?? 12;
+let ws;
 
-console.log(`lb-${route.auto_run()}`);
-let ws = new WebSocket(route.randomWSBaseUrl());
+if (app.Configuration.data["rtw.key.only"]) {
+	console.log(`lb-${route.auto_run()}`);
+	ws = new WebSocket(route.randomWSBaseUrl());
+}
+
 let Reconnect = 0;
 
 let Realtimestation = app.Configuration.data["Real-time.station"];
@@ -60,6 +64,8 @@ let chartuuids = [
 	Realtimestation3,
 	Realtimestation4,
 	Realtimestation5,
+	Realtimestation,
+	Realtimestation,
 	Realtimestation,
 ];
 
@@ -115,6 +121,25 @@ const connect = (retryTimeout) => {
 		// console.log(parsed);
 
 		switch (parsed.type) {
+			case "verify":
+				// eslint-disable-next-line no-case-declarations
+				const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.exptech.key"] != "" ? app.Configuration.data["rtw.exptech.key"] : "") : (app.Configuration.data["exptech.key"] != "" ? app.Configuration.data["exptech.key"] : "");
+				ws.send(JSON.stringify({
+					type    : "start",
+					key     : key,
+					service : ["trem.rtw"],
+					config  : {
+						"trem.rtw": [
+							parseInt(Realtimestation1.split("-")[2]),
+							parseInt(Realtimestation2.split("-")[2]),
+							parseInt(Realtimestation3.split("-")[2]),
+							parseInt(Realtimestation4.split("-")[2]),
+							parseInt(Realtimestation5.split("-")[2]),
+							parseInt(Realtimestation.split("-")[2]),
+						],
+					},
+				}));
+				break;
 			case "data": {
 				switch (parsed.data.type) {
 					case "rtw": {
@@ -137,7 +162,7 @@ const data = {
 };
 const timer = {};
 
-const Real_time_station_run = () => {
+const Real_time_station_run = (_data) => {
 	chartuuids = [
 		Realtimestation1,
 		Realtimestation2,
@@ -145,23 +170,24 @@ const Real_time_station_run = () => {
 		Realtimestation4,
 		Realtimestation5,
 		Realtimestation,
+		Realtimestation,
+		Realtimestation,
 	];
-	const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.exptech.key"] != "" ? app.Configuration.data["rtw.exptech.key"] : "") : (app.Configuration.data["exptech.key"] != "" ? app.Configuration.data["exptech.key"] : "");
-	ws.send(JSON.stringify({
-		type    : "start",
-		key     : key,
-		service : ["trem.rtw"],
-		config  : {
-			"trem.rtw": [
-				parseInt(Realtimestation1.split("-")[2]),
-				parseInt(Realtimestation2.split("-")[2]),
-				parseInt(Realtimestation3.split("-")[2]),
-				parseInt(Realtimestation4.split("-")[2]),
-				parseInt(Realtimestation5.split("-")[2]),
-				parseInt(Realtimestation.split("-")[2]),
-			],
-		},
-	}));
+
+	if (app.Configuration.data["rtw.key.only"]) {
+		const key = app.Configuration.data["rtw.key.only"] ? (app.Configuration.data["rtw.exptech.key"] != "" ? app.Configuration.data["rtw.exptech.key"] : "") : (app.Configuration.data["exptech.key"] != "" ? app.Configuration.data["exptech.key"] : "");
+		ws.send(JSON.stringify({
+			type    : "start",
+			key     : key,
+			service : ["trem.rtw"],
+			config  : {
+				"trem.rtw": _data,
+			},
+		}));
+	} else {
+		ipcRenderer.send("apikey", _data);
+	}
+
 	setCharts([
 		Realtimestation1.split("-")[2],
 		Realtimestation2.split("-")[2],
@@ -176,48 +202,39 @@ const Real_time_station_run = () => {
 
 const Real_time_station = () => {
 	try {
+		const _data = [
+			parseInt(Realtimestation1.split("-")[2]),
+			parseInt(Realtimestation2.split("-")[2]),
+			parseInt(Realtimestation3.split("-")[2]),
+			parseInt(Realtimestation4.split("-")[2]),
+			parseInt(Realtimestation5.split("-")[2]),
+			parseInt(Realtimestation.split("-")[2]),
+		];
+
 		if (Realtimestation != app.Configuration.data["Real-time.station"]) {
 			Realtimestation = app.Configuration.data["Real-time.station"];
-			Real_time_station_run();
+			Real_time_station_run(_data);
 		} else if (Realtimestation1 != app.Configuration.data["Real-time.station.1"]) {
 			Realtimestation1 = app.Configuration.data["Real-time.station.1"];
-			Real_time_station_run();
+			Real_time_station_run(_data);
 		} else if (Realtimestation2 != app.Configuration.data["Real-time.station.2"]) {
 			Realtimestation2 = app.Configuration.data["Real-time.station.2"];
-			Real_time_station_run();
+			Real_time_station_run(_data);
 		} else if (Realtimestation3 != app.Configuration.data["Real-time.station.3"]) {
 			Realtimestation3 = app.Configuration.data["Real-time.station.3"];
-			Real_time_station_run();
+			Real_time_station_run(_data);
 		} else if (Realtimestation4 != app.Configuration.data["Real-time.station.4"]) {
 			Realtimestation4 = app.Configuration.data["Real-time.station.4"];
-			Real_time_station_run();
+			Real_time_station_run(_data);
 		} else if (Realtimestation5 != app.Configuration.data["Real-time.station.5"]) {
 			Realtimestation5 = app.Configuration.data["Real-time.station.5"];
-			Real_time_station_run();
+			Real_time_station_run(_data);
 		} else if (themecolor != app.Configuration.data["theme.color"]) {
 			themecolor = app.Configuration.data["theme.color"];
-			setCharts([
-				Realtimestation1.split("-")[2],
-				Realtimestation2.split("-")[2],
-				Realtimestation3.split("-")[2],
-				Realtimestation4.split("-")[2],
-				Realtimestation5.split("-")[2],
-				Realtimestation.split("-")[2],
-				Realtimestation.split("-")[2],
-				Realtimestation.split("-")[2],
-			]);
+			setCharts(_data);
 		} else if (themedark != app.Configuration.data["theme.dark"]) {
 			themedark = app.Configuration.data["theme.dark"];
-			setCharts([
-				Realtimestation1.split("-")[2],
-				Realtimestation2.split("-")[2],
-				Realtimestation3.split("-")[2],
-				Realtimestation4.split("-")[2],
-				Realtimestation5.split("-")[2],
-				Realtimestation.split("-")[2],
-				Realtimestation.split("-")[2],
-				Realtimestation.split("-")[2],
-			]);
+			setCharts(_data);
 		}
 	} catch (error) {
 		console.warn("Failed to load station data!", error);
@@ -334,14 +351,14 @@ function station_v2_run(station_data) {
 }
 
 const charts = [
-	echarts.init(document.getElementById("wave-1"), null, { height: 560 / 6, width: 400 }),
-	echarts.init(document.getElementById("wave-2"), null, { height: 560 / 6, width: 400 }),
-	echarts.init(document.getElementById("wave-3"), null, { height: 560 / 6, width: 400 }),
-	echarts.init(document.getElementById("wave-4"), null, { height: 560 / 6, width: 400 }),
-	echarts.init(document.getElementById("wave-5"), null, { height: 560 / 6, width: 400 }),
-	echarts.init(document.getElementById("wave-6"), null, { height: 560 / 6, width: 400 }),
-	echarts.init(document.getElementById("wave-7"), null, { height: 560 / 6, width: 400 }),
-	echarts.init(document.getElementById("wave-8"), null, { height: 560 / 6, width: 400 }),
+	echarts.init(document.getElementById("wave-1"), null, { height: 560 / 6, width: 400, renderer: "svg" }),
+	echarts.init(document.getElementById("wave-2"), null, { height: 560 / 6, width: 400, renderer: "svg" }),
+	echarts.init(document.getElementById("wave-3"), null, { height: 560 / 6, width: 400, renderer: "svg" }),
+	echarts.init(document.getElementById("wave-4"), null, { height: 560 / 6, width: 400, renderer: "svg" }),
+	echarts.init(document.getElementById("wave-5"), null, { height: 560 / 6, width: 400, renderer: "svg" }),
+	echarts.init(document.getElementById("wave-6"), null, { height: 560 / 6, width: 400, renderer: "svg" }),
+	echarts.init(document.getElementById("wave-7"), null, { height: 560 / 6, width: 400, renderer: "svg" }),
+	echarts.init(document.getElementById("wave-8"), null, { height: 560 / 6, width: 400, renderer: "svg" }),
 ];
 const chartdata = [
 	[],
@@ -439,17 +456,16 @@ const wave = (wave_data) => {
 	const now = new Date(Date.now());
 	const time = Date.now();
 
-	const arr = [];
+	// const arr = [];
 
 	let id;
 
-	for (const i in chartuuids) {
+	for (const i in chartuuids)
 		if (parseInt(chartuuids[i].split("-")[2]) === wave_data_id)
 			id = i;
 
-		if (parseInt(Realtimestation.split("-")[2]) === wave_data_id)
-			id = 10;
-	}
+	if (parseInt(Realtimestation.split("-")[2]) === wave_data_id)
+		id = 10;
 
 	if (id == 10) {
 		for (let i = 0; i < n; i++) {
@@ -500,7 +516,7 @@ const wave = (wave_data) => {
 				],
 			});
 		}
-	} else {
+	} else if (chartdata[id]) {
 		for (let i = 0; i < n; i++) {
 			const calculatedTime = time + (i * timeOffset);
 			chartdata[id].push({
@@ -543,13 +559,16 @@ const wave = (wave_data) => {
 };
 
 async function init() {
-	connect(1000);
+	if (app.Configuration.data["rtw.key.only"]) {
+		connect(1000);
 
-	if (!timer.WS_rtw)
-		timer.WS_rtw = setInterval(() => {
-			if ((Date.now() - ServerT_rtw > 3_000 && ServerT_rtw != 0)) reconnect();
-			else if (ServerT_rtw == 0) reconnect();
-		}, 3000);
+		if (!timer.WS_rtw)
+			timer.WS_rtw = setInterval(() => {
+				if ((Date.now() - ServerT_rtw > 3_000 && ServerT_rtw != 0)) reconnect();
+				else if (ServerT_rtw == 0) reconnect();
+			}, 3000);
+	}
+
 	await (async () => {
 		await fetch_files();
 
@@ -613,3 +632,8 @@ async function init() {
 			],
 		});
 }
+
+ipcRenderer.on("rtw", (event, _data) => {
+	if (!app.Configuration.data["rtw.key.only"])
+		wave(_data);
+});

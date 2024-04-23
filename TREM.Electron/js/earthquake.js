@@ -1025,7 +1025,7 @@ async function init() {
 
 				if (!WS) Warn += `1(${ws_num})`;
 
-				if (!WS_backup) Warn += `2(${ws_num_bk})`;
+				// if (!WS_backup) Warn += `2(${ws_num_bk})`;
 
 				if (!FCM) Warn += "3";
 
@@ -1617,6 +1617,99 @@ async function init() {
 	// 	const test_Unit = "websocket";
 	// 	FCMdata(test_json, test_Unit);
 	// }, 5000);
+
+	// const ans0 = [
+	// 	{
+	// 		author  : "trem",
+	// 		id      : "1713870738508",
+	// 		serial  : 2,
+	// 		status  : 0,
+	// 		final   : 1,
+	// 		rts     : false,
+	// 		detail  : 0,
+	// 		reason  : 4,
+	// 		trigger : 1,
+	// 		eq      : {
+	// 			time  : 1713870728000,
+	// 			lon   : 121.54,
+	// 			lat   : 23.9,
+	// 			depth : 10,
+	// 			mag   : 1,
+	// 			loc   : "花蓮縣壽豐鄉",
+	// 			max   : 0,
+	// 			area  : {},
+	// 		},
+	// 		time: 1713870747000,
+	// 	},
+	// 	{
+	// 		author  : "trem",
+	// 		id      : "1713870796527",
+	// 		serial  : 2,
+	// 		status  : 0,
+	// 		final   : 1,
+	// 		rts     : false,
+	// 		detail  : 0,
+	// 		reason  : 4,
+	// 		trigger : 1,
+	// 		eq      : {
+	// 			time  : 1713870786000,
+	// 			lon   : 121.54,
+	// 			lat   : 23.9,
+	// 			depth : 10,
+	// 			mag   : 1,
+	// 			loc   : "花蓮縣壽豐鄉",
+	// 			max   : 0,
+	// 			area  : {},
+	// 		},
+	// 		time: 1713870805000,
+	// 	},
+	// 	{
+	// 		author  : "trem",
+	// 		id      : "1713870825027",
+	// 		serial  : 5,
+	// 		status  : 0,
+	// 		final   : 0,
+	// 		rts     : true,
+	// 		detail  : 1,
+	// 		reason  : 1,
+	// 		trigger : 3,
+	// 		eq      : {
+	// 			time  : 1713870821000,
+	// 			lon   : 121.54,
+	// 			lat   : 23.9,
+	// 			depth : 18,
+	// 			mag   : 4.7,
+	// 			loc   : "花蓮縣壽豐鄉",
+	// 			max   : 3,
+	// 			area  : {},
+	// 		},
+	// 		time: 1713870827000,
+	// 	},
+	// 	{
+	// 		author : "cwa",
+	// 		id     : "1130652",
+	// 		serial : 1,
+	// 		status : 0,
+	// 		final  : 0,
+	// 		eq     : {
+	// 			time  : 1713870822000,
+	// 			lon   : 121.61,
+	// 			lat   : 23.9,
+	// 			depth : 10,
+	// 			mag   : 4.6,
+	// 			loc   : "花蓮縣近海",
+	// 			max   : 4,
+	// 		},
+	// 		time: 1713877352000,
+	// 	},
+	// ];
+
+	// if (ans0.length != 0)
+	// 	for (const e of ans0) {
+	// 		e.type = "eew";
+	// 		e.timestamp = e.time;
+	// 		FCMdata(e, ServerType = "http");
+	// 	}
 
 	document.getElementById("rt-station-local").addEventListener("click", () => {
 		navigator.clipboard.writeText(document.getElementById("rt-station-local-id").innerText).then(() => {
@@ -4592,8 +4685,8 @@ ipcRenderer.on("sleep", (event, mode) => {
 		sleep(mode);
 });
 
-ipcRenderer.on("apikey", () => {
-	apikey();
+ipcRenderer.on("apikey", (event, data) => {
+	apikey(false, data);
 });
 
 ipcRenderer.on("report-Notification", (event, report) => {
