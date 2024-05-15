@@ -4186,7 +4186,7 @@ ipcRenderer.on("readReplayFile", (event, filePaths) => {
 
 		fs.readFile(filePaths[0], async (err, deta) => {
 			if (err) throw err;
-			await JSZip.loadAsync(deta).then(async (zip) => {
+			await JSZip.loadAsync(deta).then((zip) => {
 				const replayData = [];
 				zip.forEach((relativePath, zipEntry) => {
 					fileCount++;
