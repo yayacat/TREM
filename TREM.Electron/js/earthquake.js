@@ -1042,7 +1042,7 @@ async function init() {
 
 				Warn = ((Warn == "") ? "" : ` | 📛 ${Warn}`);
 
-				if (Warn == "") Warn = ` | ⬆: ${info.in.length + info6.in.length} ⬇: ${info.out.length + info6.out.length}}`;
+				if (Warn == "") Warn = ` | ⬆: ${info.in.length + info6.in.length} ⬇: ${info.out.length + info6.out.length}`;
 
 				if (type_Unit == "http") GetDataState += "🟩 Http";
 
