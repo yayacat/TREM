@@ -4182,7 +4182,11 @@ function openFileWindow() {
 ipcRenderer.on("readReplayFile", (event, filePaths) => {
 	try {
 		const MAX_FILES = 10000;
+		const MAX_SIZE = 1000000000;
+		// 1 GB
 		let fileCount = 0;
+		let totalSize = 0;
+		const targetDirectory = __dirname + "/archive_tmp";
 
 		fs.readFile(filePaths[0], async (err, deta) => {
 			if (err) throw err;
@@ -4194,11 +4198,25 @@ ipcRenderer.on("readReplayFile", (event, filePaths) => {
 					if (fileCount > MAX_FILES)
 						throw "Reached max. number of files";
 
-					const data = JSON.parse(zipEntry.async("string"));
-					data.rts.replay = true;
-					data.eew.forEach((e) => (e.replay = true));
-					data.time = +filename;
-					replayData.push(data);
+					// Prevent ZipSlip path traversal (S6096)
+					const resolvedPath = pathmodule.join(targetDirectory, zipEntry.name);
+
+					if (!resolvedPath.startsWith(targetDirectory))
+						throw "Path traversal detected";
+
+
+					zipEntry.async("string").then((content) => {
+						totalSize += content.length;
+
+						if (totalSize > MAX_SIZE)
+							throw "Reached max. size";
+
+						const data = JSON.parse(content);
+						data.rts.replay = true;
+						data.eew.forEach((e) => (e.replay = true));
+						data.time = +filename;
+						replayData.push(data);
+					});
 				});
 
 				// for (let i = 0, k = Object.keys(zip.files), n = k.length; i < n; i++) {
