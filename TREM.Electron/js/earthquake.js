@@ -2888,19 +2888,30 @@ async function fetchFiles() {
 		if (setting["Real-time.local"]) {
 			station_data = require(path.resolve(__dirname, "../station.json"));
 
-			if (!station_data)
+			if (Object.keys(station_data).length !== 0) {
+				station_v2_run(station_data);
+			} else {
 				station_data = await (await fetch(route.tremStation(1))).json();
-			station_v2_run(station_data);
+
+				if (Object.keys(station_data).length !== 0)
+					station_v2_run(station_data);
+			}
+
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
 			station_data = await (await fetch(route.tremStation(1))).json();
-			station_v2_run(station_data);
+
+			if (Object.keys(station_data).length !== 0)
+				station_v2_run(station_data);
 			log("Get Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Station File", origin: "Location" });
 		}
 
-		PGAMain();
+		if (Object.keys(station_data).length !== 0)
+			PGAMain();
+		else
+			await fetchFilesbackup();
 	} catch (err) {
 		log(err, 3, "Location", "fetchFiles");
 		dump({ level: 2, message: err, origin: "Location" });
@@ -2918,19 +2929,30 @@ async function fetchFilesbackup() {
 		if (setting["Real-time.local"]) {
 			station_data = require(path.resolve(__dirname, "../station.json"));
 
-			if (!station_data)
+			if (Object.keys(station_data).length !== 0) {
+				station_v2_run(station_data);
+			} else {
 				station_data = await (await fetch(route.tremStation(1))).json();
-			station_v2_run(station_data);
+
+				if (Object.keys(station_data).length !== 0)
+					station_v2_run(station_data);
+			}
+
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
 			station_data = await (await fetch(route.tremStation(1))).json();
-			station_v2_run(station_data);
+
+			if (Object.keys(station_data).length !== 0)
+				station_v2_run(station_data);
 			log("Get Station backup File", 1, "Location", "fetchFilesbackup");
 			dump({ level: 0, message: "Get Station backup File", origin: "Location" });
 		}
 
-		PGAMain();
+		if (Object.keys(station_data).length !== 0)
+			PGAMain();
+		else
+			await fetchFilesbackup0();
 	} catch (err) {
 		console.log(err);
 		log(err, 3, "Location", "fetchFilesbackup");
@@ -2947,17 +2969,31 @@ async function fetchFilesbackup0() {
 
 		if (setting["Real-time.local"]) {
 			station_data = require(path.resolve(__dirname, "../station.json"));
-			station_v2_run(station_data);
+
+			if (Object.keys(station_data).length !== 0) {
+				station_v2_run(station_data);
+			} else {
+				station_data = await (await fetch(route.tremStation(1))).json();
+
+				if (Object.keys(station_data).length !== 0)
+					station_v2_run(station_data);
+			}
+
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
 			station_data = await (await fetch(route.tremStation(1))).json();
-			station_v2_run(station_data);
+
+			if (Object.keys(station_data).length !== 0)
+				station_v2_run(station_data);
 			log("Get Station backup File", 1, "Location", "fetchFilesbackup");
 			dump({ level: 0, message: "Get Station backup File", origin: "Location" });
 		}
 
-		PGAMain();
+		if (Object.keys(station_data).length !== 0)
+			PGAMain();
+		else
+			await fetchFiles();
 	} catch (err) {
 		console.log(err);
 		log(err, 3, "Location", "fetchFilesbackup");
