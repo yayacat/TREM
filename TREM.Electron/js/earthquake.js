@@ -2887,11 +2887,14 @@ async function fetchFiles() {
 
 		if (setting["Real-time.local"]) {
 			station_data = require(path.resolve(__dirname, "../station.json"));
+
+			if (!station_data)
+				station_data = await (await fetch(route.tremStation(1))).json();
 			station_v2_run(station_data);
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
-			station_data = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/resource/station.json")).json();
+			station_data = await (await fetch(route.tremStation(1))).json();
 			station_v2_run(station_data);
 			log("Get Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Station File", origin: "Location" });
@@ -2914,6 +2917,9 @@ async function fetchFilesbackup() {
 
 		if (setting["Real-time.local"]) {
 			station_data = require(path.resolve(__dirname, "../station.json"));
+
+			if (!station_data)
+				station_data = await (await fetch(route.tremStation(1))).json();
 			station_v2_run(station_data);
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
