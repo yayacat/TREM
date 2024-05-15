@@ -4181,20 +4181,35 @@ function openFileWindow() {
 
 ipcRenderer.on("readReplayFile", (event, filePaths) => {
 	try {
+		const MAX_FILES = 10000;
+		let fileCount = 0;
+
 		fs.readFile(filePaths[0], async (err, deta) => {
 			if (err) throw err;
 			await JSZip.loadAsync(deta).then(async (zip) => {
 				const replayData = [];
+				zip.forEach((relativePath, zipEntry) => {
+					fileCount++;
 
-				for (let i = 0, k = Object.keys(zip.files), n = k.length; i < n; i++) {
-					const filename = k[i];
-					const content = await zip.files[filename].async("string");
-					const data = JSON.parse(content);
+					if (fileCount > MAX_FILES)
+						throw "Reached max. number of files";
+
+					const data = JSON.parse(zipEntry.async("string"));
 					data.rts.replay = true;
 					data.eew.forEach((e) => (e.replay = true));
 					data.time = +filename;
 					replayData.push(data);
-				}
+				});
+
+				// for (let i = 0, k = Object.keys(zip.files), n = k.length; i < n; i++) {
+				// 	const filename = k[i];
+				// 	const content = await zip.files[filename].async("string");
+				// 	const data = JSON.parse(content);
+				// 	data.rts.replay = true;
+				// 	data.eew.forEach((e) => (e.replay = true));
+				// 	data.time = +filename;
+				// 	replayData.push(data);
+				// }
 
 				const replayLength = replayData.length;
 				let replayPercentage = 0;
