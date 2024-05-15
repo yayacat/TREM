@@ -4,21 +4,16 @@ const { intensities } = require("../Constants/Constants");
 const twoPointDistance = ({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) => (((lat1 - lat2) * 111) ** 2 + ((lon1 - lon2) * 101) ** 2) ** 0.5;
 const twoSideDistance = (side1, side2) => (side1 ** 2 + side2 ** 2) ** 0.5;
 const pga = (magnitde, distance, siteEffect = 1.751) => 1.657 * Math.pow(Math.E, (1.533 * magnitde)) * Math.pow(distance, -1.607) * (siteEffect ?? 1.751);
-
-function convertValue(value) {
-	if (value >= 800) return 9;
-	else if (value <= 800 && value > 440) return 8;
-	else if (value <= 440 && value > 250) return 7;
-	else if (value <= 250 && value > 140) return 6;
-	else if (value <= 140 && value > 80) return 5;
-	else if (value <= 80 && value > 25) return 4;
-	else if (value <= 25 && value > 8) return 3;
-	else if (value <= 8 && value > 2.5) return 2;
-	else if (value <= 2.5 && value > 0.8) return 1;
-	else return 0;
-}
-
-const PGAToIntensity = (value) => intensities[convertValue(value)];
+const PGAToIntensity = (value) => intensities[value >= 800 ? 9
+	: value <= 800 && value > 440 ? 8
+		: value <= 440 && value > 250 ? 7
+			: value <= 250 && value > 140 ? 6
+				: value <= 140 && value > 80 ? 5
+					: value <= 80 && value > 25 ? 4
+						: value <= 25 && value > 8 ? 3
+							: value <= 8 && value > 2.5 ? 2
+								: value <= 2.5 && value > 0.8 ? 1
+									: 0];
 
 /**
  * @param {string} regionname
