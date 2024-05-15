@@ -4196,20 +4196,20 @@ ipcRenderer.on("readReplayFile", (event, filePaths) => {
 					fileCount++;
 
 					if (fileCount > MAX_FILES)
-						throw "Reached max. number of files";
+						throw new RangeError("Reached max. number of files");
 
 					// Prevent ZipSlip path traversal (S6096)
 					const resolvedPath = pathmodule.join(targetDirectory, zipEntry.name);
 
 					if (!resolvedPath.startsWith(targetDirectory))
-						throw "Path traversal detected";
+						throw new RangeError("Path traversal detected");
 
 
 					zipEntry.async("string").then((content) => {
 						totalSize += content.length;
 
 						if (totalSize > MAX_SIZE)
-							throw "Reached max. size";
+							throw new RangeError("Reached max. size");
 
 						const data = JSON.parse(content);
 						data.rts.replay = true;
