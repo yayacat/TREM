@@ -725,7 +725,7 @@ ipcMain.on("startPushReceiver", (event, arg) => {
 });
 
 ipcMain.on("linkpathtest", (event, cmdPath, cmdStr) => {
-	const workerProcess = cp.exec(cmdStr, { cwd: cmdPath, shell: false });
+	const workerProcess = cp.spawnSync(cmdStr, { cwd: cmdPath, shell: false });
 
 	workerProcess.stdout.on("data", (data) => {
 		console.log("stdout: " + data);
