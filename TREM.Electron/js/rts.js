@@ -260,7 +260,7 @@ const fetch_files = async () => {
 		}
 
 		if (!data.stations) {
-			const station_data = await (await fetch(`${route.randomBaseFileUrl()}station.json`)).json();
+			const station_data = await (await fetch(route.tremStation(1))).json();
 			station_v2_run(station_data);
 		}
 

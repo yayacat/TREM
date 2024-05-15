@@ -104,8 +104,8 @@ class Route {
 	/**
     * @returns {BaseFileUrl}
     */
-	randomBaseFileUrl() {
-		return `https://lb-${ this.random_ws_num }.exptech.com.tw/file/resource/`;
+	tremStation(version = this.version) {
+		return this.randomApiBaseUrl(version) + "/trem/station";
 	}
 
 	/**
@@ -152,7 +152,7 @@ class Route {
    * @returns {`${BaseUrl}/trem/rts/${timestamp}`}
    */
 	rtsReplay(version, timestamp = 0) {
-		return this.randomBaseUrl(version) + `/trem/rts/${timestamp}`;
+		return this.randomApiBaseUrl(version) + `/trem/rts/${timestamp}`;
 	}
 
 	/**
@@ -173,7 +173,7 @@ class Route {
    * @returns {`${BaseUrl}/eq/eew/${timestamp}`}
    */
 	eewReplay(version, timestamp) {
-		return this.randomBaseUrl(version) + `/eq/eew/${timestamp}`;
+		return this.randomApiBaseUrl(version) + `/eq/eew/${timestamp}`;
 	}
 }
 

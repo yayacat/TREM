@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const { getCurrentWindow } = require("@electron/remote");
 const axios = require("axios");
 const os = require("node:os");
@@ -312,7 +313,7 @@ function init() {
 		}
 
 		if (!station) {
-			const station_data = await (await fetch(`${route.randomBaseFileUrl()}station.json`)).json();
+			const station_data = await (await fetch(route.tremStation(1))).json();
 			station_v2_run(station_data);
 		}
 
@@ -659,15 +660,15 @@ function stream_mode(value) {
 		document.getElementById("report.onlycwachangeView").checked = true;
 		document.getElementById("report.onlycwachangeView").disabled = true;
 		ipcRenderer.send("config:value", "report.onlycwachangeView", true);
-		document.getElementById("report.getInfo").checked = false;
-		document.getElementById("report.getInfo").disabled = true;
-		ipcRenderer.send("config:value", "report.getInfo", false);
+		// document.getElementById("report.getInfo").checked = false;
+		// document.getElementById("report.getInfo").disabled = true;
+		// ipcRenderer.send("config:value", "report.getInfo", false);
 		document.getElementById("report.trem").checked = false;
 		document.getElementById("report.trem").disabled = true;
 		ipcRenderer.send("config:value", "report.trem", false);
-		document.getElementById("Real-time.alert").checked = false;
-		document.getElementById("Real-time.alert").disabled = true;
-		ipcRenderer.send("config:value", "Real-time.alert", false);
+		// document.getElementById("Real-time.alert").checked = false;
+		// document.getElementById("Real-time.alert").disabled = true;
+		// ipcRenderer.send("config:value", "Real-time.alert", false);
 		document.getElementById("trem.ps").checked = false;
 		document.getElementById("trem.ps").disabled = true;
 		ipcRenderer.send("config:value", "trem.ps", false);
@@ -677,9 +678,9 @@ function stream_mode(value) {
 	} else if (!value) {
 		document.getElementById("report.changeView").disabled = false;
 		document.getElementById("report.onlycwachangeView").disabled = false;
-		document.getElementById("report.getInfo").disabled = false;
+		// document.getElementById("report.getInfo").disabled = false;
 		document.getElementById("report.trem").disabled = false;
-		document.getElementById("Real-time.alert").disabled = false;
+		// document.getElementById("Real-time.alert").disabled = false;
 		document.getElementById("trem.ps").disabled = false;
 		document.getElementById("accept.eew.trem").disabled = false;
 	}
@@ -1997,7 +1998,7 @@ async function exptechlogin() {
 		}
 	} else if (setting["exptech.key"]) {
 		const KEY = setting["exptech.key"];
-		const out = await logout(KEY);
+		const out = await logout(KEY, "rts");
 
 		if (out != "") {
 			console.log("ok");
@@ -2054,7 +2055,7 @@ async function exptechrtwlogin() {
 		}
 	} else if (setting["rtw.exptech.key"]) {
 		const KEY = setting["rtw.exptech.key"];
-		const out = await logout(KEY);
+		const out = await logout(KEY, "rtw");
 
 		if (out != "") {
 			console.log("ok");
@@ -2076,75 +2077,6 @@ async function exptechrtwlogin() {
 			span.textContent = "登入";
 			keyhave_rtw = false;
 		}
-	}
-}
-
-const BASE_URL = "https://api.exptech.com.tw/api/v3/et/";
-
-async function login(data, name) {
-	try {
-		const response = await fetch(`${BASE_URL}login`, {
-			method  : "POST",
-			headers : { "Content-Type": "application/json" },
-			body    : JSON.stringify(data),
-		});
-		const ans = await response.text();
-
-		if (!response.ok) throw new Error(`${response.status} ${ans}`);
-		return ans;
-	} catch (err) {
-		console.log(err);
-
-		if (name == "rts")
-			showDialog("error",
-				TREM.Localization.getString("exptech_login_Title"),
-				TREM.Localization.getString("exptech_login_error"),
-				0, "error", () => {
-					const key = "";
-					ipcRenderer.send("config:value", "exptech.key", key);
-				}, "OK", "", () => void 0, 0, 0, () => {
-					const key = "";
-					ipcRenderer.send("config:value", "exptech.key", key);
-				});
-		else if (name == "rtw")
-			showDialog("error",
-				TREM.Localization.getString("exptech_rtw_login_Title"),
-				TREM.Localization.getString("exptech_rtw_login_error"),
-				0, "error", () => {
-					const key = "";
-					ipcRenderer.send("config:value", "rtw.exptech.key", key);
-				}, "OK", "", () => void 0, 0, 0, () => {
-					const key = "";
-					ipcRenderer.send("config:value", "rtw.exptech.key", key);
-				});
-		return "";
-	}
-}
-
-async function logout(KEY, name) {
-	try {
-		const response = await fetch(`${BASE_URL}logout`, {
-			method  : "DELETE",
-			headers : { Authorization: `Basic ${KEY}` },
-		});
-		const ans = await response.text();
-
-		if (!response.ok) throw new Error(`${response.status} ${ans}`);
-		return ans;
-	} catch (err) {
-		console.log(err);
-
-		if (name == "rts")
-			showDialog("error",
-				TREM.Localization.getString("exptech_logout_Title"),
-				TREM.Localization.getString("exptech_logout_error"),
-				0, "error", () => void 0, "OK", "", () => void 0, 0, 0, () => void 0);
-		else if (name == "rtw")
-			showDialog("error",
-				TREM.Localization.getString("exptech_rtw_logout_Title"),
-				TREM.Localization.getString("exptech_rtw_logout_error"),
-				0, "error", () => void 0, "OK", "", () => void 0, 0, 0, () => void 0);
-		return "";
 	}
 }
 

@@ -1031,18 +1031,18 @@ async function init() {
 
 				if (setting["p2p.mode"])
 					try {
-						if (!info.server.length) Warn += "5";
+						if (!info.server.length) Warn += "7";
 					} catch (e) {
-						Warn += "5";
+						Warn += "6";
 					}
 				else
 					Warn += "5";
 
-				if (!WS_yayacat) Warn += "6";
+				if (!WS_yayacat) Warn += "9";
 
 				Warn = ((Warn == "") ? "" : ` | 📛 ${Warn}`);
 
-				if (Warn == "") Warn = ` | ⬆: ${info.in.length + info6.in.length} ⬇: ${info.out.length + info6.out.length}`;
+				if (Warn == "") Warn = ` | ⬆: ${info.in.length + info6.in.length} ⬇: ${info.out.length + info6.out.length}}`;
 
 				if (type_Unit == "http") GetDataState += "🟩 Http";
 
@@ -1620,94 +1620,28 @@ async function init() {
 
 	// const ans0 = [
 	// 	{
-	// 		author  : "trem",
-	// 		id      : "1713870738508",
-	// 		serial  : 2,
-	// 		status  : 0,
-	// 		final   : 1,
-	// 		rts     : false,
-	// 		detail  : 0,
-	// 		reason  : 4,
-	// 		trigger : 1,
-	// 		eq      : {
-	// 			time  : 1713870728000,
-	// 			lon   : 121.54,
-	// 			lat   : 23.9,
-	// 			depth : 10,
-	// 			mag   : 1,
-	// 			loc   : "花蓮縣壽豐鄉",
-	// 			max   : 0,
-	// 			area  : {},
-	// 		},
-	// 		time: 1713870747000,
-	// 	},
-	// 	{
-	// 		author  : "trem",
-	// 		id      : "1713870796527",
-	// 		serial  : 2,
-	// 		status  : 0,
-	// 		final   : 1,
-	// 		rts     : false,
-	// 		detail  : 0,
-	// 		reason  : 4,
-	// 		trigger : 1,
-	// 		eq      : {
-	// 			time  : 1713870786000,
-	// 			lon   : 121.54,
-	// 			lat   : 23.9,
-	// 			depth : 10,
-	// 			mag   : 1,
-	// 			loc   : "花蓮縣壽豐鄉",
-	// 			max   : 0,
-	// 			area  : {},
-	// 		},
-	// 		time: 1713870805000,
-	// 	},
-	// 	{
-	// 		author  : "trem",
-	// 		id      : "1713870825027",
-	// 		serial  : 5,
-	// 		status  : 0,
-	// 		final   : 0,
-	// 		rts     : true,
-	// 		detail  : 1,
-	// 		reason  : 1,
-	// 		trigger : 3,
-	// 		eq      : {
-	// 			time  : 1713870821000,
-	// 			lon   : 121.54,
-	// 			lat   : 23.9,
-	// 			depth : 18,
-	// 			mag   : 4.7,
-	// 			loc   : "花蓮縣壽豐鄉",
-	// 			max   : 3,
-	// 			area  : {},
-	// 		},
-	// 		time: 1713870827000,
-	// 	},
-	// 	{
 	// 		author : "cwa",
-	// 		id     : "1130652",
-	// 		serial : 1,
+	// 		id     : "1130669",
+	// 		serial : 2,
 	// 		status : 0,
 	// 		final  : 0,
 	// 		eq     : {
-	// 			time  : 1713870822000,
-	// 			lon   : 121.61,
-	// 			lat   : 23.9,
+	// 			time  : 1714137688000,
+	// 			lon   : 121.52,
+	// 			lat   : 23.82,
 	// 			depth : 10,
-	// 			mag   : 4.6,
-	// 			loc   : "花蓮縣近海",
+	// 			mag   : 5,
+	// 			loc   : "花蓮縣壽豐鄉",
 	// 			max   : 4,
 	// 		},
-	// 		time: 1713877352000,
+	// 		time: 1714137688000,
 	// 	},
 	// ];
 
 	// if (ans0.length != 0)
 	// 	for (const e of ans0) {
 	// 		e.type = "eew";
-	// 		e.timestamp = e.time;
+	// 		e.timestamp = Date.now();
 	// 		FCMdata(e, ServerType = "http");
 	// 	}
 
@@ -1768,7 +1702,7 @@ function PGAMain() {
 				setTimeout(() => {
 					controller1.abort();
 				}, 2500);
-				fetch(route.eewReplay(1, ReplayTime * 1000), { signal: controller1.signal }).then((res2) => {
+				fetch(route.eewReplay(1, ReplayTime), { signal: controller1.signal }).then((res2) => {
 					if (res2.ok) {
 						res2.json().then(res3 => {
 							if (controller1.signal.aborted || res3 == undefined)
@@ -1896,7 +1830,7 @@ function PGAMain() {
 								Ping = "🔒";
 						}
 					} else if (!replayD) {
-						const url = route.rtsReplay(1, ReplayTime * 1000);
+						const url = route.rtsReplay(1, ReplayTime);
 						// + "&key=" + setting["exptech.key"]
 						const controller = new AbortController();
 						setTimeout(() => {
@@ -2001,7 +1935,7 @@ function PGAMainbkup() {
 				}, 2500);
 				axios({
 					method : "get",
-					url    : route.eewReplay(1, ReplayTime * 1000),
+					url    : route.eewReplay(1, ReplayTime),
 				}).then((res2) => {
 					if (res2.ok) {
 						res2.json().then(res3 => {
@@ -2130,7 +2064,7 @@ function PGAMainbkup() {
 								Ping = "🔒";
 						}
 					} else if (!replayD) {
-						const url = route.rtsReplay(1, ReplayTime * 1000);
+						const url = route.rtsReplay(1, ReplayTime);
 						// + "&key=" + setting["exptech.key"]
 						axios({
 							method : "get",
@@ -2984,7 +2918,7 @@ async function fetchFilesbackup() {
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
-			station_data = await (await fetch("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/station.json")).json();
+			station_data = await (await fetch(route.tremStation(1))).json();
 			station_v2_run(station_data);
 			log("Get Station backup File", 1, "Location", "fetchFilesbackup");
 			dump({ level: 0, message: "Get Station backup File", origin: "Location" });
@@ -3011,7 +2945,7 @@ async function fetchFilesbackup0() {
 			log("Get Local Station File", 1, "Location", "fetchFiles");
 			dump({ level: 0, message: "Get Local Station File", origin: "Location" });
 		} else {
-			station_data = await (await fetch(`${route.randomBaseFileUrl()}station.json`)).json();
+			station_data = await (await fetch(route.tremStation(1))).json();
 			station_v2_run(station_data);
 			log("Get Station backup File", 1, "Location", "fetchFilesbackup");
 			dump({ level: 0, message: "Get Station backup File", origin: "Location" });
@@ -4427,86 +4361,24 @@ TREM.color = function color(Intensity) {
 // #endregion
 
 let rts_clock = null;
+let p2p_mode_status = false;
 
 // #region IPC
 ipcRenderer.on("start", () => {
 	try {
-		if (!(rts_key_verify ? storage.getItem("disclaimer_off") : false) && !rts_key_verify) {
-			showDialog(
-				"warn",
-				"免責聲明",
-				`• TREMV 進階功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請所有使用者理解並謹慎使用。\n
-				• 強震即時警報是利用少數幾個地震測站快速演算之結果，與最終地震報告可能存有若干差異，請所有使用者理解並謹慎使用。\n
-				• 本軟體使用P2P的連線技術傳遞資料，您的電腦將會把收到的地震資訊轉傳給其他人的電腦，如此才能降低伺服器負荷與維持費用，也才能免費地提供服務給大家使用。若您開始使用本軟體則代表您已同意使用P2P連線技術將收到的資料轉傳給其他電腦。\n
-				• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
-				• Powered by ExpTech | 2023/11/03`,
-				0,
-				"warning",
-				() => {
-					if (setting["p2p.mode"]) serverinit();
-					setTimeout(() => {
-						if (localStorage.TOS_v1_2 == undefined)
-							showDialog(
-								"warn",
-								"TOS 服務條款 1.2",
-								`• 使用本服務應視為用戶同意使用條款\n
-								• TREMV 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
-								• 禁止在未經允許的情況下二次分發 TREMV 軟體內的任何資訊\n
-								• 禁止轉售 TREMV 提供之資訊\n
-								• 禁止違反法律法規或違反公共秩序和道德的行為\n
-								• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
-								• TREMV 使用 P2P 技術傳遞資訊\n
-								• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
-								• Powered by ExpTech | 2023/11/03`,
-								0,
-								"warning",
-								() => {
-									localStorage.TOS_v1_2 = true;
-								},
-								"我已詳細閱讀 並同意上述條款",
-								"",
-								() => void 0,
-								0,
-								1);
-					}, 1000);
-				},
-				"我已詳細閱讀 並同意上述免責聲明",
-				"",
-				() => void 0,
-				0,
-				1);
-		} else {
-			if (setting["p2p.mode"]) serverinit();
-			setTimeout(() => {
-				if (localStorage.TOS_v1_2 == undefined)
-					showDialog(
-						"warn",
-						"TOS 服務條款 1.2",
-						`• 使用本服務應視為用戶同意使用條款\n
-						• TREMV 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
-						• 禁止在未經允許的情況下二次分發 TREMV 軟體內的任何資訊\n
-						• 禁止轉售 TREMV 提供之資訊\n
-						• 禁止違反法律法規或違反公共秩序和道德的行為\n
-						• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
-						• TREMV 使用 P2P 技術傳遞資訊\n
-						• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
-						• Powered by ExpTech | 2023/11/03`,
-						0,
-						"warning",
-						() => {
-							localStorage.TOS_v1_2 = true;
-						},
-						"我已詳細閱讀 並同意上述條款",
-						"",
-						() => void 0,
-						0,
-						1);
-			}, 1000);
-		}
+		if (!(rts_key_verify ? storage.getItem("disclaimer_off") : false) && !rts_key_verify)
+			getp2pTOS();
+		else
+			getp2pTOSrun();
 
 		if (localStorage.rts_alert_false == undefined) {
 			localStorage.rts_alert_false = true;
 			ipcRenderer.send("config:value", "Real-time.alert", false);
+		}
+
+		if (localStorage.Real_time_local == undefined) {
+			localStorage.Real_time_local = true;
+			ipcRenderer.send("config:value", "Real-time.local", false);
 		}
 
 		setInterval(() => {
@@ -4527,6 +4399,64 @@ ipcRenderer.on("start", () => {
 		dump({ level: 2, message: error, origin: "Initialization" });
 	}
 });
+
+function getp2pTOSrun() {
+	if (setting["p2p.mode"] && !p2p_mode_status) {
+		p2p_mode_status = true;
+		serverinit();
+	}
+
+	setTimeout(() => {
+		getTOS();
+	}, 1000);
+}
+
+function getp2pTOS() {
+	showDialog(
+		"warn",
+		"免責聲明",
+		`• TREMV 進階功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請所有使用者理解並謹慎使用。\n
+		• 強震即時警報是利用少數幾個地震測站快速演算之結果，與最終地震報告可能存有若干差異，請所有使用者理解並謹慎使用。\n
+		• 本軟體使用P2P的連線技術傳遞資料，您的電腦將會把收到的地震資訊轉傳給其他人的電腦，如此才能降低伺服器負荷與維持費用，也才能免費地提供服務給大家使用。若您開始使用本軟體則代表您已同意使用P2P連線技術將收到的資料轉傳給其他電腦。\n
+		• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
+		• Powered by ExpTech | 2023/11/03`,
+		0,
+		"warning",
+		() => {
+			getp2pTOSrun();
+		},
+		"我已詳細閱讀 並同意上述免責聲明",
+		"",
+		() => void 0,
+		0,
+		1);
+}
+
+function getTOS() {
+	if (localStorage.TOS_v1_2 == undefined)
+		showDialog(
+			"warn",
+			"TOS 服務條款 1.2",
+			`• 使用本服務應視為用戶同意使用條款\n
+			• TREMV 是一款提供 地震檢知、地震預警、海嘯警報、震度速報、地震報告 的軟體\n
+			• 禁止在未經允許的情況下二次分發 TREMV 軟體內的任何資訊\n
+			• 禁止轉售 TREMV 提供之資訊\n
+			• 禁止違反法律法規或違反公共秩序和道德的行為\n
+			• 除以上條款外 任何開發團隊合理認為不適當的行為均不被允許\n
+			• TREMV 使用 P2P 技術傳遞資訊\n
+			• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
+			• Powered by ExpTech | 2023/11/03`,
+			0,
+			"warning",
+			() => {
+				localStorage.TOS_v1_2 = true;
+			},
+			"我已詳細閱讀 並同意上述條款",
+			"",
+			() => void 0,
+			0,
+			1);
+}
 
 function freertsget(rts_key_verify_f = false) {
 	if (!rts_key_verify || rts_key_verify_f) {
@@ -5712,6 +5642,8 @@ TREM.Earthquake.on("eew", (data) => {
 				MaxIntensity = int;
 		}
 
+	if (data.eq && data.eq.max) MaxIntensity = { label: TREM.Constants.intensities[data.eq.max].label, value: data.eq.max };
+
 	// TREM.MapIntensity.expected(GC);
 
 	let Alert = true;
@@ -5776,7 +5708,7 @@ TREM.Earthquake.on("eew", (data) => {
 			TREM.speech.speak({ text: `${data.Unit}，已取消警報` });
 		}
 
-		if (data.type == "eew-cwb")
+		if (data.author == "cwa")
 			if (data.location.includes("海") && Number(data.depth) <= 35)
 				if (Number(speecd_scale) >= 7 && speecd_number == 1)
 					TREM.speech.speak({ text: "震源位置及規模表明，可能發生海嘯，沿岸地區應慎防海水位突變，並留意中央氣象署是否發布，海嘯警報" });
@@ -5992,7 +5924,7 @@ TREM.Earthquake.on("eew", (data) => {
 	INFO[find] = {
 		ID              : data.id,
 		alert_number    : data.number,
-		alert_intensity : (data.type == "trem-eew" || data.author == "trem") ? data.max ? data.max : data.eq.max ?? 0 : MaxIntensity.value,
+		alert_intensity : (data.type == "trem-eew" || data.author == "trem") ? (data.max ? data.max : data.eq.max ?? 0) : MaxIntensity.value,
 		alert_location  : data.location ?? "未知區域",
 		alert_time      : time,
 		alert_sTime     : data.depth ? Math.floor(data.time + _speed(data.depth, distance).Stime * 1000) : null,

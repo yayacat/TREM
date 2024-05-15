@@ -336,6 +336,10 @@ TREM.Report = {
 		// 	ipcRenderer.send("testEEW", list);
 		// }
 
+		if (report.trem)
+			ipcRenderer.send("testoldtimeEEW", report.trem);
+
+
 		if (!report.download || !report.ID.length || !report.trem) {
 			this.replayHttp = true;
 			const oldtime = new Date(report.originTime.replace(/-/g, "/")).getTime();
@@ -947,24 +951,10 @@ TREM.Report = {
 								for (let _i = 0; _i < _report_data.length; _i++)
 									if (_report_data[_i].id)
 										if (_report_data[_i].id === report.id)
-											_report_data.splice(_i, 1);
-
-								_report_data.push(report);
-
-								for (let i = 0; i < _report_data.length - 1; i++)
-									for (let _i = 0; _i < _report_data.length - 1; _i++) {
-										const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
-										const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
-
-										if (time_temp < time_1_temp) {
-											const temp = _report_data[_i + 1];
-											_report_data[_i + 1] = _report_data[_i];
-											_report_data[_i] = temp;
-										}
-									}
+											_report_data[_i] = report;
 
 								storage.setItem("report_data", _report_data);
-								ipcRenderer.send("ReportGET");
+								// ipcRenderer.send("ReportGET");
 
 								document.getElementById("report-overview-number").innerText = TREM.Localization.getString(report.loc.startsWith("地震資訊") ? "Report_Title_Local" : (report.no % 1000 ? report.no : "Report_Title_Small"));
 								document.getElementById("report-overview-location").innerText = report.loc;
