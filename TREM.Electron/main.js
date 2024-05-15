@@ -6,7 +6,7 @@ const os = require("os");
 const logger = require("electron-log");
 const path = require("path");
 const pushReceiver = require("electron-fcm-push-receiver");
-const exectest = require("child_process").exec;
+const cp = require("child_process");
 const remote = require("@electron/remote/main");
 const get_Version = TREM.getVersion();
 
@@ -725,7 +725,7 @@ ipcMain.on("startPushReceiver", (event, arg) => {
 });
 
 ipcMain.on("linkpathtest", (event, cmdPath, cmdStr) => {
-	const workerProcess = exectest(cmdStr, { cwd: cmdPath, shell: false });
+	const workerProcess = cp.exec(cmdStr, { cwd: cmdPath, shell: false });
 
 	workerProcess.stdout.on("data", (data) => {
 		console.log("stdout: " + data);
