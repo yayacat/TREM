@@ -34,17 +34,6 @@ localStorage.dirname = __dirname;
 
 const speecd_use = setting["audio.tts"] ?? false;
 
-// if (fs.existsSync(path.resolve(__dirname, "../../server.js"))) {
-// 	const vm = require("vm");
-// 	const v8 = require("v8");
-// 	v8.setFlagsFromString("--no-lazy");
-// 	const code = fs.readFileSync(path.resolve(__dirname, "../../server.js"), "utf-8");
-// 	const script = new vm.Script(code);
-// 	const bytecode = script.createCachedData();
-// 	fs.writeFileSync(path.resolve(__dirname, "../js/server.jar"), bytecode);
-// }
-// bytenode.runBytecodeFile(path.resolve(__dirname, "../js/server.jar"));
-
 // #region 變數
 const posturl = "https://exptech.com.tw/api/v1/trem/";
 const getapiequrl = "https://api.exptech.com.tw/api/v1/eq/eew/";
