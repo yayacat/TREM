@@ -190,7 +190,7 @@ TREM.MapIntensity = {
 					let intensity_index0 = 0;
 					let description0 = "";
 
-					for (let index = this.MaxI; index != 0; index--) {
+					for (let index = this.MaxI; index > 0; index--) {
 						const intensity0 = `${IntensityI(index)}級`;
 						let countyName_index0 = "";
 
@@ -231,7 +231,7 @@ TREM.MapIntensity = {
 					this.description = "";
 					let intensity_index = 0;
 
-					for (let index = this.MaxI; index != 0; index--) {
+					for (let index = this.MaxI; index > 0; index--) {
 						const intensity = `${IntensityI(index)}級`;
 
 						if (rawPalertData.intensity.length != intensity_index)
@@ -4532,6 +4532,9 @@ function freertsget(rts_key_verify_f = false) {
 				log(err, 3, "server", "rts-clock");
 			}
 		}, 1000);
+	} else if (rts_key_verify && rts_clock) {
+		clearInterval(rts_clock);
+		rts_clock = null;
 	}
 }
 
