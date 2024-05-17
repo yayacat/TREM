@@ -3,10 +3,7 @@ const Dictionary = require("./Dictionary.js");
 class Localization {
 	constructor(defaultLocale, fallbackLocale = "zh-TW") {
 		this.defaultLocale = defaultLocale;
-		this.fallbackLocale = Localization.availableLocales.includes(fallbackLocale) ? fallbackLocale
-			: Localization.availableLocales.includes(fallbackLocale.slice(0, 2)) ? fallbackLocale.slice(0, 2)
-				: fallbackLocale.startsWith("zh") ? "zh-TW"
-					: "en";
+		this.fallbackLocale = this.fallbackLocaler(fallbackLocale);
 
 		for (const locale of Localization.availableLocales)
 			this[locale] = new Dictionary(locale);
@@ -21,11 +18,15 @@ class Localization {
 		"zh-TW",
 	];
 
+	fallbackLocaler(value) {
+		if (Localization.availableLocales.includes(value)) return value;
+		else if (Localization.availableLocales.includes(value.slice(0, 2))) return value.slice(0, 2);
+		else if (value.startsWith("zh")) return "zh-TW";
+		else return "en";
+	}
+
 	matchLocale(value) {
-		value = Localization.availableLocales.includes(value) ? value
-			: Localization.availableLocales.includes(value.slice(0, 2)) ? value.slice(0, 2)
-				: value.startsWith("zh") ? "zh-TW"
-					: "en";
+		value = this.fallbackLocaler(value);
 		return value;
 	}
 
