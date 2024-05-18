@@ -63,7 +63,7 @@ const lockScroll = state => {
 const closeDialog = event => {
 	const container = document.getElementById("modal-overlay");
 
-	if (!event.target.id.includes("dialog"))
+	if (event && !event.target.id.includes("dialog"))
 		if (event.target != container)
 			return;
 
@@ -203,8 +203,12 @@ const showDialog
 	if (time != 0) {
 		time = time * 1000;
 		showDialogtime = setTimeout((...args) => {
-			lockScroll(false);
-			$("#modal-overlay").fadeOut({ duration: 100, complete: () => container.replaceChildren() }).delay(100).show();
+			// lockScroll(false);
+			// $("#modal-overlay").fadeOut({ duration: 100, complete: () => container.replaceChildren() }).delay(100).show();
+			closeDialog(...args);
+
+			if (containerlock == 0)
+				callbackEnd();
 		}, time);
 	}
 };
