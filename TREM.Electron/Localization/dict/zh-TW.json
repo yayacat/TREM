@@ -68,6 +68,8 @@
     "exptech_logout_error": "登出失敗",
     "exptech_rtw_logout_error": "rtw登出失敗",
     "exptech_verify_Title": "驗證狀態",
-    "exptech_verify_error": "驗證失敗請到設定重新登入",
+    "exptech_verify_many_client": "驗證失敗(裝置超出連接上限)",
+    "exptech_verify_key_used": "驗證失敗(裝置已經使用中)",
+    "exptech_verify_invaild_key": "驗證失敗(無效的裝置驗證)",
     "Tray_Reload": "重新加載"
 }
