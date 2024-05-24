@@ -157,7 +157,7 @@ function createWindow() {
 				SettingWindow.close();
 			event.returnValue = false;
 		} else {
-			TREM.exit(0);
+			MainWindow.webContents.send("app-before-quit");
 		}
 	});
 	MainWindow.on("unresponsive", () => {
@@ -503,7 +503,8 @@ ipcMain.on("reloadpage", () => {
 	// restart();
 	const currentWindow = BrowserWindow.getFocusedWindow();
 
-	if (currentWindow == MainWindow) currentWindow.webContents.reload();
+	if (currentWindow == MainWindow)
+		MainWindow.webContents.send("app-before-reload");
 });
 
 ipcMain.on("Mainreloadpage", () => {
@@ -925,6 +926,14 @@ ipcMain.on("screenshot", async () => {
 		fs.writeFileSync(path.join(folder, filename), (await currentWindow.webContents.capturePage()).toPNG());
 		shell.showItemInFolder(path.join(folder, filename));
 	}
+});
+
+ipcMain.on("app-quit-response", () => {
+	TREM.exit(0);
+});
+
+ipcMain.on("app-quit-reload", () => {
+	MainWindow.webContents.reload();
 });
 
 TREM.Configuration.on("update", (data) => {

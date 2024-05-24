@@ -1697,12 +1697,13 @@ function PGAMain() {
 							if (controller1.signal.aborted || res3 == undefined)
 								console.debug("api_eq_undefined");
 							else
-								for (let i = 0; i < res3.eew.length; i++) {
-									res3.eew[i].replay_timestamp = res3.eew[i].timestamp;
-									res3.eew[i].replay_time = res3.eew[i].time;
-									res3.eew[i].time = NOW().getTime() - (res3.eew[i].timestamp - res3.eew[i].time);
-									res3.eew[i].timestamp = NOW().getTime();
-									FCMdata(res3.eew[i], "http");
+								for (let i = 0; i < res3.length; i++) {
+									res3[i].replay_timestamp = res3[i].time;
+									res3[i].replay_time = res3[i].time;
+									res3[i].time = NOW().getTime() - (ReplayTime - res3[i].time);
+									res3[i].timestamp = NOW().getTime();
+									res3[i].type = "eew";
+									FCMdata(res3[i], "http");
 								}
 						});
 					} else {
@@ -1931,12 +1932,13 @@ function PGAMainbkup() {
 							if (controller1.signal.aborted || res3 == undefined)
 								console.debug("bkup_api_eq_undefined");
 							else
-								for (let i = 0; i < res3.eew.length; i++) {
-									res3.eew[i].replay_timestamp = res3.eew[i].timestamp;
-									res3.eew[i].replay_time = res3.eew[i].time;
-									res3.eew[i].time = NOW().getTime() - (res3.eew[i].timestamp - res3.eew[i].time);
-									res3.eew[i].timestamp = NOW().getTime();
-									FCMdata(res3.eew[i], "http");
+								for (let i = 0; i < res3.length; i++) {
+									res3[i].replay_timestamp = res3[i].time;
+									res3[i].replay_time = res3[i].time;
+									res3[i].time = NOW().getTime() - (ReplayTime - res3[i].time);
+									res3[i].timestamp = NOW().getTime();
+									res3[i].type = "eew";
+									FCMdata(res3[i], "http");
 								}
 						});
 					} else {
@@ -4446,11 +4448,11 @@ function getp2pTOS() {
 	showDialog(
 		"warn",
 		"免責聲明",
-		`• TREMV 進階功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請所有使用者理解並謹慎使用。\n
+		`• TREMV VIP功能中的資訊屬於特定使用者使用，與最終非特定使用者中的資訊可能存有若干差異，請所有使用者理解並謹慎使用。\n
 		• 強震即時警報是利用少數幾個地震測站快速演算之結果，與最終地震報告可能存有若干差異，請所有使用者理解並謹慎使用。\n
 		• 本軟體使用P2P的連線技術傳遞資料，您的電腦將會把收到的地震資訊轉傳給其他人的電腦，如此才能降低伺服器負荷與維持費用，也才能免費地提供服務給大家使用。若您開始使用本軟體則代表您已同意使用P2P連線技術將收到的資料轉傳給其他電腦。\n
 		• 任何資訊均以 中央氣象署(CWA) 發布之內容為準\n
-		• Powered by ExpTech | 2023/11/03`,
+		• Powered by ExpTech | 2024/05/24`,
 		0,
 		"warning",
 		() => {
@@ -5553,7 +5555,7 @@ TREM.Earthquake.on("eew", (data) => {
 
 		if (data.eq.loc) data.location = data.eq.loc;
 
-		if (data.eq.time && !data.time) data.time = data.eq.time;
+		if (data.eq.time) data.time = data.eq.time;
 	}
 
 	if ((data.type == "trem-eew" || data.author == "trem") && (data.lat == null && data.lon == null)) return;
@@ -6948,3 +6950,29 @@ function timeconvert(time) {
 function globalgc() {
 	global.gc();
 }
+
+function WebSocket_close() {
+	if (ws.readyState === WebSocket.OPEN)
+		ws.close();
+
+	if (ws_yayacat.readyState === WebSocket.OPEN)
+		ws_yayacat.close();
+}
+
+ipcRenderer.on("app-before-quit", () => {
+	// 執行網頁內容關閉前的任務...
+	WebSocket_close();
+	log("WebSocket_close", 1, "TREM", "quit");
+
+	// 通知主程序已準備好退出
+	ipcRenderer.send("app-quit-response");
+});
+
+ipcRenderer.on("app-before-reload", () => {
+	// 執行網頁內容關閉前的任務...
+	WebSocket_close();
+	log("WebSocket_close", 1, "TREM", "reload");
+
+	// 通知主程序已準備好退出
+	ipcRenderer.send("app-quit-reload");
+});
