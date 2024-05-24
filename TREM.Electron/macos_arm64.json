@@ -1,5 +1,13 @@
 {
   "build": {
+    "productName": "TREMV",
+    "appId": "tw.exptech.tremv",
+    "asar": true,
+    "asarUnpack": [
+      "./audio",
+      "./station.json",
+      "./package.json"
+    ],
     "mac": {
       "target": [
         {
@@ -15,6 +23,24 @@
           ]
         }
       ]
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "directories": {
+      "buildResources": "resources",
+      "output": "dev"
     }
   }
 }
