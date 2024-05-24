@@ -63,7 +63,7 @@ jobs:
           /home/runner/work/TREM/TREM/TREM.Electron/dev/*.rpm
 
   macOS_x64:
-    runs-on: macos-latest
+    runs-on: macos-13
     defaults:
       run:
         working-directory: TREM.Electron
