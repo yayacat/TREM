@@ -1,0 +1,8 @@
+ mac:
+   target:
+     - target: dmg
+       arch:
+         - x64
+     - target: pkg
+       arch:
+         - x64
