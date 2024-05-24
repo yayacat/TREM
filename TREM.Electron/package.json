@@ -1,6 +1,6 @@
 {
   "name": "tremv",
-  "version": "6.1.109",
+  "version": "6.1.110",
   "description": "Taiwan Real-time Earthquake Monitoring Variety ( 臺灣即時地震監測變體 )",
   "main": "main.js",
   "homepage": "https://exptech.com.tw/",
@@ -25,13 +25,15 @@
         {
           "target": "dmg",
           "arch": [
-            "x64"
+            "x64",
+            "arm64"
           ]
         },
         {
           "target": "pkg",
           "arch": [
-            "x64"
+            "x64",
+            "arm64"
           ]
         }
       ]

@@ -921,15 +921,19 @@ async function init() {
 
 	// Connect to server
 	try {
-		if (process.platform === "win32")
+		if (process.platform === "win32") {
 			bytenode.runBytecodeFile(path.resolve(__dirname, "../js/winserver.jar"));
-		else if (process.platform === "darwin")
-			bytenode.runBytecodeFile(path.resolve(__dirname, "../js/macosserver.jar"));
-		else if (process.platform === "linux")
+		} else if (process.platform === "darwin") {
+			if (process.arch === "x64")
+				bytenode.runBytecodeFile(path.resolve(__dirname, "../js/macos_x64_server.jar"));
+			else if (process.arch === "arm64")
+				bytenode.runBytecodeFile(path.resolve(__dirname, "../js/macos_arm64_server.jar"));
+		} else if (process.platform === "linux") {
 			if (process.arch === "x64")
 				bytenode.runBytecodeFile(path.resolve(__dirname, "../js/linux_x64_server.jar"));
 			else if (process.arch === "arm64")
 				bytenode.runBytecodeFile(path.resolve(__dirname, "../js/linux_arm64_server.jar"));
+		}
 
 		$("#loading").text(TREM.Localization.getString("Application_Connecting"));
 		log("Trying to connect to the server...", 1, "ResourceLoader", "init");
