@@ -1,0 +1,20 @@
+{
+  "build": {
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        },
+        {
+          "target": "pkg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ]
+    }
+  }
+}

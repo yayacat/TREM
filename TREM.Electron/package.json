@@ -9,8 +9,8 @@
     "start": "electron .",
     "dev": "electron . --dev --key",
     "dist": "electron-builder -p always",
-    "dist_x64": "electron-builder --x64 -p always -c macos_x64.yml",
-    "dist_arm64": "electron-builder --arm64 -p always -c macos_arm64.yml",
+    "dist_x64": "electron-builder --x64 -p always -c macos_x64.json",
+    "dist_arm64": "electron-builder --arm64 -p always -c macos_arm64.json",
     "lint": "eslint --ext .js js/"
   },
   "build": {
