@@ -3497,6 +3497,186 @@
                                 </div>
                                 <div class="control-title">
                                     <div>
+                                        <span lang="zh-TW">P2P統計資訊</span>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="option-container">
+                                    <div class="option-label">
+                                        <div class="option-label-title">
+                                            <span lang="zh-TW">v4伺服器資訊</span>
+                                        </div>
+                                        <div class="option-label-description" id="p2p_server_num">
+                                            <span lang="zh-TW">v4伺服器資訊</span>
+                                        </div>
+                                    </div>
+                                    <div class="control" id="p2p_server">
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="option-container">
+                                    <div class="option-label">
+                                        <div class="option-label-title">
+                                            <span lang="zh-TW">v4接收資訊</span>
+                                        </div>
+                                        <div class="option-label-description" id="p2p_in_num">
+                                            <span lang="zh-TW">v4接收資訊</span>
+                                        </div>
+                                    </div>
+                                    <div class="control" id="p2p_in">
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="option-container">
+                                    <div class="option-label">
+                                        <div class="option-label-title">
+                                            <span lang="zh-TW">v4發送資訊</span>
+                                        </div>
+                                        <div class="option-label-description" id="p2p_out_num">
+                                            <span lang="zh-TW">v4發送資訊</span>
+                                        </div>
+                                    </div>
+                                    <div class="control" id="p2p_out">
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="option-container">
+                                    <div class="option-label">
+                                        <div class="option-label-title">
+                                            <span lang="zh-TW">v6伺服器資訊</span>
+                                        </div>
+                                        <div class="option-label-description" id="p2p_v6_server_num">
+                                            <span lang="zh-TW">v6伺服器資訊</span>
+                                        </div>
+                                    </div>
+                                    <div class="control" id="p2p_v6_server">
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="option-container">
+                                    <div class="option-label">
+                                        <div class="option-label-title">
+                                            <span lang="zh-TW">v6接收資訊</span>
+                                        </div>
+                                        <div class="option-label-description" id="p2p_v6_in_num">
+                                            <span lang="zh-TW">v6接收資訊</span>
+                                        </div>
+                                    </div>
+                                    <div class="control" id="p2p_v6_in">
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="option-container">
+                                    <div class="option-label">
+                                        <div class="option-label-title">
+                                            <span lang="zh-TW">v6發送資訊</span>
+                                        </div>
+                                        <div class="option-label-description" id="p2p_v6_out_num">
+                                            <span lang="zh-TW">v6發送資訊</span>
+                                        </div>
+                                    </div>
+                                    <div class="control" id="p2p_v6_out">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-container" id="Windows">
+                                <div class="control-title">
+                                    <div>
+                                        <span lang="en">Windows Settings</span>
+                                        <span lang="ja">Windows 設定</span>
+                                        <span lang="kr">Windows 설정</span>
+                                        <span lang="ru">Настройки Windows</span>
+                                        <span lang="zh-CN">Windows 设置</span>
+                                        <span lang="zh-TW">Windows 設定</span>
+                                    </div>
+                                </div>
+                                <div class="control-container">
+                                    <div class="option-container">
+                                        <div class="option-label">
+                                            <div class="option-label-title">
+                                                <span lang="en">Start with Windows</span>
+                                                <span lang="ja">TREMV を開く</span>
+                                                <span lang="kr">시작프로그램</span>
+                                                <span lang="ru">Начните с Windows</span>
+                                                <span lang="zh-CN">在 Windows 开机时启动</span>
+                                                <span lang="zh-TW">在 Windows 開機時啟動</span>
+                                                <span class="option-label-id">windows.startup</span>
+                                            </div>
+                                            <div class="option-label-description">
+                                                <span lang="en">Let TREMV starts on computer startup.</span>
+                                                <span lang="ja">パソコン起動時に TREMV を起動させます。</span>
+                                                <span lang="kr">Windows 시작 시 TREMV이 같이 실행됩니다.</span>
+                                                <span lang="ru">Пусть TREMV запускается при загрузке компьютера</span>
+                                                <span lang="zh-CN">让 TREMV 跟着 Windows 一起启动。</span>
+                                                <span lang="zh-TW">讓 TREMV 跟著 Windows 一起啟動。</span>
+                                            </div>
+                                        </div>
+                                        <label class="md3 switch">
+                                            <input type="checkbox" id="windows.startup" onclick="CheckSave('windows.startup')">
+                                            <span class="slider">
+                                                <span class="material-symbols-rounded icon">done</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="option-container">
+                                        <div class="option-label">
+                                            <div class="option-label-title">
+                                                <span lang="en">Start Minimized</span>
+                                                <span lang="ja">最小化した状態で起動する</span>
+                                                <span lang="kr">최소화되어 실행</span>
+                                                <span lang="ru">Начало Минимизировано</span>
+                                                <span lang="zh-CN">启动后缩小到系统托盘</span>
+                                                <span lang="zh-TW">以最小化啟動</span>
+                                                <span class="option-label-id">windows.minimize</span>
+                                            </div>
+                                            <div class="option-label-description">
+                                                <span lang="en">Let TREMV starts in the background.</span>
+                                                <span lang="ja">TREMV をバックグラウンドで起動させます。</span>
+                                                <span lang="kr">TREMV이 백그라운드에서 실행됩니다.</span>
+                                                <span lang="ru">Пусть на заднем плане запустится TREMV</span>
+                                                <span lang="zh-CN">让 TREMV 在后台运行。</span>
+                                                <span lang="zh-TW">讓 TREMV 在背景執行。</span>
+                                            </div>
+                                        </div>
+                                        <label class="md3 switch">
+                                            <input type="checkbox" id="windows.minimize" onclick="CheckSave('windows.minimize')">
+                                            <span class="slider">
+                                                <span class="material-symbols-rounded icon">done</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="option-container">
+                                        <div class="option-label">
+                                            <div class="option-label-title">
+                                                <span lang="en">Minimize to Tray</span>
+                                                <span lang="ja">トレイに最小化</span>
+                                                <span lang="kr">트래이로 최소화</span>
+                                                <span lang="ru">Свернуть в лоток</span>
+                                                <span lang="zh-CN">缩小到系统托盘</span>
+                                                <span lang="zh-TW">最小化到系統列</span>
+                                                <span class="option-label-id">windows.tray</span>
+                                            </div>
+                                            <div class="option-label-description">
+                                                <span lang="en">Let TREMV minimize to your system tray when you close the app.</span>
+                                                <span lang="ja">「X」を押すと、アプリを閉じたときに TREMV をシステムトレイで休止します。</span>
+                                                <span lang="kr">"X"를 눌러 닫은 후에도 알림 영역에서 계속 실행됩니다</span>
+                                                <span lang="ru">Позволяет сворачивать TREMV в системный трей при закрытии TREMV</span>
+                                                <span lang="zh-CN">点击「X」关闭程序后，会使 TREMV 于后台运行，并保留在系统托盘中。</span>
+                                                <span lang="zh-TW">按下「X」關閉應用程式後，會讓 TREMV 回到背景，留在系統通知區。</span>
+                                            </div>
+                                        </div>
+                                        <label class="md3 switch">
+                                            <input type="checkbox" id="windows.tray" onclick="CheckSave('windows.tray')">
+                                            <span class="slider">
+                                                <span class="material-symbols-rounded icon">done</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-container" id="Test1">
+                                <div class="control-title">
+                                    <div>
                                         <span lang="en">Test EEW</span>
                                         <span lang="ja">速報テスト</span>
                                         <span lang="kr">테스트</span>
@@ -3892,186 +4072,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="control-title">
-                                    <div>
-                                        <span lang="zh-TW">P2P統計資訊</span>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="option-container">
-                                    <div class="option-label">
-                                        <div class="option-label-title">
-                                            <span lang="zh-TW">v4伺服器資訊</span>
-                                        </div>
-                                        <div class="option-label-description" id="p2p_server_num">
-                                            <span lang="zh-TW">v4伺服器資訊</span>
-                                        </div>
-                                    </div>
-                                    <div class="control" id="p2p_server">
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="option-container">
-                                    <div class="option-label">
-                                        <div class="option-label-title">
-                                            <span lang="zh-TW">v4接收資訊</span>
-                                        </div>
-                                        <div class="option-label-description" id="p2p_in_num">
-                                            <span lang="zh-TW">v4接收資訊</span>
-                                        </div>
-                                    </div>
-                                    <div class="control" id="p2p_in">
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="option-container">
-                                    <div class="option-label">
-                                        <div class="option-label-title">
-                                            <span lang="zh-TW">v4發送資訊</span>
-                                        </div>
-                                        <div class="option-label-description" id="p2p_out_num">
-                                            <span lang="zh-TW">v4發送資訊</span>
-                                        </div>
-                                    </div>
-                                    <div class="control" id="p2p_out">
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="option-container">
-                                    <div class="option-label">
-                                        <div class="option-label-title">
-                                            <span lang="zh-TW">v6伺服器資訊</span>
-                                        </div>
-                                        <div class="option-label-description" id="p2p_v6_server_num">
-                                            <span lang="zh-TW">v6伺服器資訊</span>
-                                        </div>
-                                    </div>
-                                    <div class="control" id="p2p_v6_server">
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="option-container">
-                                    <div class="option-label">
-                                        <div class="option-label-title">
-                                            <span lang="zh-TW">v6接收資訊</span>
-                                        </div>
-                                        <div class="option-label-description" id="p2p_v6_in_num">
-                                            <span lang="zh-TW">v6接收資訊</span>
-                                        </div>
-                                    </div>
-                                    <div class="control" id="p2p_v6_in">
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="option-container">
-                                    <div class="option-label">
-                                        <div class="option-label-title">
-                                            <span lang="zh-TW">v6發送資訊</span>
-                                        </div>
-                                        <div class="option-label-description" id="p2p_v6_out_num">
-                                            <span lang="zh-TW">v6發送資訊</span>
-                                        </div>
-                                    </div>
-                                    <div class="control" id="p2p_v6_out">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="list-container" id="Windows">
-                                <div class="control-title">
-                                    <div>
-                                        <span lang="en">Windows Settings</span>
-                                        <span lang="ja">Windows 設定</span>
-                                        <span lang="kr">Windows 설정</span>
-                                        <span lang="ru">Настройки Windows</span>
-                                        <span lang="zh-CN">Windows 设置</span>
-                                        <span lang="zh-TW">Windows 設定</span>
-                                    </div>
-                                </div>
-                                <div class="control-container">
-                                    <div class="option-container">
-                                        <div class="option-label">
-                                            <div class="option-label-title">
-                                                <span lang="en">Start with Windows</span>
-                                                <span lang="ja">TREMV を開く</span>
-                                                <span lang="kr">시작프로그램</span>
-                                                <span lang="ru">Начните с Windows</span>
-                                                <span lang="zh-CN">在 Windows 开机时启动</span>
-                                                <span lang="zh-TW">在 Windows 開機時啟動</span>
-                                                <span class="option-label-id">windows.startup</span>
-                                            </div>
-                                            <div class="option-label-description">
-                                                <span lang="en">Let TREMV starts on computer startup.</span>
-                                                <span lang="ja">パソコン起動時に TREMV を起動させます。</span>
-                                                <span lang="kr">Windows 시작 시 TREMV이 같이 실행됩니다.</span>
-                                                <span lang="ru">Пусть TREMV запускается при загрузке компьютера</span>
-                                                <span lang="zh-CN">让 TREMV 跟着 Windows 一起启动。</span>
-                                                <span lang="zh-TW">讓 TREMV 跟著 Windows 一起啟動。</span>
-                                            </div>
-                                        </div>
-                                        <label class="md3 switch">
-                                            <input type="checkbox" id="windows.startup" onclick="CheckSave('windows.startup')">
-                                            <span class="slider">
-                                                <span class="material-symbols-rounded icon">done</span>
-                                            </span>
-                                        </label>
-                                    </div>
-                                    <div class="option-container">
-                                        <div class="option-label">
-                                            <div class="option-label-title">
-                                                <span lang="en">Start Minimized</span>
-                                                <span lang="ja">最小化した状態で起動する</span>
-                                                <span lang="kr">최소화되어 실행</span>
-                                                <span lang="ru">Начало Минимизировано</span>
-                                                <span lang="zh-CN">启动后缩小到系统托盘</span>
-                                                <span lang="zh-TW">以最小化啟動</span>
-                                                <span class="option-label-id">windows.minimize</span>
-                                            </div>
-                                            <div class="option-label-description">
-                                                <span lang="en">Let TREMV starts in the background.</span>
-                                                <span lang="ja">TREMV をバックグラウンドで起動させます。</span>
-                                                <span lang="kr">TREMV이 백그라운드에서 실행됩니다.</span>
-                                                <span lang="ru">Пусть на заднем плане запустится TREMV</span>
-                                                <span lang="zh-CN">让 TREMV 在后台运行。</span>
-                                                <span lang="zh-TW">讓 TREMV 在背景執行。</span>
-                                            </div>
-                                        </div>
-                                        <label class="md3 switch">
-                                            <input type="checkbox" id="windows.minimize" onclick="CheckSave('windows.minimize')">
-                                            <span class="slider">
-                                                <span class="material-symbols-rounded icon">done</span>
-                                            </span>
-                                        </label>
-                                    </div>
-                                    <div class="option-container">
-                                        <div class="option-label">
-                                            <div class="option-label-title">
-                                                <span lang="en">Minimize to Tray</span>
-                                                <span lang="ja">トレイに最小化</span>
-                                                <span lang="kr">트래이로 최소화</span>
-                                                <span lang="ru">Свернуть в лоток</span>
-                                                <span lang="zh-CN">缩小到系统托盘</span>
-                                                <span lang="zh-TW">最小化到系統列</span>
-                                                <span class="option-label-id">windows.tray</span>
-                                            </div>
-                                            <div class="option-label-description">
-                                                <span lang="en">Let TREMV minimize to your system tray when you close the app.</span>
-                                                <span lang="ja">「X」を押すと、アプリを閉じたときに TREMV をシステムトレイで休止します。</span>
-                                                <span lang="kr">"X"를 눌러 닫은 후에도 알림 영역에서 계속 실행됩니다</span>
-                                                <span lang="ru">Позволяет сворачивать TREMV в системный трей при закрытии TREMV</span>
-                                                <span lang="zh-CN">点击「X」关闭程序后，会使 TREMV 于后台运行，并保留在系统托盘中。</span>
-                                                <span lang="zh-TW">按下「X」關閉應用程式後，會讓 TREMV 回到背景，留在系統通知區。</span>
-                                            </div>
-                                        </div>
-                                        <label class="md3 switch">
-                                            <input type="checkbox" id="windows.tray" onclick="CheckSave('windows.tray')">
-                                            <span class="slider">
-                                                <span class="material-symbols-rounded icon">done</span>
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="list-container" id="Test1">
                                 <div class="control-title">
                                     <div>
                                         <span lang="zh-TW">測試舊rts</span>
