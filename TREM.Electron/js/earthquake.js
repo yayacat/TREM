@@ -3275,6 +3275,8 @@ function ReportGET(badcatch = false) {
 						_report_data_temp[j] = _report_data[i];
 						j += 1;
 					}
+				} else if (_report_data[i].identifier === "") {
+					_report_data.splice(_i, 1);
 				}
 
 			_report_data = _report_data_temp;
@@ -3326,6 +3328,7 @@ function ReportGET(badcatch = false) {
 									}
 
 									ans[i].no = id.split("-")[0];
+									ans[i].originTime = now_format(new Date(ans[i].time));
 
 									for (let _i = 0; _i < _report_data.length; _i++)
 										if (_report_data[_i]) {
@@ -3356,12 +3359,8 @@ function ReportGET(badcatch = false) {
 											} else if (_report_data[_i].identifier) {
 												if (_report_data[_i].identifier === id)
 													_report_data.splice(_i, 1);
-											} else if (_report_data[_i].identifier === "") {
-												_report_data.splice(_i, 1);
 											}
 										}
-
-									ans[i].originTime = now_format(new Date(ans[i].time));
 								}
 
 								for (let i = 0; i < ans.length; i++)
@@ -3525,6 +3524,7 @@ function ReportGET(badcatch = false) {
 									}
 
 									ans[i].no = id.split("-")[0];
+									ans[i].originTime = now_format(new Date(ans[i].time));
 
 									for (let _i = 0; _i < _report_data.length; _i++)
 										if (_report_data[_i]) {
@@ -3546,7 +3546,6 @@ function ReportGET(badcatch = false) {
 												} else if (_report_data[_i + 1]) {
 													if (_report_data[_i].id === _report_data[_i + 1].id)
 														_report_data.splice(_i, 1);
-
 												}
 
 												if (_report_data && _report_data[_i] && !_report_data[_i].no && _report_data[_i].id !== undefined)
@@ -3555,12 +3554,8 @@ function ReportGET(badcatch = false) {
 											} else if (_report_data[_i].identifier) {
 												if (_report_data[_i].identifier === id)
 													_report_data.splice(_i, 1);
-											} else if (_report_data[_i].identifier === "") {
-												_report_data.splice(_i, 1);
 											}
 										}
-
-									ans[i].originTime = now_format(new Date(ans[i].time));
 								}
 
 								for (let i = 0; i < ans.length; i++)
