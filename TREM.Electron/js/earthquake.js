@@ -3365,10 +3365,10 @@ function ReportGET(badcatch = false) {
 								}
 
 								for (let i = 0; i < ans.length; i++)
-									_report_data.push(ans[i]);
+									_report_data.unshift(ans[i]);
 
-								for (let i = 0; i < _report_data.length - 1; i++)
-									for (let _i = 0; _i < _report_data.length - 1; _i++) {
+								for (let i = 0; i < ans.length - 1; i++)
+									for (let _i = 0; _i < ans.length - 1; _i++) {
 										const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
 										const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
 
@@ -3564,10 +3564,10 @@ function ReportGET(badcatch = false) {
 								}
 
 								for (let i = 0; i < ans.length; i++)
-									_report_data.push(ans[i]);
+									_report_data.unshift(ans[i]);
 
-								for (let i = 0; i < _report_data.length - 1; i++)
-									for (let _i = 0; _i < _report_data.length - 1; _i++) {
+								for (let i = 0; i < ans.length - 1; i++)
+									for (let _i = 0; _i < ans.length - 1; _i++) {
 										const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
 										const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
 
