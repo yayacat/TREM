@@ -90,7 +90,7 @@
   },
   "dependencies": {
     "@electron/remote": "^2.0.12",
-    "@material/material-color-utilities": "^0.2.0",
+    "@material/material-color-utilities": "^0.2.7",
     "@turf/circle": "^6.5.0",
     "axios": "^1.6.7",
     "bytenode": "^1.5.6",
