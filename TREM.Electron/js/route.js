@@ -5,22 +5,28 @@
  * @template {number} [random_max_num = 4]
  * @template {number} [random_ws_num = 1~4]
  * @template {number} [random_api_num = 1~2]
+ * @template {string} [global_url = ["com.tw", "dev"]]
  */
 class Route {
 
 	/**
    * @typedef BaseUrl
-   * @type {`https://lb-${number}.exptech.com.tw/api/v${version}`}
+   * @type {`https://lb-${number}.exptech.${global_url}/api/v${version}`}
    */
 
 	/**
    * @typedef BaseApiUrl
-   * @type {`https://api-${number}.exptech.com.tw/api/v${version}`}
+   * @type {`https://api-${number}.exptech.${global_url}/api/v${version}`}
+   */
+
+	/**
+   * @typedef BaseETUrl
+   * @type {`https://api-1.exptech.${global_url}/api/v${version}/et/`}
    */
 
 	/**
    * @typedef WSBaseUrl
-   * @type {`wss://lb-${number}.exptech.com.tw/websocket`}
+   * @type {`wss://lb-${number}.exptech.${global_url}/websocket`}
    */
 
 	/**
@@ -35,6 +41,12 @@ class Route {
 		this.random_api_num = this.randomAPINum();
 		this.ws_num = -1;
 		this.ws_num_bk = -1;
+		this.global_url = ["com.tw", "dev"];
+	}
+
+	getRandomElement(list) {
+		const index = Math.floor(Math.random() * list.length);
+		return list[index];
 	}
 
 	/**
@@ -89,16 +101,25 @@ class Route {
    * @returns {BaseUrl}
    */
 	randomBaseUrl(version = this.version) {
-		return `https://lb-${ this.random_ws_num }.exptech.com.tw/api/v${ version }`;
+		return `https://lb-${ this.random_ws_num }.exptech.${this.getRandomElement(this.global_url)}/api/v${ version }`;
 	}
 
 	/**
    * @template {number} version
    * @param {version} version
-   * @returns {BaseUrl}
+   * @returns {BaseApiUrl}
    */
 	randomApiBaseUrl(version = this.version) {
-		return `https://api-${ this.random_api_num }.exptech.com.tw/api/v${ version }`;
+		return `https://api-${ this.random_api_num }.exptech.${this.getRandomElement(this.global_url)}/api/v${ version }`;
+	}
+
+	/**
+   * @template {number} version
+   * @param {version} version
+   * @returns {BaseETUrl}
+   */
+	randomETBaseUrl(version = this.version) {
+		return `https://api-1.exptech.${this.getRandomElement(this.global_url)}/api/v${ version }/et/`;
 	}
 
 	/**
@@ -112,7 +133,7 @@ class Route {
    * @returns {WSBaseUrl}
    */
 	randomWSBaseUrl() {
-		return `wss://lb-${ this.random_ws_num }.exptech.com.tw/websocket`;
+		return `wss://lb-${ this.random_ws_num }.exptech.${this.getRandomElement(this.global_url)}/websocket`;
 	}
 
 	/**

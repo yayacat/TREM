@@ -2,6 +2,8 @@ require("leaflet");
 require("leaflet-edgebuffer");
 require("leaflet-geojson-vt");
 const { BrowserWindow } = require("@electron/remote");
+const Route = require("../js/route.js");
+const route = new Route();
 
 const MapData = {};
 const Station = {};
@@ -170,30 +172,30 @@ TREM.Intensity = {
 	handle(rawIntensityData) {
 		console.debug(rawIntensityData);
 
-		if (rawIntensityData.raw != undefined) {
-			let unit = rawIntensityData.unit;
-			const raw = rawIntensityData.raw;
-			const raw_intensity_Data = raw.intensity;
-			const raw_info_Data = raw.info;
+		if (rawIntensityData != undefined) {
+			const raw = rawIntensityData;
+			const raw_intensity_Data = raw.area;
+			let unit = raw.author;
+			// const raw_info_Data = raw.info;
 			const PLoc = {};
 			const int = new Map();
 			// console.log(raw_info_Data);
 
 			// 判斷是否存在經緯度顛倒
-			if (raw_info_Data.lat >= -90 && raw_info_Data.lat <= 90 && raw_info_Data.lon >= -180 && raw_info_Data.lon <= 180) {
-				console.debug("經緯度正確");
-			} else {
-				console.debug("經緯度顛倒");
+			// if (raw_info_Data.lat >= -90 && raw_info_Data.lat <= 90 && raw_info_Data.lon >= -180 && raw_info_Data.lon <= 180) {
+			// 	console.debug("經緯度正確");
+			// } else {
+			// 	console.debug("經緯度顛倒");
 
-				// 修正經緯度顛倒
-				const temp = raw_info_Data.lat;
-				raw_info_Data.lat = raw_info_Data.lon;
-				raw_info_Data.lon = temp;
+			// 	// 修正經緯度顛倒
+			// 	const temp = raw_info_Data.lat;
+			// 	raw_info_Data.lat = raw_info_Data.lon;
+			// 	raw_info_Data.lon = temp;
 
-				console.debug("修正後的經緯度:", raw_info_Data);
-			}
+			// 	console.debug("修正後的經緯度:", raw_info_Data);
+			// }
 
-			if (unit == "cwb")
+			if (unit == "cwa")
 				TREM.Intensity.cwa = rawIntensityData;
 			else if (unit == "palert")
 				TREM.Intensity.palert = rawIntensityData;
@@ -202,7 +204,7 @@ TREM.Intensity = {
 
 			if (this._raw != null) this.clear();
 
-			if (unit == "cwb") unit = "CWA";
+			if (unit == "cwa") unit = "CWA";
 
 			if (unit == "palert") unit = "P-Alert";
 
@@ -212,14 +214,14 @@ TREM.Intensity = {
 				const intensity = Number(keys[index]);
 				const ids = raw_intensity_Data[intensity];
 
-				for (const city in TREM.Resources.region)
-					for (const town in TREM.Resources.region[city]) {
-						const loc = TREM.Resources.region[city][town];
+				for (const city in TREM.Resources.regionv2)
+					for (const town in TREM.Resources.regionv2[city]) {
+						const loc = TREM.Resources.regionv2[city][town];
 
 						for (const id of ids)
-							if (loc.id == id) {
-								int.set(loc.code, intensity);
-								PLoc[loc.code] = intensity;
+							if (loc.code == id) {
+								int.set(loc.new_code, intensity);
+								PLoc[loc.new_code] = intensity;
 							}
 					}
 			}
@@ -243,25 +245,35 @@ TREM.Intensity = {
 				document.getElementById("intensity-overview").style.visibility = "visible";
 				document.getElementById("intensity-overview").classList.add("show");
 				document.getElementById("intensity-overview-unit").innerText = unit;
-				document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
-				const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-				document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
-				document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
-				document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
-				document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
-				document.getElementById("intensity-overview-depth").innerText = raw_info_Data.depth != 0 ? raw_info_Data.depth : "未知";
-				document.getElementById("intensity-overview-number").innerText = rawIntensityData.number ? rawIntensityData.number : "1";
+				document.getElementById("intensity-time").innerText = raw.id != 0 ? "發震時間" : "接收時間";
 
-				this._markers = L.marker(
-					[raw_info_Data.lat, raw_info_Data.lon],
-					{
-						icon: L.divIcon({
-							html      : TREM.Resources.icon.oldcross,
-							iconSize  : [32, 32],
-							className : "epicenterIcon",
-						}),
-						zIndexOffset: 5000,
-					}).addTo(Maps.intensity);
+				if (raw.eq == undefined) {
+					const time = new Date(raw.id != 0 ? raw.id : raw.timestamp);
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
+					document.getElementById("intensity-overview-latitude").innerText = "未知";
+					document.getElementById("intensity-overview-longitude").innerText = "未知";
+					document.getElementById("intensity-overview-magnitude").innerText = "未知";
+					document.getElementById("intensity-overview-depth").innerText = "未知";
+				} else if (raw.eq != undefined) {
+					const time = new Date(raw.eq.time);
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
+					document.getElementById("intensity-overview-latitude").innerText = raw.eq.lat;
+					document.getElementById("intensity-overview-longitude").innerText = raw.eq.lon;
+					document.getElementById("intensity-overview-magnitude").innerText = raw.eq.mag;
+					document.getElementById("intensity-overview-depth").innerText = raw.eq.depth;
+					this._markers = L.marker(
+						[raw.eq.lat, raw.eq.lon],
+						{
+							icon: L.divIcon({
+								html      : TREM.Resources.icon.oldcross,
+								iconSize  : [32, 32],
+								className : "epicenterIcon",
+							}),
+							zIndexOffset: 5000,
+						}).addTo(Maps.intensity);
+				}
+
+				document.getElementById("intensity-overview-number").innerText = raw.serial;
 
 				this.geojson = L.geoJson.vt(MapData.tw_town, {
 					minZoom   : 7.5,
@@ -298,25 +310,36 @@ TREM.Intensity = {
 				document.getElementById("intensity-overview").style.visibility = "visible";
 				document.getElementById("intensity-overview").classList.add("show");
 				document.getElementById("intensity-overview-unit").innerText = unit;
-				document.getElementById("intensity-time").innerText = raw_info_Data.time != 0 ? "發震時間" : "接收時間";
-				const time = new Date(raw_info_Data.time != 0 ? raw_info_Data.time : rawIntensityData.timestamp);
-				document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
-				document.getElementById("intensity-overview-latitude").innerText = raw_info_Data.lat != 0 ? raw_info_Data.lat : "未知";
-				document.getElementById("intensity-overview-longitude").innerText = raw_info_Data.lon != 0 ? raw_info_Data.lon : "未知";
-				document.getElementById("intensity-overview-magnitude").innerText = raw_info_Data.scale != 0 ? raw_info_Data.scale : "未知";
-				document.getElementById("intensity-overview-depth").innerText = raw_info_Data.depth != 0 ? raw_info_Data.depth : "未知";
-				document.getElementById("intensity-overview-number").innerText = rawIntensityData.number ? rawIntensityData.number : "1";
+				document.getElementById("intensity-time").innerText = raw.id != 0 ? "發震時間" : "接收時間";
 
-				this._markers = L.marker(
-					[raw_info_Data.lat, raw_info_Data.lon],
-					{
-						icon: L.divIcon({
-							html      : TREM.Resources.icon.oldcross,
-							iconSize  : [32, 32],
-							className : "epicenterIcon",
-						}),
-						zIndexOffset: 5000,
-					}).addTo(Maps.intensity);
+				if (raw.eq == undefined) {
+					const time = new Date(raw.id != 0 ? raw.id : raw.timestamp);
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
+					document.getElementById("intensity-overview-latitude").innerText = "未知";
+					document.getElementById("intensity-overview-longitude").innerText = "未知";
+					document.getElementById("intensity-overview-magnitude").innerText = "未知";
+					document.getElementById("intensity-overview-depth").innerText = "未知";
+					this.geteewinfo(raw);
+				} else if (raw.eq != undefined) {
+					const time = new Date(raw.eq.time);
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
+					document.getElementById("intensity-overview-latitude").innerText = raw.eq.lat;
+					document.getElementById("intensity-overview-longitude").innerText = raw.eq.lon;
+					document.getElementById("intensity-overview-magnitude").innerText = raw.eq.mag;
+					document.getElementById("intensity-overview-depth").innerText = raw.eq.depth;
+					this._markers = L.marker(
+						[raw.eq.lat, raw.eq.lon],
+						{
+							icon: L.divIcon({
+								html      : TREM.Resources.icon.oldcross,
+								iconSize  : [32, 32],
+								className : "epicenterIcon",
+							}),
+							zIndexOffset: 5000,
+						}).addTo(Maps.intensity);
+				}
+
+				document.getElementById("intensity-overview-number").innerText = raw.serial;
 			}
 
 			if (!this.isTriggered) {
@@ -500,7 +523,257 @@ TREM.Intensity = {
 			} else {
 				this.timer = setTimeout(() => this.clear, 60_000);
 			}
+		} else if (rawIntensityData != undefined) {
+			const raw = rawIntensityData;
+			const raw_intensity_Data = raw.area;
+			let unit = raw.author;
+			// const raw_info_Data = raw.info;
+			const PLoc = {};
+			const int = new Map();
+			// console.log(raw_info_Data);
+
+			// 判斷是否存在經緯度顛倒
+			// if (raw_info_Data.lat >= -90 && raw_info_Data.lat <= 90 && raw_info_Data.lon >= -180 && raw_info_Data.lon <= 180) {
+			// 	console.debug("經緯度正確");
+			// } else {
+			// 	console.debug("經緯度顛倒");
+
+			// 	// 修正經緯度顛倒
+			// 	const temp = raw_info_Data.lat;
+			// 	raw_info_Data.lat = raw_info_Data.lon;
+			// 	raw_info_Data.lon = temp;
+
+			// 	console.debug("修正後的經緯度:", raw_info_Data);
+			// }
+
+			if (unit == "cwa")
+				TREM.Intensity.cwa = rawIntensityData;
+			else if (unit == "palert")
+				TREM.Intensity.palert = rawIntensityData;
+			else if (unit == "trem")
+				TREM.Intensity.trem = rawIntensityData;
+
+			if (this._raw != null) this.clear();
+
+			if (unit == "cwa") unit = "CWA";
+
+			if (unit == "palert") unit = "P-Alert";
+
+			if (unit == "trem") unit = "TREM";
+
+			for (let index = 0, keys = Object.keys(raw_intensity_Data), n = keys.length; index < n; index++) {
+				const intensity = Number(keys[index]);
+				const ids = raw_intensity_Data[intensity];
+
+				for (const city in TREM.Resources.regionv2)
+					for (const town in TREM.Resources.regionv2[city]) {
+						const loc = TREM.Resources.regionv2[city][town];
+
+						for (const id of ids)
+							if (loc.code == id) {
+								int.set(loc.new_code, intensity);
+								PLoc[loc.new_code] = intensity;
+							}
+					}
+			}
+
+			if (this.geojson != null) {
+				this.geojson.remove();
+				this.geojson = null;
+			}
+
+			if (this._markers != null) {
+				this._markers.remove();
+				this._markers = null;
+			}
+
+			if (int.size) {
+				log(`Total ${int.size} triggered area`, 1, "Intensity", "handle");
+				dump({ level: 0, message: `Total ${int.size} triggered area`, origin: "Intensity" });
+
+				this._raw = raw;
+
+				document.getElementById("intensity-overview").style.visibility = "visible";
+				document.getElementById("intensity-overview").classList.add("show");
+				document.getElementById("intensity-overview-unit").innerText = unit;
+				document.getElementById("intensity-time").innerText = raw.id != 0 ? "發震時間" : "接收時間";
+
+				if (raw.eq == undefined) {
+					const time = new Date(raw.id != 0 ? raw.id : raw.timestamp);
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
+					document.getElementById("intensity-overview-latitude").innerText = "未知";
+					document.getElementById("intensity-overview-longitude").innerText = "未知";
+					document.getElementById("intensity-overview-magnitude").innerText = "未知";
+					document.getElementById("intensity-overview-depth").innerText = "未知";
+				} else if (raw.eq != undefined) {
+					const time = new Date(raw.eq.time);
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
+					document.getElementById("intensity-overview-latitude").innerText = raw.eq.lat;
+					document.getElementById("intensity-overview-longitude").innerText = raw.eq.lon;
+					document.getElementById("intensity-overview-magnitude").innerText = raw.eq.mag;
+					document.getElementById("intensity-overview-depth").innerText = raw.eq.depth;
+					this._markers = L.marker(
+						[raw.eq.lat, raw.eq.lon],
+						{
+							icon: L.divIcon({
+								html      : TREM.Resources.icon.oldcross,
+								iconSize  : [32, 32],
+								className : "epicenterIcon",
+							}),
+							zIndexOffset: 5000,
+						}).addTo(Maps.intensity);
+				}
+
+				document.getElementById("intensity-overview-number").innerText = raw.serial;
+
+				this.geojson = L.geoJson.vt(MapData.tw_town, {
+					minZoom   : 7.5,
+					maxZoom   : 10,
+					tolerance : 20,
+					buffer    : 256,
+					debug     : 0,
+					zIndex    : 5,
+					style     : (properties) => {
+						const name = properties.TOWNCODE;
+
+						if (PLoc[name] == 0 || PLoc[name] == undefined)
+							return {
+								color       : "transparent",
+								weight      : 0,
+								opacity     : 0,
+								fillColor   : "transparent",
+								fillOpacity : 0,
+							};
+						return {
+							color       : TREM.Colors.secondary,
+							weight      : 0.8,
+							fillColor   : color(PLoc[name]),
+							fillOpacity : 1,
+						};
+					},
+				}).addTo(Maps.intensity);
+			} else {
+				log(`Total ${int.size} triggered area`, 1, "Intensity", "handle");
+				dump({ level: 0, message: `Total ${int.size} triggered area`, origin: "Intensity" });
+
+				this._raw = raw;
+
+				document.getElementById("intensity-overview").style.visibility = "visible";
+				document.getElementById("intensity-overview").classList.add("show");
+				document.getElementById("intensity-overview-unit").innerText = unit;
+				document.getElementById("intensity-time").innerText = raw.id != 0 ? "發震時間" : "接收時間";
+
+				if (raw.eq == undefined) {
+					const time = new Date(raw.id != 0 ? raw.id : raw.timestamp);
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
+					document.getElementById("intensity-overview-latitude").innerText = "未知";
+					document.getElementById("intensity-overview-longitude").innerText = "未知";
+					document.getElementById("intensity-overview-magnitude").innerText = "未知";
+					document.getElementById("intensity-overview-depth").innerText = "未知";
+				} else if (raw.eq != undefined) {
+					const time = new Date(raw.eq.time);
+					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
+					document.getElementById("intensity-overview-latitude").innerText = raw.eq.lat;
+					document.getElementById("intensity-overview-longitude").innerText = raw.eq.lon;
+					document.getElementById("intensity-overview-magnitude").innerText = raw.eq.mag;
+					document.getElementById("intensity-overview-depth").innerText = raw.eq.depth;
+					this._markers = L.marker(
+						[raw.eq.lat, raw.eq.lon],
+						{
+							icon: L.divIcon({
+								html      : TREM.Resources.icon.oldcross,
+								iconSize  : [32, 32],
+								className : "epicenterIcon",
+							}),
+							zIndexOffset: 5000,
+						}).addTo(Maps.intensity);
+				}
+
+				document.getElementById("intensity-overview-number").innerText = raw.serial;
+			}
+
+			if (raw.eq == undefined) this.geteewinfo(raw);
+
+			if (!this.isTriggered) {
+				this.isTriggered = true;
+
+				if (setting["intensity.show"]) {
+					if (setting["Real-time.show"]) TREM.win.showInactive();
+
+					if (setting["Real-time.cover"]) TREM.win.moveTop();
+
+					if (!TREM.win.isFocused()) TREM.win.flashFrame(true);
+
+					if (setting["audio.PAlert"]) TREM.Audios.palert.play();
+				}
+			}
+
+			if (this.timer) {
+				clearTimeout(this.timer);
+				delete this.timer;
+				this.timer = setTimeout(() => this.clear, 60_000);
+			} else {
+				this.timer = setTimeout(() => this.clear, 60_000);
+			}
 		}
+	},
+
+	geteewinfo(raw) {
+		const controller1 = new AbortController();
+		setTimeout(() => {
+			controller1.abort();
+		}, 2500);
+		const url = route.eewReplay(1, raw.timestamp);
+		console.log(url);
+		fetch(url, { signal: controller1.signal }).then((res2) => {
+			if (res2.ok)
+				res2.json().then(res3 => {
+					if (controller1.signal.aborted || res3 == undefined)
+						console.debug("api_eq_undefined");
+					else
+						for (let i = 0; i < res3.length; i++)
+							if (res3[i].author == raw.author) {
+								raw.eq = res3[i].eq;
+								const time = new Date(raw.eq.time);
+								document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
+								document.getElementById("intensity-overview-latitude").innerText = raw.eq.lat;
+								document.getElementById("intensity-overview-longitude").innerText = raw.eq.lon;
+								document.getElementById("intensity-overview-magnitude").innerText = raw.eq.mag;
+								document.getElementById("intensity-overview-depth").innerText = raw.eq.depth;
+								this._markers = L.marker(
+									[raw.eq.lat, raw.eq.lon],
+									{
+										icon: L.divIcon({
+											html      : TREM.Resources.icon.oldcross,
+											iconSize  : [32, 32],
+											className : "epicenterIcon",
+										}),
+										zIndexOffset: 5000,
+									}).addTo(Maps.intensity);
+
+								try {
+									const jsonData = JSON.stringify(raw);
+									const filePath = path.resolve(folder, `${setting["intensity.trem"]}.json`);
+									fs.writeFileSync(filePath, jsonData);
+									console.log("File written successfully!");
+								} catch (err) {
+									console.error("Error writing file:", err);
+								}
+							}
+
+				});
+			else
+				setTimeout(() => {
+					this.geteewinfo(raw);
+				}, 3000);
+
+		}).catch((err) => {
+			log(err, 3, "PGATimer", "PGAMain");
+			dump({ level: 2, message: err });
+			setTimeout(() => {
+				this.geteewinfo(raw);
+			}, 3000);
+		});
 	},
 
 	clear() {

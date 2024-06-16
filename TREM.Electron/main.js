@@ -234,7 +234,11 @@ function createRTSWindow() {
 }
 
 function createIntensityWindow() {
-	if (IntensityWindow instanceof BrowserWindow) return IntensityWindow.show();
+	if (IntensityWindow instanceof BrowserWindow) {
+		if (!IntensityWindow.isVisible()) IntensityWindow.reload();
+		return IntensityWindow.show();
+	}
+
 	IntensityWindow = TREM.Window.set("Intensity", new BrowserWindow({
 		title          : TREM.Localization.getString("Application_Title"),
 		width          : 1280,

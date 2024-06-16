@@ -2080,6 +2080,76 @@ async function exptechrtwlogin() {
 	}
 }
 
+const globals_Route = require("../js/route.js");
+const globals_route = new globals_Route();
+
+async function login(data, name) {
+	try {
+		const response = await fetch(`${globals_route.randomETBaseUrl(3)}login`, {
+			method  : "POST",
+			headers : { "Content-Type": "application/json" },
+			body    : JSON.stringify(data),
+		});
+		const ans = await response.text();
+
+		if (!response.ok) throw new Error(`${response.status} ${ans}`);
+		return ans;
+	} catch (err) {
+		console.log(err);
+
+		if (name == "rts")
+			showDialog("error",
+				TREM.Localization.getString("exptech_login_Title"),
+				TREM.Localization.getString("exptech_login_error"),
+				0, "error", () => {
+					const key = "";
+					ipcRenderer.send("config:value", "exptech.key", key);
+				}, "OK", "", () => void 0, 0, 0, () => {
+					const key = "";
+					ipcRenderer.send("config:value", "exptech.key", key);
+				});
+		else if (name == "rtw")
+			showDialog("error",
+				TREM.Localization.getString("exptech_rtw_login_Title"),
+				TREM.Localization.getString("exptech_rtw_login_error"),
+				0, "error", () => {
+					const key = "";
+					ipcRenderer.send("config:value", "rtw.exptech.key", key);
+				}, "OK", "", () => void 0, 0, 0, () => {
+					const key = "";
+					ipcRenderer.send("config:value", "rtw.exptech.key", key);
+				});
+		return "";
+	}
+}
+
+async function logout(KEY, name) {
+	try {
+		const response = await fetch(`${globals_route.randomETBaseUrl(3)}logout`, {
+			method  : "DELETE",
+			headers : { Authorization: `Basic ${KEY}` },
+		});
+		const ans = await response.text();
+
+		if (!response.ok) throw new Error(`${response.status} ${ans}`);
+		return ans;
+	} catch (err) {
+		console.log(err);
+
+		if (name == "rts")
+			showDialog("error",
+				TREM.Localization.getString("exptech_logout_Title"),
+				TREM.Localization.getString("exptech_logout_error"),
+				0, "error", () => void 0, "OK", "", () => void 0, 0, 0, () => void 0);
+		else if (name == "rtw")
+			showDialog("error",
+				TREM.Localization.getString("exptech_rtw_logout_Title"),
+				TREM.Localization.getString("exptech_rtw_logout_error"),
+				0, "error", () => void 0, "OK", "", () => void 0, 0, 0, () => void 0);
+		return "";
+	}
+}
+
 /*
 // register the handler
 document.addEventListener("keydown", stepLockRange, false);

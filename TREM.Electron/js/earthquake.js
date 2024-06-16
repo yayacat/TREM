@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
 /* eslint-disable no-undef */
 require("leaflet");
 require("leaflet-edgebuffer");
@@ -36,7 +37,6 @@ const speecd_use = setting["audio.tts"] ?? false;
 
 // #region 變數
 const posturl = "https://exptech.com.tw/api/v1/trem/";
-const getapiequrl = "https://api.exptech.com.tw/api/v1/eq/eew/";
 const MapData = {};
 const Timers = {};
 let Stamp = 0;
@@ -95,7 +95,6 @@ let palert_geojson = null;
 let areav2_geojson = null;
 let investigation = false;
 let ReportTag = 0;
-TREM.IntensityTag1 = 0;
 let EEWshot = 0;
 let EEWshotC = 0;
 let Response = {};
@@ -127,6 +126,7 @@ let stationnowall = 0;
 let RMTpgaTime = 0;
 let type_Unit = "";
 let link_on = false;
+let p2p_mode_status = false;
 // #endregion
 
 TREM.Detector = {
@@ -998,13 +998,6 @@ async function init() {
 						stopReplay();
 					}
 
-					if (TREM.IntensityTag1 != 0 && NOW().getTime() - TREM.IntensityTag1 > 30_000) {
-						console.debug("IntensityTag1 end: ", NOW().getTime());
-						TREM.IntensityTag1 = 0;
-						changeView("main", "#mainView_btn");
-						globalgc();
-					}
-
 					if (TREM.toggleNavTime != 0 && NOW().getTime() - TREM.toggleNavTime > 5_000) {
 						toggleNav(false);
 						globalgc();
@@ -1076,8 +1069,8 @@ async function init() {
 				// const warn = (Warn) ? "⚠️" : "";
 				const error = (testEEWerror) ? "❌" : "";
 				// const unlock = (Unlock) ? "⚡" : "";
-				$("#log").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${ws_num_bk}) | ${rss}`);
-				$("#log1").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${ws_num_bk}) | ${rss}`);
+				$("#log").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${get_r_url[0]}) | ${rss}`);
+				$("#log1").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${get_r_url[0]}) | ${rss}`);
 				ipcRenderer.send("TREMIntensitylog2", { time: now_format(NOW()), log: `${stationnow}/${stationnowall} | ${stationPercentage}% | ${rss}`, ver: `${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}` });
 				$("#app-version").text(`${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}`);
 				$("#app-version1").text(`${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}`);
@@ -4393,7 +4386,6 @@ TREM.color = function color(Intensity) {
 // #endregion
 
 let rts_clock = null;
-let p2p_mode_status = false;
 
 // #region IPC
 ipcRenderer.on("start", () => {
@@ -4819,8 +4811,8 @@ ipcRenderer.on("report-Notification", (event, report) => {
 
 ipcRenderer.on("intensity-Notification", (event, intensity) => {
 	// console.log(intensity);
-	const info = intensity.raw.info;
-	const intensity1 = intensity.raw.intensity;
+	const info = intensity;
+	const intensity1 = info.area;
 	let description = "";
 	let city0 = "";
 	const intensity1r = Object.keys(intensity1).reverse();
@@ -4833,78 +4825,86 @@ ipcRenderer.on("intensity-Notification", (event, intensity) => {
 
 		description += `${intensity3.replace("-級", "弱").replace("+級", "強")}\n`;
 
-		for (const city in TREM.Resources.region)
-			for (const town in TREM.Resources.region[city]) {
-				const loc = TREM.Resources.region[city][town];
+		for (const city in TREM.Resources.regionv2)
+			for (const town in TREM.Resources.regionv2[city]) {
+				const loc = TREM.Resources.regionv2[city][town];
 
 				for (const id of ids)
-					if (loc.id == id && city0 == city) {
+					if (loc.code == id && city0 == city) {
 						description += ` ${town}`;
-					} else if (loc.id == id && city0 == "") {
+					} else if (loc.code == id && city0 == "") {
 						description += `${city} ${town}`;
 						city0 = city;
-					} else if (loc.id == id && city0 != city) {
+					} else if (loc.code == id && city0 != city) {
 						description += `\n${city} ${town}`;
 						city0 = city;
 					}
 			}
 
+		if (city0 == "") continue;
 		city0 = "";
 		description += "\n";
 	}
 
 	description += "\n";
 
-	if (intensity.unit == "cwb") intensity.unit = "cwa";
-
-	if (speecd_use && intensity.unit != "palert") {
-		const now = timeconvert(new Date(info.time != 0 ? info.time : intensity.timestamp)).format("YYYY/MM/DD HH:mm:ss");
+	if (speecd_use && info.author != "palert") {
+		const now = timeconvert(new Date(info.id != 0 ? info.id : info.timestamp)).format("YYYY/MM/DD HH:mm:ss");
 		let description0 = "";
+		const city1 = {};
 
 		for (let index = 0, keys = Object.keys(intensity1r), n = keys.length; index < n; index++) {
-			const intensity2 = keys.length - Number(keys[index]);
-			const ids = intensity1[intensity1r[index]];
+			const intensity2 = Number(intensity1r[index]);
+			const ids = intensity1[intensity2];
 			const intensity3 = `${IntensityI(intensity2)}級`;
 
-			for (const city in TREM.Resources.region)
-				for (const town in TREM.Resources.region[city]) {
-					const loc = TREM.Resources.region[city][town];
+			for (const city in TREM.Resources.regionv2)
+				for (const town in TREM.Resources.regionv2[city]) {
+					const loc = TREM.Resources.regionv2[city][town];
 
 					for (const id of ids)
-						if (loc.id == id && city0 == city) {
+						if (city1[city] == city) {
 							continue;
-						} else if (loc.id == id && city0 == "") {
+						} else if (loc.code == id && city0 == city) {
+							continue;
+						} else if (loc.code == id && city0 == "") {
 							description0 += `${city}`;
 							description0 += `${intensity3.replace("-級", "弱").replace("+級", "強")}\n`;
 							city0 = city;
-						} else if (loc.id == id && city0 != city) {
-							description0 += `\n${city}`;
+							city1[city] = city;
+						} else if (loc.code == id && city0 != city) {
+							description0 += `${city}`;
 							description0 += `${intensity3.replace("-級", "弱").replace("+級", "強")}\n`;
 							city0 = city;
+							city1[city] = city;
 						}
 				}
 
+			if (city0 == "") continue;
 			city0 = "";
 		}
 
+		console.error(description0);
+
 		TREM.speech.speak({ text: "震度速報"
-		+ "資料來源" + intensity.unit
-		+ (info.time != 0 ? "發震時間" : "接收時間") + now
+		+ "資料來源" + info.author
+		+ (info.id != 0 ? "發震時間" : "接收時間") + now
 		+ "震度分布" + description0 });
 	}
 
 	if (setting["webhook.url"] != "" && setting["intensity.Notification"]) {
 		log("Posting Notification intensity Webhook", 1, "Webhook", "intensity-Notification");
 		dump({ level: 0, message: "Posting Notification intensity Webhook", origin: "Webhook" });
+		const max_intensity = `${IntensityI(info.max)}級`;
 		const msg = {
 			username   : "TREMV | 臺灣即時地震監測變體",
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ("震度速報"
-			+ "資料來源" + intensity.unit
-			+ (info.time != 0 ? "發震時間" : "接收時間") + (info.time != 0 ? timeconvert(new Date(info.time)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(intensity.timestamp)).format("YYYY/MM/DD HH:mm:ss"))
-			+ "芮氏規模" + (info.scale != 0 ? info.scale.toFixed(1) : "未知")
-			+ "深度" + (info.depth != 0 ? info.depth + " 公里" : "未知")
-			+ "震央位置" + "東經" + (info.lon != 0 ? info.lon : "未知") + "北緯" + (info.lat != 0 ? info.lat : "未知")) : "震度速報",
+			+ "資料來源" + info.author
+			+ (info.id != 0 ? "發震時間" : "接收時間") + (info.id != 0 ? timeconvert(new Date(info.id)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(info.timestamp)).format("YYYY/MM/DD HH:mm:ss"))
+			+ "第" + `${info.serial}報`
+			+ ((info.final) ? "最終報" : "")
+			+ "最大震度" + max_intensity.replace("-級", "弱").replace("+級", "強")) : "震度速報",
 			tts    : setting["tts.Notification"],
 			embeds : [
 				{
@@ -4916,27 +4916,27 @@ ipcRenderer.on("intensity-Notification", (event, intensity) => {
 					fields: [
 						{
 							name   : "資料來源",
-							value  : intensity.unit,
+							value  : info.author,
 							inline : true,
 						},
 						{
-							name   : info.time != 0 ? "發震時間" : "接收時間",
-							value  : info.time != 0 ? timeconvert(new Date(info.time)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(intensity.timestamp)).format("YYYY/MM/DD HH:mm:ss"),
+							name   : info.id != 0 ? "發震時間" : "接收時間",
+							value  : info.id != 0 ? timeconvert(new Date(info.id)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(info.timestamp)).format("YYYY/MM/DD HH:mm:ss"),
 							inline : true,
 						},
 						{
-							name   : "芮氏規模",
-							value  : info.scale != 0 ? info.scale.toFixed(1) : "未知",
+							name   : `第${info.serial}報`,
+							value  : "",
+							inline : false,
+						},
+						{
+							name   : (info.final) ? "最終報" : "",
+							value  : "",
 							inline : true,
 						},
 						{
-							name   : "深度",
-							value  : info.depth != 0 ? info.depth + " 公里" : "未知",
-							inline : true,
-						},
-						{
-							name   : "震央位置",
-							value  : "> 經度 **東經 " + (info.lon != 0 ? info.lon : "未知") + "**\n> 緯度 **北緯 " + (info.lat != 0 ? info.lat : "未知") + "**",
+							name   : "最大震度",
+							value  : max_intensity.replace("-級", "弱").replace("+級", "強"),
 							inline : false,
 						},
 						{
@@ -5209,6 +5209,11 @@ function FCMdata(json, Unit) {
 	// const json = JSON.parse(data);
 	console.log(json);
 
+	if (json.type == "eew")
+		if (EarthquakeList[json.id])
+			if (EarthquakeList[json.id].number == json.serial) return;
+			else if (EarthquakeList[json.id].number > json.serial) return;
+
 	if (server_timestamp.includes(json.timestamp) || NOW().getTime() - json.timestamp > 180_000) return;
 	server_timestamp.push(json.timestamp);
 
@@ -5259,6 +5264,8 @@ function FCMdata(json, Unit) {
 		log("Got Earthquake intensity", 1, "API", "FCMdata");
 		dump({ level: 0, message: "Got Earthquake intensity", origin: "API" });
 
+		if (EarthquakeList[json.id]) json.eq = EarthquakeList[json.id].eq;
+
 		setTimeout(() => {
 			ipcRenderer.send("screenshotEEWI", {
 				Function : "intensity",
@@ -5269,11 +5276,11 @@ function FCMdata(json, Unit) {
 			});
 		}, 1250);
 
-		if (json.unit == "cwb")
+		if (json.author == "cwa")
 			ipcRenderer.send("config:value", "intensity.cwa", filename.toString());
-		else if (json.unit == "palert")
+		else if (json.author == "palert")
 			ipcRenderer.send("config:value", "intensity.palert", filename.toString());
-		else if (json.unit == "trem")
+		else if (json.author == "trem")
 			ipcRenderer.send("config:value", "intensity.trem", filename.toString());
 
 		ipcRenderer.send("TREMIntensityhandle", json);
@@ -5579,6 +5586,7 @@ TREM.Earthquake.on("eew", (data) => {
 		distance        : [],
 		epicenterIcon   : null,
 		epicenterIconTW : null,
+		eq              : {},
 	};
 	else if (EarthquakeList[data.id].number == data.number) return;
 	else if (EarthquakeList[data.id].number > data.number) return;
@@ -5586,6 +5594,8 @@ TREM.Earthquake.on("eew", (data) => {
 	EarthquakeList[data.id].epicenter = [+data.lon, +data.lat];
 	EarthquakeList[data.id].Time = data.time;
 	EarthquakeList[data.id].ID = data.id;
+
+	if (data.eq) EarthquakeList[data.id].eq = data.eq;
 
 	let value = 0;
 	let distance = 0;
@@ -6766,6 +6776,12 @@ function main(data) {
 				break;
 			}
 
+		if (TREM.EEW.get(data.id)?.waveProgress) {
+			TREM.EEW.get(data.id).waveProgress.remove();
+			delete TREM.EEW.get(data.id).waveProgress;
+		}
+
+
 		if (TREM.EEW.get(data.id)?.geojson) {
 			TREM.EEW.get(data.id).geojson.remove();
 			delete TREM.EEW.get(data.id).geojson;
@@ -6810,7 +6826,7 @@ function main(data) {
 			Timers.eew = null;
 			rts_remove_eew = false;
 
-			stopReplay();
+			if (ReportTag == 0) stopReplay();
 		}
 	}
 }
