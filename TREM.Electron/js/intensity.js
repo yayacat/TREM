@@ -115,7 +115,8 @@ async function init() {
 			ipcRenderer.send("TREMIntensityload", json_cwb);
 		}
 	} catch (err) {
-		console.error(`解析檔案 ${setting["intensity.cwa"]}.json 時發生錯誤:`, err);
+		log(`解析檔案 ${setting["intensity.cwa"]}.json 時發生錯誤:`, 3, "init", "intensity");
+		log(err, 3, "init", "intensity");
 	}
 
 	try {
@@ -124,7 +125,8 @@ async function init() {
 			ipcRenderer.send("TREMIntensityload", json_palert);
 		}
 	} catch (err) {
-		console.error(`解析檔案 ${setting["intensity.palert"]}.json 時發生錯誤:`, err);
+		log(`解析檔案 ${setting["intensity.palert"]}.json 時發生錯誤:`, 3, "init", "intensity");
+		log(err, 3, "init", "intensity");
 	}
 
 	try {
@@ -133,7 +135,8 @@ async function init() {
 			ipcRenderer.send("TREMIntensityload", json_trem);
 		}
 	} catch (err) {
-		console.error(`解析檔案 ${setting["intensity.trem"]}.json 時發生錯誤:`, err);
+		log(`解析檔案 ${setting["intensity.trem"]}.json 時發生錯誤:`, 3, "init", "intensity");
+		log(err, 3, "init", "intensity");
 	}
 }
 
@@ -170,7 +173,7 @@ TREM.Intensity = {
 	},
 
 	handle(rawIntensityData) {
-		console.debug(rawIntensityData);
+		log(rawIntensityData, 0, "handle", "intensity");
 
 		if (rawIntensityData != undefined) {
 			const raw = rawIntensityData;
@@ -367,7 +370,7 @@ TREM.Intensity = {
 	},
 
 	load(rawIntensityData) {
-		console.debug(rawIntensityData);
+		log(rawIntensityData, 0, "load", "intensity");
 
 		if (rawIntensityData.raw != undefined) {
 			let unit = rawIntensityData.unit;
@@ -379,22 +382,23 @@ TREM.Intensity = {
 			// console.log(raw_info_Data);
 
 			if (!raw_info_Data) {
-				console.error("資料錯誤");
+				log("資料錯誤", 3, "load", "intensity");
 				return;
 			}
 
 			// 判斷是否存在經緯度顛倒
 			if (raw_info_Data.lat >= -90 && raw_info_Data.lat <= 90 && raw_info_Data.lon >= -180 && raw_info_Data.lon <= 180) {
-				console.debug("經緯度正確");
+				log("經緯度正確", 0, "load", "intensity");
 			} else {
-				console.debug("經緯度顛倒");
+				log("經緯度顛倒", 0, "load", "intensity");
 
 				// 修正經緯度顛倒
 				const temp = raw_info_Data.lat;
 				raw_info_Data.lat = raw_info_Data.lon;
 				raw_info_Data.lon = temp;
 
-				console.debug("修正後的經緯度:", raw_info_Data);
+				log("修正後的經緯度", 0, "load", "intensity");
+				log(raw_info_Data, 0, "load", "intensity");
 			}
 
 			if (this._raw != null) this.clear();
@@ -724,12 +728,12 @@ TREM.Intensity = {
 			controller1.abort();
 		}, 2500);
 		const url = route.eewReplay(1, raw.timestamp);
-		console.log(url);
+		log(url, 0, "geteewinfo", "intensity");
 		fetch(url, { signal: controller1.signal }).then((res2) => {
 			if (res2.ok)
 				res2.json().then(res3 => {
 					if (controller1.signal.aborted || res3 == undefined)
-						console.debug("api_eq_undefined");
+						log("api_eq_undefined", 0, "geteewinfo", "intensity");
 					else
 						for (let i = 0; i < res3.length; i++)
 							if (res3[i].author == raw.author) {
@@ -755,9 +759,10 @@ TREM.Intensity = {
 									const jsonData = JSON.stringify(raw);
 									const filePath = path.resolve(folder, `${setting["intensity.trem"]}.json`);
 									fs.writeFileSync(filePath, jsonData);
-									console.log("File written successfully!");
+									log("File written successfully!", 0, "geteewinfo_fs", "intensity");
 								} catch (err) {
-									console.error("Error writing file:", err);
+									log(err, 3, "geteewinfo_fs", "intensity");
+									dump({ level: 2, message: err });
 								}
 							}
 
@@ -768,7 +773,7 @@ TREM.Intensity = {
 				}, 3000);
 
 		}).catch((err) => {
-			log(err, 3, "PGATimer", "PGAMain");
+			log(err, 3, "geteewinfo", "intensity");
 			dump({ level: 2, message: err });
 			setTimeout(() => {
 				this.geteewinfo(raw);
@@ -823,7 +828,7 @@ TREM.Old_database = {
 		// 讀取資料夾中的檔案
 		fs.readdir(folder, (err, files) => {
 			if (err) {
-				console.error(err);
+				log(err, 3, "Old_database_search", "intensity");
 				return;
 			}
 
@@ -833,10 +838,10 @@ TREM.Old_database = {
 
 			const startTime = new Date(document.getElementById("old-database-filter-startdate-value").value + " " + document.getElementById("old-database-filter-starttime-value").value).getTime();
 			const endTime = new Date(document.getElementById("old-database-filter-enddate-value").value + " " + document.getElementById("old-database-filter-endtime-value").value).getTime();
-			console.debug(document.getElementById("old-database-filter-startdate-value").value + " " + document.getElementById("old-database-filter-starttime-value").value);
-			console.debug(document.getElementById("old-database-filter-enddate-value").value + " " + document.getElementById("old-database-filter-endtime-value").value);
-			console.debug(startTime);
-			console.debug(endTime);
+			log(document.getElementById("old-database-filter-startdate-value").value + " " + document.getElementById("old-database-filter-starttime-value").value, 0, "Old_database_search", "intensity");
+			log(document.getElementById("old-database-filter-enddate-value").value + " " + document.getElementById("old-database-filter-endtime-value").value, 0, "Old_database_search", "intensity");
+			log(startTime, 0, "Old_database_search", "intensity");
+			log(endTime, 0, "Old_database_search", "intensity");
 
 			// 過濾出符合時間範圍的檔案
 			const filteredFiles = files.filter((file) => {
@@ -889,7 +894,8 @@ TREM.Old_database = {
 						// return true;
 					}
 				} catch (err) {
-					console.error(`解析檔案 ${file} 時發生錯誤:`, err);
+					log(`解析檔案 ${file} 時發生錯誤:`, 3, "Old_database_search", "intensity");
+					log(err, 3, "Old_database_search", "intensity");
 					// 刪除檔案
 					// fs.unlink(filePath, (unlinkErr) => {
 					// 	if (unlinkErr) {
@@ -903,15 +909,15 @@ TREM.Old_database = {
 				return false;
 			}).length;
 
-			console.debug(`檔案總共 ${num} 個`);
+			log(`檔案總共 ${num} 個`, 0, "Old_database_search", "intensity");
 			document.getElementById("old-database-label-search-value").innerText = `查詢檔案共 ${num} 個`;
 			this.refreshList();
 			// console.log(filteredFiles);
 		});
 	},
 	setcache(file, type, fileData) {
-		console.debug(`檔案 ${file} 的 type 屬性為: ${type}`);
-		console.debug(fileData);
+		log(`檔案 ${file} 的 type 屬性為: ${type}`, 0, "Old_database_setcache", "intensity");
+		log(fileData, 0, "Old_database_setcache", "intensity");
 		this.cache.set(fileData.timestamp, fileData);
 		return true;
 	},
@@ -973,11 +979,11 @@ TREM.Old_database = {
 			} else if (type === "report") {
 				ipcRenderer.send("Olddatabase_report", Olddatabase.raw);
 			} else if (type === "pws") {
-				console.debug(Olddatabase);
+				log(Olddatabase, 0, "Old_database_createOlddatabaseItem", "intensity");
 			} else if (type === "tsunami") {
 				ipcRenderer.send("Olddatabase_tsunami", Olddatabase);
 			} else if (type === "tsunami-test") {
-				console.debug(Olddatabase);
+				log(Olddatabase, 0, "Old_database_createOlddatabaseItem", "intensity");
 				ipcRenderer.send("Olddatabase_tsunami", Olddatabase);
 			} else {
 				ipcRenderer.send("Olddatabase_eew", Olddatabase);
