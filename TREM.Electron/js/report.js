@@ -1327,6 +1327,9 @@ TREM.Report = {
 				this._setupeewget(report);
 			}
 		}
+
+		ReportTag = NOW().getTime();
+		console.debug("ReportTag: ", ReportTag);
 	},
 	_setupeewget(report) {
 		if (report.ID)

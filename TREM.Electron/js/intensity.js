@@ -257,6 +257,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-longitude").innerText = "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = "未知";
 					document.getElementById("intensity-overview-depth").innerText = "未知";
+					this.geteewinfo(raw);
 				} else if (raw.eq != undefined) {
 					const time = new Date(raw.eq.time);
 					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
@@ -276,7 +277,7 @@ TREM.Intensity = {
 						}).addTo(Maps.intensity);
 				}
 
-				document.getElementById("intensity-overview-number").innerText = raw.serial;
+				document.getElementById("intensity-overview-number").innerText = raw.serial ?? "1";
 
 				this.geojson = L.geoJson.vt(MapData.tw_town, {
 					minZoom   : 7.5,
@@ -342,7 +343,7 @@ TREM.Intensity = {
 						}).addTo(Maps.intensity);
 				}
 
-				document.getElementById("intensity-overview-number").innerText = raw.serial;
+				document.getElementById("intensity-overview-number").innerText = raw.serial ?? "1";
 			}
 
 			if (!this.isTriggered) {
@@ -370,7 +371,7 @@ TREM.Intensity = {
 	},
 
 	load(rawIntensityData) {
-		log(rawIntensityData, 0, "load", "intensity");
+		log(JSON.stringify(rawIntensityData, null, 2), 0, "load", "intensity");
 
 		if (rawIntensityData.raw != undefined) {
 			let unit = rawIntensityData.unit;
@@ -609,6 +610,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-longitude").innerText = "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = "未知";
 					document.getElementById("intensity-overview-depth").innerText = "未知";
+					this.geteewinfo(raw);
 				} else if (raw.eq != undefined) {
 					const time = new Date(raw.eq.time);
 					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
@@ -628,7 +630,7 @@ TREM.Intensity = {
 						}).addTo(Maps.intensity);
 				}
 
-				document.getElementById("intensity-overview-number").innerText = raw.serial;
+				document.getElementById("intensity-overview-number").innerText = raw.serial ?? "1";
 
 				this.geojson = L.geoJson.vt(MapData.tw_town, {
 					minZoom   : 7.5,
@@ -674,6 +676,7 @@ TREM.Intensity = {
 					document.getElementById("intensity-overview-longitude").innerText = "未知";
 					document.getElementById("intensity-overview-magnitude").innerText = "未知";
 					document.getElementById("intensity-overview-depth").innerText = "未知";
+					this.geteewinfo(raw);
 				} else if (raw.eq != undefined) {
 					const time = new Date(raw.eq.time);
 					document.getElementById("intensity-overview-time").innerText = this.timeformat(time);
@@ -693,10 +696,8 @@ TREM.Intensity = {
 						}).addTo(Maps.intensity);
 				}
 
-				document.getElementById("intensity-overview-number").innerText = raw.serial;
+				document.getElementById("intensity-overview-number").innerText = raw.serial ?? "1";
 			}
-
-			if (raw.eq == undefined) this.geteewinfo(raw);
 
 			if (!this.isTriggered) {
 				this.isTriggered = true;
@@ -757,13 +758,15 @@ TREM.Intensity = {
 
 								try {
 									const jsonData = JSON.stringify(raw);
-									const filePath = path.resolve(folder, `${setting["intensity.trem"]}.json`);
+									const filePath = path.resolve(folder, `${raw.timestamp}.json`);
 									fs.writeFileSync(filePath, jsonData);
 									log("File written successfully!", 0, "geteewinfo_fs", "intensity");
 								} catch (err) {
 									log(err, 3, "geteewinfo_fs", "intensity");
 									dump({ level: 2, message: err });
 								}
+
+								break;
 							}
 
 				});
@@ -917,8 +920,8 @@ TREM.Old_database = {
 	},
 	setcache(file, type, fileData) {
 		log(`檔案 ${file} 的 type 屬性為: ${type}`, 0, "Old_database_setcache", "intensity");
-		log(fileData, 0, "Old_database_setcache", "intensity");
-		this.cache.set(fileData.timestamp, fileData);
+		log(JSON.stringify(fileData, null, 2), 0, "Old_database_setcache", "intensity");
+		this.cache.set(file, fileData);
 		return true;
 	},
 	unloadReports(skipCheck = false) {
@@ -927,9 +930,9 @@ TREM.Old_database = {
 	loadReports(skipCheck = false) {
 		if (this.view == "report-list" || skipCheck) {
 			const fragment = new DocumentFragment();
-			const reports = Array.from(this.cache, ([k, v]) => v);
+			const reports = Array.from(this.cache, ([k, v]) => ([k, v]));
 
-			for (const report of reports) {
+			for (const [file, report] of reports) {
 				const element = this._createOlddatabaseItem(report);
 				fragment.appendChild(element);
 			}
@@ -960,7 +963,7 @@ TREM.Old_database = {
 
 		if (Olddatabase.eq) {
 			scale = Olddatabase.eq.mag;
-			number = Olddatabase.serial;
+			number = Olddatabase.serial ?? "1";
 		}
 
 		if (unit == "intensity" && scale == "?") unit = "intensity" + " 資料有很大的機率無法顯示";

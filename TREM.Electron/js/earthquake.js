@@ -3380,8 +3380,8 @@ function ReportGET(badcatch = false) {
 									TREM.set_report_overview = 1;
 									TREM.Report.setView("eq-report-overview", _report_data[0]);
 									changeView("report", "#reportView_btn");
-									ReportTag = NOW().getTime();
-									console.debug("ReportTag: ", ReportTag);
+									// ReportTag = NOW().getTime();
+									// console.debug("ReportTag: ", ReportTag);
 									_report_data[0].show = true;
 								}
 
@@ -3573,8 +3573,8 @@ function ReportGET(badcatch = false) {
 									TREM.set_report_overview = 1;
 									TREM.Report.setView("eq-report-overview", _report_data[0]);
 									changeView("report", "#reportView_btn");
-									ReportTag = NOW().getTime();
-									console.debug("ReportTag: ", ReportTag);
+									// ReportTag = NOW().getTime();
+									// console.debug("ReportTag: ", ReportTag);
 									_report_data[0].show = true;
 								}
 
@@ -4105,8 +4105,8 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 			TREM.set_report_overview = 1;
 			TREM.Report.setView("eq-report-overview", report);
 			changeView("report", "#reportView_btn");
-			ReportTag = NOW().getTime();
-			console.debug("ReportTag: ", ReportTag);
+			// ReportTag = NOW().getTime();
+			// console.debug("ReportTag: ", ReportTag);
 		});
 		Div.addEventListener("contextmenu", () => {
 			if (replay != 0) return;
@@ -4135,31 +4135,36 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 
 			TREM.Report.cache.set(report.identifier ?? report.id, report);
 
-			if (report.identifier) {
-				if ((report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) && setting["report.onlycwachangeView"]) {
-					TREM.Report.setView("eq-report-overview", report);
-					changeView("report", "#reportView_btn");
-					ReportTag = NOW().getTime();
-					console.debug("ReportTag: ", ReportTag);
-				} else if (setting["report.changeView"]) {
-					TREM.Report.setView("eq-report-overview", report);
-					changeView("report", "#reportView_btn");
-					ReportTag = NOW().getTime();
-					console.debug("ReportTag: ", ReportTag);
-				}
-			} else if (report.id) {
-				if (report.id.match(/-/g).length === 3 && setting["report.onlycwachangeView"]) {
-					TREM.Report.setView("eq-report-overview", report);
-					changeView("report", "#reportView_btn");
-					ReportTag = NOW().getTime();
-					console.debug("ReportTag: ", ReportTag);
-				} else if (setting["report.changeView"]) {
-					TREM.Report.setView("eq-report-overview", report);
-					changeView("report", "#reportView_btn");
-					ReportTag = NOW().getTime();
-					console.debug("ReportTag: ", ReportTag);
-				}
-			}
+			// if (report.identifier) {
+			// 	if ((report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) && setting["report.onlycwachangeView"]) {
+			// 		TREM.Report.setView("eq-report-overview", report);
+			// 		changeView("report", "#reportView_btn");
+			// 		ReportTag = NOW().getTime();
+			// 		console.debug("ReportTag: ", ReportTag);
+			// 	} else if (setting["report.changeView"]) {
+			// 		TREM.Report.setView("eq-report-overview", report);
+			// 		changeView("report", "#reportView_btn");
+			// 		ReportTag = NOW().getTime();
+			// 		console.debug("ReportTag: ", ReportTag);
+			// 	}
+			// } else if (report.id) {
+			// 	if (report.id.match(/-/g).length === 3 && setting["report.onlycwachangeView"]) {
+			// 		TREM.Report.setView("eq-report-overview", report);
+			// 		changeView("report", "#reportView_btn");
+			// 		ReportTag = NOW().getTime();
+			// 		console.debug("ReportTag: ", ReportTag);
+			// 	} else if (setting["report.changeView"]) {
+			// 		TREM.Report.setView("eq-report-overview", report);
+			// 		changeView("report", "#reportView_btn");
+			// 		ReportTag = NOW().getTime();
+			// 		console.debug("ReportTag: ", ReportTag);
+			// 	}
+			// }
+
+			TREM.Report.setView("eq-report-overview", report);
+			changeView("report", "#reportView_btn");
+			// ReportTag = NOW().getTime();
+			// console.debug("ReportTag: ", ReportTag);
 
 			let _report_data = [];
 			_report_data = storage.getItem("report_data");
@@ -4849,7 +4854,7 @@ ipcRenderer.on("intensity-Notification", (event, intensity) => {
 	description += "\n";
 
 	if (speecd_use && info.author != "palert") {
-		const now = timeconvert(new Date(info.id != 0 ? info.id : info.timestamp)).format("YYYY/MM/DD HH:mm:ss");
+		const now = timeconvert(new Date(info.eq.time != 0 ? info.eq.time : info.timestamp)).format("YYYY/MM/DD HH:mm:ss");
 		let description0 = "";
 		const city1 = {};
 
@@ -4888,7 +4893,7 @@ ipcRenderer.on("intensity-Notification", (event, intensity) => {
 
 		TREM.speech.speak({ text: "震度速報"
 		+ "資料來源" + info.author
-		+ (info.id != 0 ? "發震時間" : "接收時間") + now
+		+ (info.eq.time != 0 ? "發震時間" : "接收時間") + now
 		+ "震度分布" + description0 });
 	}
 
@@ -4901,8 +4906,8 @@ ipcRenderer.on("intensity-Notification", (event, intensity) => {
 			avatar_url : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			content    : setting["tts.Notification"] ? ("震度速報"
 			+ "資料來源" + info.author
-			+ (info.id != 0 ? "發震時間" : "接收時間") + (info.id != 0 ? timeconvert(new Date(info.id)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(info.timestamp)).format("YYYY/MM/DD HH:mm:ss"))
-			+ "第" + `${info.serial}報`
+			+ (info.id != 0 ? "發震時間" : "接收時間") + (info.eq.time != 0 ? timeconvert(new Date(info.eq.time)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(info.timestamp)).format("YYYY/MM/DD HH:mm:ss"))
+			+ "第" + `${info.serial ?? "1"}報`
 			+ ((info.final) ? "最終報" : "")
 			+ "最大震度" + max_intensity.replace("-級", "弱").replace("+級", "強")) : "震度速報",
 			tts    : setting["tts.Notification"],
@@ -4920,12 +4925,12 @@ ipcRenderer.on("intensity-Notification", (event, intensity) => {
 							inline : true,
 						},
 						{
-							name   : info.id != 0 ? "發震時間" : "接收時間",
-							value  : info.id != 0 ? timeconvert(new Date(info.id)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(info.timestamp)).format("YYYY/MM/DD HH:mm:ss"),
+							name   : info.eq.time != 0 ? "發震時間" : "接收時間",
+							value  : info.eq.time != 0 ? timeconvert(new Date(info.eq.time)).format("YYYY/MM/DD HH:mm:ss") : timeconvert(new Date(info.timestamp)).format("YYYY/MM/DD HH:mm:ss"),
 							inline : true,
 						},
 						{
-							name   : `第${info.serial}報`,
+							name   : `第${info.serial ?? "1"}報`,
 							value  : "",
 							inline : false,
 						},
@@ -6819,7 +6824,6 @@ function main(data) {
 			$("#map-tw").removeClass("show");
 			// restore reports
 			$(roll).fadeIn(200);
-			rts_remove_eew = false;
 			clearInterval(Timers.epicenterBlinker);
 			delete Timers.epicenterBlinker;
 			clearInterval(Timers.eew);
