@@ -95,7 +95,7 @@
     "axios": "1.6.7",
     "bytenode": "^1.5.6",
     "chokidar": "^3.5.3",
-    "discord.js": "14.14.1",
+    "discord.js": "14.15.3",
     "echarts": "^5.5.1",
     "electron-common-ipc": "^16.0.4",
     "electron-fcm-push-receiver": "^2.1.7",
