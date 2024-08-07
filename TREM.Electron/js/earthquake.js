@@ -1638,9 +1638,12 @@ async function init() {
 		});
 	});
 
-	ipcRenderer.send("config:value", "accept.eew.CWA", setting["accept.eew.CWB"]);
-	ipcRenderer.send("config:value", "report.onlycwachangeView", setting["report.onlycwbchangeView"]);
-	ipcRenderer.send("config:value", "intensity.cwa", setting["intensity.cwb"]);
+	if (localStorage.cwb_to_cwa == undefined) {
+		localStorage.cwb_to_cwa = true;
+		ipcRenderer.send("config:value", "accept.eew.CWA", setting["accept.eew.CWB"]);
+		ipcRenderer.send("config:value", "report.onlycwachangeView", setting["report.onlycwbchangeView"]);
+		ipcRenderer.send("config:value", "intensity.cwa", setting["intensity.cwb"]);
+	}
 
 	globalgc();
 }
