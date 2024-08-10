@@ -4136,39 +4136,6 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 				TREM.MapIntensity.MaxI = -1;
 			}
 
-			TREM.Report.cache.set(report.identifier ?? report.id, report);
-
-			// if (report.identifier) {
-			// 	if ((report.identifier.startsWith("CWB") || report.identifier.startsWith("CWA")) && setting["report.onlycwachangeView"]) {
-			// 		TREM.Report.setView("eq-report-overview", report);
-			// 		changeView("report", "#reportView_btn");
-			// 		ReportTag = NOW().getTime();
-			// 		console.debug("ReportTag: ", ReportTag);
-			// 	} else if (setting["report.changeView"]) {
-			// 		TREM.Report.setView("eq-report-overview", report);
-			// 		changeView("report", "#reportView_btn");
-			// 		ReportTag = NOW().getTime();
-			// 		console.debug("ReportTag: ", ReportTag);
-			// 	}
-			// } else if (report.id) {
-			// 	if (report.id.match(/-/g).length === 3 && setting["report.onlycwachangeView"]) {
-			// 		TREM.Report.setView("eq-report-overview", report);
-			// 		changeView("report", "#reportView_btn");
-			// 		ReportTag = NOW().getTime();
-			// 		console.debug("ReportTag: ", ReportTag);
-			// 	} else if (setting["report.changeView"]) {
-			// 		TREM.Report.setView("eq-report-overview", report);
-			// 		changeView("report", "#reportView_btn");
-			// 		ReportTag = NOW().getTime();
-			// 		console.debug("ReportTag: ", ReportTag);
-			// 	}
-			// }
-
-			TREM.Report.setView("eq-report-overview", report);
-			changeView("report", "#reportView_btn");
-			// ReportTag = NOW().getTime();
-			// console.debug("ReportTag: ", ReportTag);
-
 			let _report_data = [];
 			_report_data = storage.getItem("report_data");
 
@@ -4192,6 +4159,10 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 				}
 
 			storage.setItem("report_data", _report_data);
+
+			TREM.Report.cache.set(report.identifier ?? report.id, report);
+			TREM.Report.setView("eq-report-overview", report);
+			changeView("report", "#reportView_btn");
 		} else {
 			roll.append(Div);
 		}
@@ -5361,8 +5332,6 @@ function FCMdata(json, Unit) {
 					// 			silent : win.isFocused(),
 					// 		});
 
-					addReport(report, true);
-
 					setTimeout(() => {
 						ipcRenderer.send("screenshotEEW", {
 							Function : "report",
@@ -5389,6 +5358,8 @@ function FCMdata(json, Unit) {
 							win.focus();
 							win.setAlwaysOnTop(false);
 						}
+
+					addReport(report, true);
 				}
 			} else if (report.id.match(/-/g).length === 3) {
 				if (!win.isFocused())
@@ -5398,8 +5369,6 @@ function FCMdata(json, Unit) {
 							icon   : "../TREM.ico",
 							silent : win.isFocused(),
 						});
-
-				addReport(report, true);
 
 				setTimeout(() => {
 					ipcRenderer.send("screenshotEEW", {
@@ -5427,6 +5396,8 @@ function FCMdata(json, Unit) {
 						win.focus();
 						win.setAlwaysOnTop(false);
 					}
+
+				addReport(report, true);
 			}
 		}
 
