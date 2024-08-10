@@ -1645,6 +1645,11 @@ async function init() {
 		ipcRenderer.send("config:value", "intensity.cwa", setting["intensity.cwb"]);
 	}
 
+	const loadDiv = document.getElementById("load");
+
+	if (loadDiv)
+		loadDiv.remove();
+
 	globalgc();
 }
 // #endregion
@@ -2296,8 +2301,8 @@ function handler(Json) {
 			intensitytest = (current_data.i) ? Math.round(current_data.i) : -5;
 			NA999 = (intensity == 9 && amount == 999) ? "Y" : "NA";
 			NA0999 = (intensity == 0 && amount == 999) ? "Y" : "NA";
-			size = (intensity == 0 || intensity == "NA" || amount == 999) ? 8 : 16;
-			level_class = (intensity != 0 && NA999 != "Y" && NA0999 != "Y") ? IntensityToClassString(intensity)
+			size = (intensity == 0 || intensity == "NA" || amount == 999 || !Alert) ? 8 : 16;
+			level_class = (intensity != 0 && NA999 != "Y" && NA0999 != "Y" && Alert) ? IntensityToClassString(intensity)
 				: (intensity == 0 && Alert) ? "pga0"
 					: (amount == 999) ? "pga6"
 						: (amount > 4.5) ? "pga5"
@@ -2306,7 +2311,7 @@ function handler(Json) {
 									: (amount > 3) ? "pga2"
 										: "pga1";
 
-			if (setting["Real-time.websocket"] === "yayacat" && Alert) {
+			if (setting["Real-time.websocket"] === "yayacat" && Alert && setting["dev.mode"]) {
 				intensity = Math.round(current_data.i);
 				level_class = IntensityToClassString(intensity);
 			}
