@@ -1008,15 +1008,7 @@ function trayIcon() {
 	}
 
 	const iconPath = path.join(__dirname, process.platform === "darwin" ? "TREM.png" : "TREM.ico");
-	let trayIconPath = nativeImage.createFromPath(iconPath);
-
-	if (trayIconPath.isEmpty()) {
-		console.warn(iconPath);
-		console.warn("Icon is empty, trying alternative method");
-		trayIconPath = nativeImage.createFromNamedImage("NSImageNameUser");
-	}
-
-	tray = new Tray(trayIconPath);
+	tray = new Tray(nativeImage.createFromPath(iconPath));
 
 
 	tray.setIgnoreDoubleClickEvents(true);
