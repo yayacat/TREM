@@ -1163,7 +1163,11 @@ function trayIcon() {
 		},
 	]);
 	tray.setToolTip(TREM.Localization.getString("Application_Title"));
-	tray.setContextMenu(contextMenu);
+	if (process.platform === 'darwin') {
+		TREM.dock.setMenu(contextMenu);
+	} else {
+		tray.setContextMenu(contextMenu);
+	}
 }
 
 
