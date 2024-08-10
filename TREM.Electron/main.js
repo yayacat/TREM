@@ -1007,8 +1007,18 @@ function trayIcon() {
 		tray = null;
 	}
 
-	const iconPath = path.join(__dirname, "TREM.ico");
-	tray = new Tray(nativeImage.createFromPath(iconPath));
+	const iconPath = path.join(__dirname, process.platform === "darwin" ? "TREM.png" : "TREM.ico");
+	let trayIconPath = nativeImage.createFromPath(iconPath);
+
+	if (trayIconPath.isEmpty()) {
+		console.warn(iconPath);
+		console.warn("Icon is empty, trying alternative method");
+		trayIconPath = nativeImage.createFromNamedImage("NSImageNameUser");
+	}
+
+	tray = new Tray(trayIconPath);
+
+
 	tray.setIgnoreDoubleClickEvents(true);
 	tray.on("click", (e) => {
 		if (MainWindow != null)
@@ -1166,8 +1176,8 @@ function trayIcon() {
 
 	if (process.platform === "darwin")
 		TREM.dock.setMenu(contextMenu);
-	else
-		tray.setContextMenu(contextMenu);
+
+	tray.setContextMenu(contextMenu);
 
 }
 

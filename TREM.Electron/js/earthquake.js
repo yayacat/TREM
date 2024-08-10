@@ -2225,8 +2225,6 @@ function handler(Json) {
 
 		let level_class = "";
 		let station_tooltip = "";
-		let NA999 = "NA";
-		let NA0999 = "NA";
 		let size = 8;
 		let amount = 0;
 		let intensity = 0;
@@ -2245,8 +2243,6 @@ function handler(Json) {
 
 			const off_now = new Date(station_time_json[uuid]);
 			station_tooltip = `<div>${keys[index]}(${current_station_data.Loc})無資料</div><div>最近離線時間: ${timeconvert(off_now).format("YYYY/MM/DD HH:mm:ss")}</div>`;
-			NA999 = "NA";
-			NA0999 = "NA";
 			size = 8;
 			amount = "--";
 			intensity = "-";
@@ -2299,10 +2295,8 @@ function handler(Json) {
 			// 								: (amount >= 2.2) ? 1
 			// 									: 0;
 			intensitytest = (current_data.i) ? Math.round(current_data.i) : -5;
-			NA999 = (intensity == 9 && amount == 999) ? "Y" : "NA";
-			NA0999 = (intensity == 0 && amount == 999) ? "Y" : "NA";
 			size = (intensity == 0 || intensity == "NA" || amount == 999 || !Alert) ? 8 : 16;
-			level_class = (intensity != 0 && NA999 != "Y" && NA0999 != "Y" && Alert) ? IntensityToClassString(intensity)
+			level_class = (intensity != 0 && Alert) ? IntensityToClassString(intensity)
 				: (intensity == 0 && Alert) ? "pga0"
 					: (amount == 999) ? "pga6"
 						: (amount > 4.5) ? "pga5"
@@ -2320,7 +2314,7 @@ function handler(Json) {
 
 			if (intensity > MaxIntensity2) MaxIntensity2 = intensity;
 
-			if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y") {
+			if (intensity != "NA") {
 				stationnowindex += 1;
 				stationnow = stationnowindex;
 			}
@@ -2423,7 +2417,7 @@ function handler(Json) {
 
 		const Level = IntensityI(intensity);
 
-		// if (intensity != "NA" && NA999 != "Y" && NA0999 != "Y" && (intensity >= 0 && Alert) && amount < 999 && (target_count > 1 || Object.keys(eew).length != 0)) {
+		// if (intensity != "NA" && (intensity >= 0 && Alert) && amount < 999 && (target_count > 1 || Object.keys(eew).length != 0)) {
 		// detected_list[current_station_data.PGA] ??= {
 		// 	intensity : intensity,
 		// 	time      : 0,
@@ -2534,7 +2528,7 @@ function handler(Json) {
 				intensitytag = max_intensity;
 			}
 		}
-		//  else if (NA999 != "Y" && NA0999 != "Y" && intensitytest > -1 && amount < 999) {
+		//  else if (intensitytest > -1 && amount < 999) {
 		// 	if (uuid.split("-")[2] == "7735548")
 		// 		current_station_data.PGA = 7735548;
 		// 	else if (uuid.split("-")[2] == "13379360")
