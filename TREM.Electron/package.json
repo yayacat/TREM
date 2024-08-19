@@ -84,7 +84,7 @@
   "keywords": [],
   "license": "AGPL-3.0",
   "devDependencies": {
-    "electron": "^31.3.1",
+    "electron": "^31.4.0",
     "electron-builder": "^25.0.4",
     "eslint": "^8.57.0"
   },
