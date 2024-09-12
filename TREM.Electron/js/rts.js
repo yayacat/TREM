@@ -80,7 +80,7 @@ function reconnect() {
 		ws = null;
 	}
 
-	console.log(`lb-${route.auto_run()}`);
+	console.log(`lb-${route.auto_run()} ${route.auto_run_global_url()}`);
 	ws = new WebSocket(route.randomWSBaseUrl());
 	connect(1000);
 }
