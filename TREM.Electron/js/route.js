@@ -41,8 +41,13 @@ class Route {
 		this.random_api_num = this.randomAPINum();
 		this.ws_num = -1;
 		this.ws_num_bk = -1;
-		this.global_url = ["com.tw", "dev"];
+		this.global_url = ["dev"];
 		this.random_global_url = this.auto_run_global_url();
+	}
+
+	getRandomElement(list) {
+		const index = Math.floor(Math.random() * list.length);
+		return list[index];
 	}
 
 	/**

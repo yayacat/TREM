@@ -1069,8 +1069,8 @@ async function init() {
 				// const warn = (Warn) ? "⚠️" : "";
 				const error = (testEEWerror) ? "❌" : "";
 				// const unlock = (Unlock) ? "⚡" : "";
-				$("#log").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${get_r_url[0]}) | ${rss}`);
-				$("#log1").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${get_r_url[0]}) | ${rss}`);
+				$("#log").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${route.random_global_url}) | ${rss}`);
+				$("#log1").text(`${stationnow}/${stationnowall} | ${stationPercentage}% | LB(${ws_num},${route.random_global_url}) | ${rss}`);
 				ipcRenderer.send("TREMIntensitylog2", { time: now_format(NOW()), log: `${stationnow}/${stationnowall} | ${stationPercentage}% | ${rss}`, ver: `${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}` });
 				$("#app-version").text(`${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}`);
 				$("#app-version1").text(`${app.getVersion()} ${Ping} ${GetDataState} ${Warn} ${error}`);
