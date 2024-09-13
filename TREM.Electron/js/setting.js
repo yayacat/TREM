@@ -458,7 +458,7 @@ function station_v2_run(station_data) {
 		const station_id = k_ks[k];
 		const station_ = station_data[station_id];
 
-		if (!station_.work) continue;
+		if (!station_.work && !setting["dev.mode"]) continue;
 
 		const station_net = station_.net === "MS-Net" ? "H" : "L";
 		const work = station_.work;
