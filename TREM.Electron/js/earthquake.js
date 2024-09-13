@@ -1703,11 +1703,20 @@ function PGAMain() {
 								console.debug("api_eq_undefined");
 							else
 								for (let i = 0; i < res3.length; i++) {
-									res3[i].replay_timestamp = res3[i].time;
-									res3[i].replay_time = res3[i].time;
-									res3[i].time = NOW().getTime() - (ReplayTime - res3[i].time);
-									res3[i].timestamp = NOW().getTime();
-									res3[i].type = "eew";
+									if (!EarthquakeList[res3[i].id]) {
+										res3[i].replay_timestamp = ReplayTime;
+										res3[i].replay_time = res3[i].time;
+										res3[i].time = NOW().getTime() - (ReplayTime - res3[i].time);
+										res3[i].timestamp = NOW().getTime();
+										res3[i].type = "eew";
+									} else {
+										res3[i].replay_timestamp = ReplayTime;
+										res3[i].replay_time = res3[i].time;
+										res3[i].time = EarthquakeList[res3[i].id].Time;
+										res3[i].timestamp = NOW().getTime();
+										res3[i].type = "eew";
+									}
+
 									FCMdata(res3[i], "http");
 								}
 						});
@@ -1938,11 +1947,20 @@ function PGAMainbkup() {
 								console.debug("bkup_api_eq_undefined");
 							else
 								for (let i = 0; i < res3.length; i++) {
-									res3[i].replay_timestamp = res3[i].time;
-									res3[i].replay_time = res3[i].time;
-									res3[i].time = NOW().getTime() - (ReplayTime - res3[i].time);
-									res3[i].timestamp = NOW().getTime();
-									res3[i].type = "eew";
+									if (!EarthquakeList[res3[i].id]) {
+										res3[i].replay_timestamp = ReplayTime;
+										res3[i].replay_time = res3[i].time;
+										res3[i].time = NOW().getTime() - (ReplayTime - res3[i].time);
+										res3[i].timestamp = NOW().getTime();
+										res3[i].type = "eew";
+									} else {
+										res3[i].replay_timestamp = ReplayTime;
+										res3[i].replay_time = res3[i].time;
+										res3[i].time = EarthquakeList[res3[i].id].Time;
+										res3[i].timestamp = NOW().getTime();
+										res3[i].type = "eew";
+									}
+
 									FCMdata(res3[i], "http");
 								}
 						});
@@ -4214,7 +4232,7 @@ ipcRenderer.on("readReplayFile", (event, filePaths) => {
 						if (e.serial == 1) replay_time = NOW().getTime() - 3000;
 
 						e.replay_time = e.eq.time;
-						e.replay_timestamp = e.eq.time;
+						e.replay_timestamp = replayTemp;
 						e.time = replay_time;
 						e.timestamp = NOW().getTime();
 						e.Unit = (e.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
@@ -5526,6 +5544,12 @@ TREM.Earthquake.on("eew", (data) => {
 
 	if (data.status == 3) data.cancel = true;
 
+	if (data.status == 2) data.Test = true;
+
+	if (data.status == 1) data.Alert = true;
+
+	if (data.status == 0) data.Alert = false;
+
 	if (data.serial > 0) data.number = data.serial;
 
 	if (data.eq) {
@@ -5539,7 +5563,7 @@ TREM.Earthquake.on("eew", (data) => {
 
 		if (data.eq.loc) data.location = data.eq.loc;
 
-		if (data.eq.time) data.time = data.eq.time;
+		if (data.eq.time && replay == 0) data.time = data.eq.time;
 	}
 
 	if ((data.type == "trem-eew" || data.author == "trem") && (data.lat == null && data.lon == null)) return;
@@ -5675,12 +5699,12 @@ TREM.Earthquake.on("eew", (data) => {
 
 	let Nmsg = "";
 
-	if (data.type == "trem-eew" && data.number <= 3) {
+	if (data.type == "trem-eew" && data.number < 3) {
 		data.scale = null;
 		data.depth = null;
 	}
 
-	if (data.author == "trem" && data.serial <= 3) {
+	if (data.author == "trem" && data.serial < 3) {
 		data.scale = null;
 		data.depth = null;
 	}
@@ -5802,9 +5826,7 @@ TREM.Earthquake.on("eew", (data) => {
 	}
 
 	if (data.author != "trem")
-		if (MaxIntensity.value >= 5) {
-			data.Alert = true;
-
+		if (MaxIntensity.value >= 5)
 			if (!Info.Warn.includes(data.id)) {
 				Info.Warn.push(data.id);
 
@@ -5816,9 +5838,6 @@ TREM.Earthquake.on("eew", (data) => {
 							audioPlay("../audio/Warn.wav");
 				}
 			}
-		} else {
-			data.Alert = false;
-		}
 
 	let _time = -1;
 	let stamp = 0;
