@@ -99,7 +99,7 @@
     "echarts": "^5.5.1",
     "electron-common-ipc": "^16.0.4",
     "electron-fcm-push-receiver": "^2.1.7",
-    "electron-log": "5.1.7",
+    "electron-log": "5.2.0",
     "electron-updater": "6.3.4",
     "expose-gc": "^1.0.0",
     "jquery": "3.7.1",
