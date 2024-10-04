@@ -127,6 +127,7 @@ let RMTpgaTime = 0;
 let type_Unit = "";
 let link_on = false;
 let p2p_mode_status = false;
+let rts_url = 0;
 // #endregion
 
 TREM.Detector = {
@@ -4489,24 +4490,43 @@ function freertsget(rts_key_verify_f = false) {
 			try {
 				const controller = new AbortController();
 				const timer = setTimeout(() => controller.abort(), 1000);
-				await fetch(route.rts(1), { signal: controller.signal })
+				await fetch(route.rts(1, new Date().getTime(), rts_url), { signal: controller.signal })
 					.then((ans0) => {
 						if (ans0.ok) {
 							ans0.json().then(ans => {
 								rts_ws_timestamp = new Date().getTime();
+
+								if ((rts_ws_timestamp - ans.time) >= 30000)
+									if (rts_url == 0)
+										rts_url = 1;
+									 else
+										rts_url = 0;
+
 								ans.Time = rts_ws_timestamp;
 								rts_response = ans;
 								clearTimeout(timer);
 							});
 						} else {
+							if (rts_url == 0)
+								rts_url = 1;
+							 else
+								rts_url = 0;
 							log(ans0.status, 3, "server", "rts-clock");
 							clearTimeout(timer);
 						}
 					}).catch((err) => {
+						if (rts_url == 0)
+							rts_url = 1;
+						 else
+							rts_url = 0;
 						log(err, 3, "server", "rts-clock");
 						clearTimeout(timer);
 					});
 			} catch (err) {
+				if (rts_url == 0)
+					rts_url = 1;
+				 else
+					rts_url = 0;
 				log(err, 3, "server", "rts-clock");
 			}
 		}, 1000);

@@ -175,8 +175,14 @@ class Route {
    * @param {timestamp} timestamp
    * @returns {`${BaseUrl}/trem/rts?time=${timestamp}`}
    */
-	rts(version, timestamp = 0) {
-		return this.randomBaseUrl(version) + `/trem/rts${timestamp ? `?time=${timestamp}` : ""}`;
+	rts(version, timestamp = 0, url) {
+		let reurl;
+
+		if (url == 0)
+			reurl = this.randomBaseUrl(version) + `/trem/rts${timestamp ? `?time=${timestamp}` : ""}`;
+		else if (url == 1)
+			reurl = this.randomApiBaseUrl(version) + `/trem/rts${timestamp ? `?time=${timestamp}` : ""}`;
+		return reurl;
 	}
 
 	/**
@@ -195,9 +201,15 @@ class Route {
    * @param {version} version
    * @returns {`${BaseUrl}/eq/eew`}
    */
-	eew(version) {
+	eew(version, url) {
+		let reurl;
+
+		if (url == 0)
+			reurl = this.randomBaseUrl(version) + "/eq/eew?type=all";
+		else if (url == 1)
+			reurl = this.randomApiBaseUrl(version) + "/eq/eew?type=all";
 		// this.auto_run();
-		return this.randomBaseUrl(version) + "/eq/eew?type=all";
+		return reurl;
 	}
 
 	/**
