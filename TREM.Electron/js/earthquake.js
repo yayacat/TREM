@@ -4505,6 +4505,13 @@ function freertsget(rts_key_verify_f = false) {
 								ans.Time = rts_ws_timestamp;
 								rts_response = ans;
 								clearTimeout(timer);
+							}).catch((err) => {
+								if (rts_url == 0)
+									rts_url = 1;
+								 else
+									rts_url = 0;
+								log(err, 3, "server", "rts-clock");
+								clearTimeout(timer);
 							});
 						} else {
 							if (rts_url == 0)
