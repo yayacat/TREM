@@ -128,6 +128,7 @@ let type_Unit = "";
 let link_on = false;
 let p2p_mode_status = false;
 let rts_url = 0;
+let HTTP = false;
 // #endregion
 
 TREM.Detector = {
@@ -959,9 +960,12 @@ async function init() {
 
 		if (!Timers.clock)
 			Timers.clock = setInterval(() => {
-				if (TimerDesynced) {
+				if (TimerDesynced && replayTemp == 0 && replay == 0) {
 					if (!time.classList.contains("desynced"))
 						time.classList.add("desynced");
+					const now_f = now_format(NOW());
+					time.innerText = `${now_f}`;
+					time1.innerText = `${now_f}`;
 				} else if (replayTemp) {
 					if (!time.classList.contains("replay"))
 						time.classList.add("replay");
@@ -4383,6 +4387,8 @@ TREM.color = function color(Intensity) {
 // #endregion
 
 let rts_clock = null;
+let eew_clock = null;
+let ntp_clock = null;
 
 // #region IPC
 ipcRenderer.on("start", () => {
@@ -4410,6 +4416,8 @@ ipcRenderer.on("start", () => {
 		}, 0);
 
 		freertsget();
+		fetch_eew();
+		fetch_ntp();
 
 		log(`Initializing ServerCore >> ${ServerVer}`, 1, "Initialization", "start");
 		dump({ level: 0, message: `Initializing ServerCore >> ${ServerVer}`, origin: "Initialization" });
@@ -4540,6 +4548,132 @@ function freertsget(rts_key_verify_f = false) {
 	} else if (rts_key_verify && rts_clock) {
 		clearInterval(rts_clock);
 		rts_clock = null;
+	}
+}
+
+function fetch_eew() {
+	if (eew_clock) {
+		clearInterval(eew_clock);
+		eew_clock = null;
+	}
+
+	eew_clock = setInterval(async () => {
+		try {
+			const controller = new AbortController();
+			const timer = setTimeout(() => controller.abort(), 1000);
+			const lb_num = route.auto_run();
+			await fetch(route.eew(1, rts_url), { signal: controller.signal })
+				.then((ans) => {
+					if (ans.ok) {
+						ans.json().then((ans0) => {
+							HTTP = true;
+
+							if (ans0.length != 0)
+								for (const e of ans0) {
+									e.type = "eew";
+									e.timestamp = Date.now();
+									FCMdata(e, ServerType = "http");
+								}
+
+							clearTimeout(timer);
+						});
+					} else {
+						HTTP = false;
+						log(`lb-${lb_num} eq_eew`, 3, "server", "eew_clock");
+						console.error(err);
+
+						switch (ans.status) {
+							case 429: {
+								break;
+							}
+
+							case 404: {
+								break;
+							}
+
+							case 500: {
+								break;
+							}
+
+							default: {
+								break;
+							}
+						}
+
+						clearTimeout(timer);
+					}
+				})
+				.catch((err) => {
+					HTTP = false;
+					log(`lb-${lb_num} eq_eew`, 3, "server", "eew_clock");
+					log(err, 3, "server", "eew_clock");
+					clearTimeout(timer);
+				});
+		} catch (err) {
+			log(err, 3, "server", "eew_clock");
+		}
+	}, 1000);
+}
+
+function fetch_ntp() {
+	if (!rts_key_verify) {
+		if (ntp_clock) {
+			clearInterval(ntp_clock);
+			ntp_clock = null;
+		}
+
+		ntp_clock = setInterval(async () => {
+			try {
+				const controller = new AbortController();
+				const timer = setTimeout(() => controller.abort(), 1000);
+				const lb_num = route.auto_run();
+				await fetch(route.ntp(), { signal: controller.signal })
+					.then((ans) => {
+						if (ans.ok) {
+							ans.json().then((ans0) => {
+								if (!replayTemp && !replay) {
+									ServerT = Date.now();
+									ServerTime = ans0;
+								}
+
+								clearTimeout(timer);
+							});
+						} else {
+							HTTP = false;
+							log(`lb-${lb_num} ntp`, 3, "server", "ntp_clock");
+							console.error(err);
+
+							switch (ans.status) {
+								case 429: {
+									break;
+								}
+
+								case 404: {
+									break;
+								}
+
+								case 500: {
+									break;
+								}
+
+								default: {
+									break;
+								}
+							}
+
+							clearTimeout(timer);
+						}
+					})
+					.catch((err) => {
+						HTTP = false;
+						log(`lb-${lb_num} ntp`, 3, "server", "ntp_clock");
+						log(err, 3, "server", "eew_clock");
+						clearTimeout(timer);
+					});
+			} catch (err) {
+				log(err, 3, "server", "eew_clock");
+			}
+		}, 1000);
 	}
 }
 

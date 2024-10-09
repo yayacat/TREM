@@ -161,16 +161,17 @@ function dumpUpload() {
 	};
 	axios.post("https://exptech.mywire.org:1015", msg)
 		.then((res) => {
-			if (res.data.response == "Speed limit") alert("Dump 發送限制\n稍等 5 分鐘後再次嘗試");
+			if (res.data.response == "Speed limit")
+				log("Dump 發送限制\n稍等 5 分鐘後再次嘗試", 3, "dump", "dumpUpload");
 
 			if (res.ok) {
-				alert("Dump 發送成功");
+				log("Dump 發送成功", 3, "dump", "dumpUpload");
 			} else {
 				console.error(res);
 
 				switch (res.status) {
 					case 429: {
-						alert("Dump 發送限制\n稍等 5 分鐘後再次嘗試");
+						log("Dump 發送限制\n稍等 5 分鐘後再次嘗試", 3, "dump", "dumpUpload");
 						break;
 					}
 
@@ -179,6 +180,6 @@ function dumpUpload() {
 			}
 		})
 		.catch((error) => {
-			alert("Dump 發送失敗\nError > " + error);
+			log(`Dump 發送失敗\nError > ${error}`, 3, "dump", "dumpUpload");
 		});
 }

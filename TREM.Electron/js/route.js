@@ -222,6 +222,15 @@ class Route {
 	eewReplay(version, timestamp) {
 		return this.randomApiBaseUrl(version) + `/eq/eew/${timestamp}`;
 	}
+
+	/**
+   * @template {number} version
+   * @param {version} version
+   * @returns {`${BaseUrl}/eq/eew`}
+   */
+	ntp() {
+		return `https://lb-${ this.random_ws_num }.exptech.${this.random_global_url}/ntp`;
+	}
 }
 
 module.exports = Route;
