@@ -1007,7 +1007,7 @@ function trayIcon() {
 		tray = null;
 	}
 
-	const iconPath = path.join(__dirname, process.platform === "darwin" ? "TREM.png" : "TREM.ico");
+	const iconPath = path.join(__dirname, process.platform === "win32" ? "TREM.ico" : "TREM.png");
 	tray = new Tray(nativeImage.createFromPath(iconPath));
 
 
