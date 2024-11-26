@@ -10,6 +10,11 @@
 class Route {
 
 	/**
+   * @typedef BaseLbUrl
+   * @type {`https://lb-${number}.exptech.${global_url}`}
+   */
+
+	/**
    * @typedef BaseUrl
    * @type {`https://lb-${number}.exptech.${global_url}/api/v${version}`}
    */
@@ -226,7 +231,7 @@ class Route {
 	/**
    * @template {number} version
    * @param {version} version
-   * @returns {`${BaseUrl}/eq/eew`}
+   * @returns {`${BaseLbUrl}/ntp`}
    */
 	ntp() {
 		return `https://lb-${ this.random_ws_num }.exptech.${this.random_global_url}/ntp`;
