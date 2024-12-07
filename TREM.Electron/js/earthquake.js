@@ -7112,7 +7112,8 @@ function findClosest(arr, target) {
 }
 
 function NOW() {
-	return new Date(ServerTime + (Date.now() - ((ServerT != 0 && setting["Real-time.websocket"] === "exptech") ? ServerT : ServerT_yayacat)));
+	// return new Date(ServerTime + (Date.now() - ((ServerT != 0 && setting["Real-time.websocket"] === "exptech") ? ServerT : ServerT_yayacat)));
+	return new Date(Date.now());
 }
 
 function timeconvert(time) {
