@@ -5729,10 +5729,10 @@ TREM.Earthquake.on("eew", (data) => {
 
 	if ((data.type == "trem-eew" || data.author == "trem") && (data.lat == null && data.lon == null)) return;
 
-	if (data.number == 1 && setting["link.on"] && !link_on) {
-		link_on = true;
-		ipcRenderer.send("linkpathtest", setting["link.path"], setting["link.name"]);
-	}
+	// if (data.number == 1 && setting["link.on"] && !link_on) {
+	// 	link_on = true;
+	// 	ipcRenderer.send("linkpathtest", setting["link.path"], setting["link.name"]);
+	// }
 
 	if (!TREM.EEW.has(data.id))
 		TREM.EEW.set(data.id, new EEW(data));

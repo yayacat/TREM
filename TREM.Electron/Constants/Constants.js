@@ -468,18 +468,18 @@ const Constants = Object.freeze({
 			type  : "select",
 			value : "1",
 		},
-		"link.on": {
-			type  : "toggle",
-			value : false,
-		},
-		"link.path": {
-			type  : "string",
-			value : "",
-		},
-		"link.name": {
-			type  : "string",
-			value : "",
-		},
+		// "link.on": {
+		// 	type  : "toggle",
+		// 	value : false,
+		// },
+		// "link.path": {
+		// 	type  : "string",
+		// 	value : "",
+		// },
+		// "link.name": {
+		// 	type  : "string",
+		// 	value : "",
+		// },
 		"rtw.key.only": {
 			type  : "toggle",
 			value : true,
