@@ -7,7 +7,7 @@ require("expose-gc");
 const { BrowserWindow, shell } = require("@electron/remote");
 const { default: turfCircle } = require("@turf/circle");
 const { setTimeout, setInterval, clearTimeout, clearInterval } = require("node:timers");
-const axios = require("axios");
+// const axios = require("axios");
 const bytenode = require("bytenode");
 const Route = require("../js/route.js");
 const route = new Route();
@@ -1938,66 +1938,66 @@ function PGAMainbkup() {
 			const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
 
 			if (ReplayTime != 0 && TREM.Report.replayHttp) {
-				const controller1 = new AbortController();
-				setTimeout(() => {
-					controller1.abort();
-				}, 2500);
-				axios({
-					method : "get",
-					url    : route.eewReplay(1, ReplayTime),
-				}).then((res2) => {
-					if (res2.ok) {
-						res2.json().then(res3 => {
-							if (controller1.signal.aborted || res3 == undefined)
-								console.debug("bkup_api_eq_undefined");
-							else
-								for (let i = 0; i < res3.length; i++) {
-									if (!EarthquakeList[res3[i].id]) {
-										res3[i].replay_timestamp = ReplayTime;
-										res3[i].replay_time = res3[i].time;
-										res3[i].time = NOW().getTime() - (ReplayTime - res3[i].time);
-										res3[i].timestamp = NOW().getTime();
-										res3[i].type = "eew";
-									} else {
-										res3[i].replay_timestamp = ReplayTime;
-										res3[i].replay_time = res3[i].time;
-										res3[i].time = EarthquakeList[res3[i].id].Time;
-										res3[i].timestamp = NOW().getTime();
-										res3[i].type = "eew";
-									}
+				// const controller1 = new AbortController();
+				// setTimeout(() => {
+				// 	controller1.abort();
+				// }, 2500);
+				// axios({
+				// 	method : "get",
+				// 	url    : route.eewReplay(1, ReplayTime),
+				// }).then((res2) => {
+				// 	if (res2.ok) {
+				// 		res2.json().then(res3 => {
+				// 			if (controller1.signal.aborted || res3 == undefined)
+				// 				console.debug("bkup_api_eq_undefined");
+				// 			else
+				// 				for (let i = 0; i < res3.length; i++) {
+				// 					if (!EarthquakeList[res3[i].id]) {
+				// 						res3[i].replay_timestamp = ReplayTime;
+				// 						res3[i].replay_time = res3[i].time;
+				// 						res3[i].time = NOW().getTime() - (ReplayTime - res3[i].time);
+				// 						res3[i].timestamp = NOW().getTime();
+				// 						res3[i].type = "eew";
+				// 					} else {
+				// 						res3[i].replay_timestamp = ReplayTime;
+				// 						res3[i].replay_time = res3[i].time;
+				// 						res3[i].time = EarthquakeList[res3[i].id].Time;
+				// 						res3[i].timestamp = NOW().getTime();
+				// 						res3[i].type = "eew";
+				// 					}
 
-									FCMdata(res3[i], "http");
-								}
-						});
-					} else {
-						console.error(res2);
+				// 					FCMdata(res3[i], "http");
+				// 				}
+				// 		});
+				// 	} else {
+				// 		console.error(res2);
 
-						switch (res2.status) {
-							case 429: {
-								Ping = `❌ ${res2.status}`;
-								break;
-							}
+				// 		switch (res2.status) {
+				// 			case 429: {
+				// 				Ping = `❌ ${res2.status}`;
+				// 				break;
+				// 			}
 
-							case 404: {
-								Ping = `❌ ${res2.status}`;
-								break;
-							}
+				// 			case 404: {
+				// 				Ping = `❌ ${res2.status}`;
+				// 				break;
+				// 			}
 
-							case 500: {
-								Ping = `❌ ${res2.status}`;
-								break;
-							}
+				// 			case 500: {
+				// 				Ping = `❌ ${res2.status}`;
+				// 				break;
+				// 			}
 
-							default: {
-								Ping = `❌ ${res2.status}`;
-								break;
-							}
-						}
-					}
-				}).catch((err) => {
-					log(err, 3, "PGATimer", "PGAMainbkup");
-					dump({ level: 2, message: err });
-				});
+				// 			default: {
+				// 				Ping = `❌ ${res2.status}`;
+				// 				break;
+				// 			}
+				// 		}
+				// 	}
+				// }).catch((err) => {
+				// 	log(err, 3, "PGATimer", "PGAMainbkup");
+				// 	dump({ level: 2, message: err });
+				// });
 			}
 		}, 1_000);
 		Timers.rts_clock = setInterval(() => {
@@ -2006,7 +2006,7 @@ function PGAMainbkup() {
 					const _t = NOW().getTime();
 					const ReplayTime = (replay == 0) ? 0 : replay + (NOW().getTime() - replayT);
 
-					if (ReplayTime == 0) {
+					if (ReplayTime == 0)
 						if (rts_ws_timestamp && setting["Real-time.websocket"] === "exptech") {
 							const t1 = Math.abs((rts_response.Time ?? rts_response.time) - NOW().getTime());
 
@@ -2082,49 +2082,50 @@ function PGAMainbkup() {
 							else
 								Ping = "🔒";
 						}
-					} else if (!replayD) {
-						const url = route.rtsReplay(1, ReplayTime);
-						// + "&key=" + setting["exptech.key"]
-						axios({
-							method : "get",
-							url    : url,
-						}).then((response) => {
-							if (response.ok) {
-								Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
-								Response = response.data;
-							} else {
-								console.error(response);
+					 else if (!replayD)
+						PGAMain();
+						// const url = route.rtsReplay(1, ReplayTime);
+						// // + "&key=" + setting["exptech.key"]
+						// axios({
+						// 	method : "get",
+						// 	url    : url,
+						// }).then((response) => {
+						// 	if (response.ok) {
+						// 		Ping = `🔁 ${(Math.abs(NOW().getTime() - _t) / 1000).toFixed(1)}s`;
+						// 		Response = response.data;
+						// 	} else {
+						// 		console.error(response);
 
-								switch (response.status) {
-									case 429: {
-										Ping = `❌ ${response.status}`;
-										break;
-									}
+					// 		switch (response.status) {
+					// 			case 429: {
+					// 				Ping = `❌ ${response.status}`;
+					// 				break;
+					// 			}
 
-									case 404: {
-										Ping = `❌ ${response.status}`;
-										break;
-									}
+					// 			case 404: {
+					// 				Ping = `❌ ${response.status}`;
+					// 				break;
+					// 			}
 
-									case 500: {
-										Ping = `❌ ${response.status}`;
-										break;
-									}
+					// 			case 500: {
+					// 				Ping = `❌ ${response.status}`;
+					// 				break;
+					// 			}
 
-									default: {
-										Ping = `❌ ${response.status}`;
-										break;
-									}
-								}
+					// 			default: {
+					// 				Ping = `❌ ${response.status}`;
+					// 				break;
+					// 			}
+					// 		}
 
-								PGAMain();
-							}
-						}).catch((err) => {
-							log(err, 3, "PGATimer", "PGAMainbkup");
-							dump({ level: 2, message: err });
-							PGAMain();
-						});
-					}
+					// 		PGAMain();
+					// 	}
+					// }).catch((err) => {
+					// 	log(err, 3, "PGATimer", "PGAMainbkup");
+					// 	dump({ level: 2, message: err });
+					// 	PGAMain();
+					// });
+
 
 					handler(Response);
 				} catch (err) {
@@ -5194,104 +5195,104 @@ ipcRenderer.on("testEEW", (event, list = []) => {
 	if (TREM.MapArea2.isTriggered)
 		TREM.MapArea2.clear();
 
-	if (!list.length)
-		setTimeout(() => {
-			log("Start EEW Test", 1, "EEW", "testEEW");
-			dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
+	// if (!list.length)
+	// 	setTimeout(() => {
+	// 		log("Start EEW Test", 1, "EEW", "testEEW");
+	// 		dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
 
-			const data = {
-				uuid: `rts-TREM-${localStorage.UUID_rts}`,
-			};
+	// 		const data = {
+	// 			uuid: `rts-TREM-${localStorage.UUID_rts}`,
+	// 		};
 
-			log(`Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, 0, "Verbose", "testEEW");
-			dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
-			axios.post(posturl + "replay", data)
-				.then((res) => {
-					if (res.ok) {
-						console.debug(res);
-						testEEWerror = false;
-					} else {
-						console.error(res);
+	// 		log(`Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, 0, "Verbose", "testEEW");
+	// 		dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
+	// 		axios.post(posturl + "replay", data)
+	// 			.then((res) => {
+	// 				if (res.ok) {
+	// 					console.debug(res);
+	// 					testEEWerror = false;
+	// 				} else {
+	// 					console.error(res);
 
-						switch (res.status) {
-							case 429: {
-								log(res.status, 3, "testEEW", "replay");
-								dump({ level: 2, message: res.status });
-								break;
-							}
+	// 					switch (res.status) {
+	// 						case 429: {
+	// 							log(res.status, 3, "testEEW", "replay");
+	// 							dump({ level: 2, message: res.status });
+	// 							break;
+	// 						}
 
-							case 404: {
-								log(res.status, 3, "testEEW", "replay");
-								dump({ level: 2, message: res.status });
-								break;
-							}
+	// 						case 404: {
+	// 							log(res.status, 3, "testEEW", "replay");
+	// 							dump({ level: 2, message: res.status });
+	// 							break;
+	// 						}
 
-							case 500: {
-								log(res.status, 3, "testEEW", "replay");
-								dump({ level: 2, message: res.status });
-								break;
-							}
+	// 						case 500: {
+	// 							log(res.status, 3, "testEEW", "replay");
+	// 							dump({ level: 2, message: res.status });
+	// 							break;
+	// 						}
 
-							default: break;
-						}
-					}
-				})
-				.catch((error) => {
-					testEEWerror = true;
-					log(error, 3, "Verbose", "testEEW");
-					dump({ level: 2, message: error, origin: "Verbose" });
-				});
-		}, 100);
-	else
-		for (let index = 0; index < list.length; index++)
-			setTimeout(() => {
-				log("Start list EEW Test", 1, "EEW", "testEEW");
-				dump({ level: 0, message: "Start list EEW Test", origin: "EEW" });
+	// 						default: break;
+	// 					}
+	// 				}
+	// 			})
+	// 			.catch((error) => {
+	// 				testEEWerror = true;
+	// 				log(error, 3, "Verbose", "testEEW");
+	// 				dump({ level: 2, message: error, origin: "Verbose" });
+	// 			});
+	// 	}, 100);
+	// else
+	// 	for (let index = 0; index < list.length; index++)
+	// 		setTimeout(() => {
+	// 			log("Start list EEW Test", 1, "EEW", "testEEW");
+	// 			dump({ level: 0, message: "Start list EEW Test", origin: "EEW" });
 
-				const data = {
-					uuid : `rts-TREM-${localStorage.UUID_rts}`,
-					id   : list[index],
-				};
+	// 			const data = {
+	// 				uuid : `rts-TREM-${localStorage.UUID_rts}`,
+	// 				id   : list[index],
+	// 			};
 
-				log(`Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, 0, "Verbose", "testEEW");
-				dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
-				axios.post(posturl + "replay", data)
-					.then((res) => {
-						if (res.ok) {
-							console.debug(res);
-							testEEWerror = false;
-						} else {
-							console.error(res);
+	// 			log(`Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, 0, "Verbose", "testEEW");
+	// 			dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
+	// 			axios.post(posturl + "replay", data)
+	// 				.then((res) => {
+	// 					if (res.ok) {
+	// 						console.debug(res);
+	// 						testEEWerror = false;
+	// 					} else {
+	// 						console.error(res);
 
-							switch (res.status) {
-								case 429: {
-									log(res.status, 3, "testEEW", "replay");
-									dump({ level: 2, message: res.status });
-									break;
-								}
+	// 						switch (res.status) {
+	// 							case 429: {
+	// 								log(res.status, 3, "testEEW", "replay");
+	// 								dump({ level: 2, message: res.status });
+	// 								break;
+	// 							}
 
-								case 404: {
-									log(res.status, 3, "testEEW", "replay");
-									dump({ level: 2, message: res.status });
-									break;
-								}
+	// 							case 404: {
+	// 								log(res.status, 3, "testEEW", "replay");
+	// 								dump({ level: 2, message: res.status });
+	// 								break;
+	// 							}
 
-								case 500: {
-									log(res.status, 3, "testEEW", "replay");
-									dump({ level: 2, message: res.status });
-									break;
-								}
+	// 							case 500: {
+	// 								log(res.status, 3, "testEEW", "replay");
+	// 								dump({ level: 2, message: res.status });
+	// 								break;
+	// 							}
 
-								default: break;
-							}
-						}
-					})
-					.catch((error) => {
-						testEEWerror = true;
-						log(error, 3, "Verbose", "testEEW");
-						dump({ level: 2, message: error, origin: "Verbose" });
-					});
-			}, 100);
+	// 							default: break;
+	// 						}
+	// 					}
+	// 				})
+	// 				.catch((error) => {
+	// 					testEEWerror = true;
+	// 					log(error, 3, "Verbose", "testEEW");
+	// 					dump({ level: 2, message: error, origin: "Verbose" });
+	// 				});
+	// 		}, 100);
 });
 
 ipcRenderer.on("settingError", (event, error) => {
