@@ -2928,7 +2928,7 @@ async function fetchFiles() {
 	} catch (err) {
 		log(err, 3, "Location", "fetchFiles");
 		dump({ level: 2, message: err, origin: "Location" });
-		console.log(err);
+		route.auto_api_run();
 		await fetchFilesbackup();
 	}
 }
@@ -2967,9 +2967,9 @@ async function fetchFilesbackup() {
 		else
 			await fetchFilesbackup0();
 	} catch (err) {
-		console.log(err);
 		log(err, 3, "Location", "fetchFilesbackup");
 		dump({ level: 2, message: err, origin: "Location" });
+		route.auto_api_run();
 		await fetchFilesbackup0();
 	}
 }
@@ -3008,9 +3008,9 @@ async function fetchFilesbackup0() {
 		else
 			await fetchFiles();
 	} catch (err) {
-		console.log(err);
 		log(err, 3, "Location", "fetchFilesbackup");
 		dump({ level: 2, message: err, origin: "Location" });
+		route.auto_api_run();
 		await fetchFiles();
 	}
 }
