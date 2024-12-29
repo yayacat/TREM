@@ -128,6 +128,7 @@ let type_Unit = "";
 let link_on = false;
 let p2p_mode_status = false;
 let rts_url = 0;
+let eew_url = 0;
 let HTTP = false;
 // #endregion
 
@@ -4508,7 +4509,7 @@ function freertsget(rts_key_verify_f = false) {
 								if ((rts_ws_timestamp - ans.time) >= 30000)
 									if (rts_url == 0)
 										rts_url = 1;
-									 else
+									else
 										rts_url = 0;
 
 								ans.Time = rts_ws_timestamp;
@@ -4517,7 +4518,7 @@ function freertsget(rts_key_verify_f = false) {
 							}).catch((err) => {
 								if (rts_url == 0)
 									rts_url = 1;
-								 else
+								else
 									rts_url = 0;
 								log(err, 3, "server", "rts-clock");
 								clearTimeout(timer);
@@ -4525,7 +4526,7 @@ function freertsget(rts_key_verify_f = false) {
 						} else {
 							if (rts_url == 0)
 								rts_url = 1;
-							 else
+							else
 								rts_url = 0;
 							log(ans0.status, 3, "server", "rts-clock");
 							clearTimeout(timer);
@@ -4533,7 +4534,7 @@ function freertsget(rts_key_verify_f = false) {
 					}).catch((err) => {
 						if (rts_url == 0)
 							rts_url = 1;
-						 else
+						else
 							rts_url = 0;
 						log(err, 3, "server", "rts-clock");
 						clearTimeout(timer);
@@ -4563,7 +4564,7 @@ function fetch_eew() {
 			const controller = new AbortController();
 			const timer = setTimeout(() => controller.abort(), 1000);
 			const lb_num = route.auto_run();
-			await fetch(route.eew(2, rts_url), { signal: controller.signal })
+			await fetch(route.eew(2, eew_url), { signal: controller.signal })
 				.then((ans) => {
 					if (ans.ok) {
 						ans.json().then((ans0) => {
@@ -4579,9 +4580,13 @@ function fetch_eew() {
 							clearTimeout(timer);
 						});
 					} else {
+						if (eew_url == 0)
+							eew_url = 1;
+						else
+							eew_url = 0;
 						HTTP = false;
 						log(`lb-${lb_num} eq_eew`, 3, "server", "eew_clock");
-						console.error(err);
+						console.error(ans);
 
 						switch (ans.status) {
 							case 429: {
@@ -4605,12 +4610,21 @@ function fetch_eew() {
 					}
 				})
 				.catch((err) => {
+					if (eew_url == 0)
+						eew_url = 1;
+					else
+						eew_url = 0;
 					HTTP = false;
 					log(`lb-${lb_num} eq_eew`, 3, "server", "eew_clock");
 					log(err, 3, "server", "eew_clock");
 					clearTimeout(timer);
 				});
 		} catch (err) {
+			if (eew_url == 0)
+				eew_url = 1;
+			else
+				eew_url = 0;
+			HTTP = false;
 			log(err, 3, "server", "eew_clock");
 		}
 	}, 1000);

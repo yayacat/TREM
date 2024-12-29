@@ -5,7 +5,7 @@
  * @template {number} [random_max_num = 4]
  * @template {number} [random_ws_num = 1~4]
  * @template {number} [random_api_num = 1~2]
- * @template {string} [global_url = ["com.tw", "dev"]]
+ * @template {string} [global_url = ["dev"]]
  */
 class Route {
 
