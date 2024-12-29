@@ -4499,7 +4499,7 @@ function freertsget(rts_key_verify_f = false) {
 			try {
 				const controller = new AbortController();
 				const timer = setTimeout(() => controller.abort(), 1000);
-				await fetch(route.rts(1, new Date().getTime(), rts_url), { signal: controller.signal })
+				await fetch(route.rts(2, 0, rts_url), { signal: controller.signal })
 					.then((ans0) => {
 						if (ans0.ok) {
 							ans0.json().then(ans => {
@@ -4563,7 +4563,7 @@ function fetch_eew() {
 			const controller = new AbortController();
 			const timer = setTimeout(() => controller.abort(), 1000);
 			const lb_num = route.auto_run();
-			await fetch(route.eew(1, rts_url), { signal: controller.signal })
+			await fetch(route.eew(2, rts_url), { signal: controller.signal })
 				.then((ans) => {
 					if (ans.ok) {
 						ans.json().then((ans0) => {
