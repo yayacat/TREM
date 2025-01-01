@@ -4561,6 +4561,32 @@ function fetch_eew() {
 
 	eew_clock = setInterval(async () => {
 		try {
+			if (!window.navigator.onLine) {
+				clearInterval(rts_clock);
+				rts_clock = null;
+				clearInterval(eew_clock);
+				eew_clock = null;
+				clearInterval(ntp_clock);
+				ntp_clock = null;
+				clearInterval(ws_clock);
+				ws_clock = null;
+				clearInterval(ws_yayacat_clock);
+				ws_yayacat_clock = null;
+				ws = null;
+				ws_yayacat = null;
+				ServerT_Time = 0;
+				ServerT_yayacat = 0;
+				ServerT_yayacat_Time = 0;
+				return showDialog(
+					"error",
+					TREM.Localization.getString("Initialization_No_Connection_Title"),
+					TREM.Localization.getString("Initialization_No_Connection_Description"),
+					0, "wifi_off", () => {
+						ipcRenderer.send("restart");
+					},
+				);
+			}
+
 			const controller = new AbortController();
 			const timer = setTimeout(() => controller.abort(), 1000);
 			const lb_num = route.auto_run();

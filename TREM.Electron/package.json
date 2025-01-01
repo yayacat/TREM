@@ -1,6 +1,6 @@
 {
   "name": "tremv",
-  "version": "6.1.129",
+  "version": "6.1.130",
   "description": "Taiwan Real-time Earthquake Monitoring Variety ( 臺灣即時地震監測變體 )",
   "main": "main.js",
   "homepage": "https://exptech.com.tw/",
@@ -82,7 +82,7 @@
   "keywords": [],
   "license": "AGPL-3.0",
   "devDependencies": {
-    "electron": "^33.2.0",
+    "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
     "eslint": "^8.57.0"
   },
