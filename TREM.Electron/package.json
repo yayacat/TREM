@@ -92,7 +92,7 @@
     "@turf/circle": "^7.1.0",
     "bytenode": "^1.5.6",
     "chokidar": "^4.0.3",
-    "discord.js": "14.16.3",
+    "discord.js": "14.17.2",
     "echarts": "^5.5.1",
     "electron-common-ipc": "^16.0.4",
     "electron-fcm-push-receiver": "^2.1.7",
