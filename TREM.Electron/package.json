@@ -107,7 +107,7 @@
     "protobufjs": "^7.3.2",
     "speak-tts": "^2.0.8",
     "tinycolor2": "1.6.0",
-    "tough-cookie": "^5.0.0",
+    "tough-cookie": "^5.1.0",
     "undici": "7.2.0",
     "ws": "^8.18.0"
   },
