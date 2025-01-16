@@ -1712,7 +1712,7 @@ function PGAMain() {
 									if (!EarthquakeList[res3[i].id]) {
 										res3[i].replay_timestamp = ReplayTime;
 										res3[i].replay_time = res3[i].time;
-										res3[i].time = NOW().getTime() - (ReplayTime - res3[i].time);
+										res3[i].time = NOW().getTime() - (ReplayTime - res3[i].eq.time);
 										res3[i].timestamp = NOW().getTime();
 										res3[i].type = "eew";
 									} else {

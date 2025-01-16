@@ -102,6 +102,7 @@ TREM.Report = {
 			for (const report of reports) {
 				// if (setting["exptech.key"] == "" && report.data[0].areaIntensity == 0) continue;
 				const element = this._createReportItem(report);
+				const report_date = report.originTime?.split(" ")[0];
 
 				if (report.mag) report.magnitudeValue = report.mag;
 
@@ -112,8 +113,8 @@ TREM.Report = {
 					|| (this._filterIntensity && !(report.data ? report.data[0]?.areaIntensity == this._filterIntensityValue : report.int == this._filterIntensityValue))
 					|| (this._filterTREM && !(report.location ? report.location.startsWith("地震資訊") : report.loc.startsWith("地震資訊")))
 					|| (this._filterCWA && !(report.identifier ? (report.identifier.startsWith("CWA") || report.identifier.startsWith("CWB")) : report.id.match(/-/g).length === 3))
-					|| (this._filterDate && !(report.originTime.split(" ")[0] == this._filterDateValue))
-					|| (this._filterMonth && !((report.originTime.split(" ")[0].split("/")[0] + "/" + report.originTime.split(" ")[0].split("/")[1]) == this._filterMonthValue))) {
+					|| (this._filterDate && !(report_date == this._filterDateValue))
+					|| (this._filterMonth && !((report_date.split("/")[0] + "/" + report_date.split("/")[1]) == this._filterMonthValue))) {
 					element.classList.add("hide");
 					element.style.display = "none";
 				} else {
