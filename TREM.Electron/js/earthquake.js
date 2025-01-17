@@ -4794,6 +4794,7 @@ ipcRenderer.on("testoldEEW", () => {
 });
 
 ipcRenderer.on("testoldtimeEEW", (event, oldtime) => {
+	TREM.Report.replayHttp = true;
 	replay = oldtime - 5000;
 	replayT = NOW().getTime();
 	Report_GET();
@@ -5889,47 +5890,7 @@ TREM.Earthquake.on("eew", (data) => {
 	let dev_s = 0;
 
 	if (data.depth) {
-		let kmP = 0;
-		let km = 0;
-
-		const km_time = (NOW().getTime() - data.time) / 1000;
-
-		const _time_table = TREM.Resources.time[findClosest(TREM.Resources.time_list, data.depth)];
-		let prev_table = null;
-
-		for (const table of _time_table) {
-			if (!kmP && table.P > km_time)
-				if (prev_table) {
-					const t_diff = table.P - prev_table.P;
-					const r_diff = table.R - prev_table.R;
-					const t_offset = km_time - prev_table.P;
-					const r_offset = (t_offset / t_diff) * r_diff;
-					kmP = prev_table.R + r_offset;
-				} else {
-					kmP = table.R;
-				}
-
-			if (!km && table.S > km_time)
-				if (prev_table) {
-					const t_diff = table.S - prev_table.S;
-					const r_diff = table.R - prev_table.R;
-					const t_offset = km_time - prev_table.S;
-					const r_offset = (t_offset / t_diff) * r_diff;
-					km = prev_table.R + r_offset;
-				} else {
-					km = table.R;
-				}
-
-			if (kmP && km) break;
-
-			prev_table = table;
-		}
-
 		const get_speed = _speed(data.depth, distance);
-
-		if (kmP / get_speed.Ptime > 7) get_speed.Ptime = kmP / 7;
-
-		if (km / get_speed.Stime > 4) get_speed.Stime = km / 4;
 		dev_p = get_speed.Ptime;
 		dev_s = get_speed.Stime;
 		dev_p *= 1000;
