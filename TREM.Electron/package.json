@@ -108,7 +108,7 @@
     "speak-tts": "^2.0.8",
     "tinycolor2": "1.6.0",
     "tough-cookie": "^5.1.0",
-    "undici": "7.2.1",
+    "undici": "7.2.3",
     "ws": "^8.18.0"
   },
   "dependenciesoff": {
