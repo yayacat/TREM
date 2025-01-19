@@ -210,9 +210,9 @@ class Route {
 		let reurl;
 
 		if (url == 0)
-			reurl = this.randomBaseUrl(version) + "/eq/eew?type=all";
+			reurl = this.randomBaseUrl(version) + "/eq/eew";
 		else if (url == 1)
-			reurl = this.randomApiBaseUrl(version) + "/eq/eew?type=all";
+			reurl = this.randomBaseUrl(version) + "/eq/eew?type=all";
 		// this.auto_run();
 		return reurl;
 	}
