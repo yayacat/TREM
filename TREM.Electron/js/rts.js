@@ -340,7 +340,7 @@ function station_v2_run(station_data) {
 			if (station_id === "13379360") {
 				Loc = "重庆市 北碚区";
 				area = "重庆市中部";
-			} else if (station_id === "7735548") {
+			} else if (station_id === "7363648") {
 				Loc = "南楊州市 和道邑";
 				area = "南楊州市中部";
 			}

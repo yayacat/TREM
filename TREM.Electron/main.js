@@ -866,6 +866,13 @@ ipcMain.on("config:value", (event, key, value) => {
 			break;
 		}
 
+		case "report.tremeew": {
+			TREM.Configuration.data["report.tremeew"] = value;
+			emitAllWindow("setting", TREM.Configuration._data);
+			ipcMain.emit("ReportTREM");
+			break;
+		}
+
 		case "exptech.key": {
 			TREM.Configuration.data["exptech.key"] = value;
 			emitAllWindow("setting", TREM.Configuration._data);

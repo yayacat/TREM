@@ -130,6 +130,7 @@ let p2p_mode_status = false;
 let rts_url = 0;
 let eew_url = 0;
 let HTTP = false;
+let NewReportTag = "";
 // #endregion
 
 TREM.Detector = {
@@ -1495,7 +1496,7 @@ async function init() {
 				}
 
 				for (let index = 0; index < Object.keys(detected_list).length; index++)
-					if (Object.keys(detected_list)[index].toString() == "7735548") {
+					if (Object.keys(detected_list)[index].toString() == "7363648") {
 						focusScale = 5;
 						xl = index;
 					} else if (Object.keys(detected_list)[index].toString() == "13379360") {
@@ -2554,8 +2555,8 @@ function handler(Json) {
 			}
 		}
 		//  else if (intensitytest > -1 && amount < 999) {
-		// 	if (uuid.split("-")[2] == "7735548")
-		// 		current_station_data.PGA = 7735548;
+		// 	if (uuid.split("-")[2] == "7363648")
+		// 		current_station_data.PGA = 7363648;
 		// 	else if (uuid.split("-")[2] == "13379360")
 		// 		current_station_data.PGA = 13379360;
 
@@ -3072,7 +3073,7 @@ function station_v2_run(station_temp) {
 			if (station_id === "13379360") {
 				Loc = "重庆市 北碚区";
 				area = "重庆市中部";
-			} else if (station_id === "7735548") {
+			} else if (station_id === "7363648") {
 				Loc = "南楊州市 和道邑";
 				area = "南楊州市中部";
 			}
@@ -3334,9 +3335,9 @@ function ReportGET(badcatch = false) {
 			fetch(route.earthquakeReportList(setting["cache.report"]), { signal: controller1.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
-						console.debug(ans0);
+						// console.debug(ans0);
 						ans0.json().then((ans) => {
-							console.debug(ans);
+							// console.debug(ans);
 
 							if (ans.length != 0) {
 								for (let i = 0; i < ans.length; i++) {
@@ -3364,6 +3365,11 @@ function ReportGET(badcatch = false) {
 														ans[i].Max_Level = _report_data[_i].Max_Level;
 														ans[i].Max_Level_areaName = _report_data[_i].Max_Level_areaName;
 														ans[i].Max_Level_stationName = _report_data[_i].Max_Level_stationName;
+													}
+
+													if (_report_data[_i].trem) {
+														ans[i].trem = _report_data[_i].trem;
+														ans[i].trem_list = _report_data[_i].trem_list;
 													}
 
 													_report_data.splice(_i, 1);
@@ -3402,13 +3408,161 @@ function ReportGET(badcatch = false) {
 
 								const OriginTime = _report_data[0].originTime ? new Date(_report_data[0].originTime).getTime() : _report_data[0].time;
 
-								if ((NOW().getTime() - OriginTime) > 0 && !_report_data[0].show) {
+								if ((NOW().getTime() - OriginTime) > 0 && NewReportTag != _report_data[0].id) {
 									if (replay != 0) return;
-									TREM.set_report_overview = 1;
-									TREM.Report.setView("eq-report-overview", _report_data[0]);
-									changeView("report", "#reportView_btn");
-									// ReportTag = NOW().getTime();
-									// console.debug("ReportTag: ", ReportTag);
+
+									if (!setting["report.changeView"]) return;
+									let report = _report_data[0];
+									NewReportTag = report.id;
+									TREM.Report._get_trem_list();
+
+									if (!report.list)
+										fetch(route.earthquakeReport(report.id))
+											.then((res) => {
+												if (res.ok) {
+													// console.debug(res);
+
+													res.json().then(res1 => {
+														// console.debug(res1);
+
+														if (!report.trem)
+															fetch("https://api-1.exptech.dev/api/v1/trem/list")
+																.then((res0) => {
+																	if (res0.ok) {
+																	// console.debug(res);
+																		res0.json().then(res2 => {
+																			// console.debug(res2);
+																			report.list = res1.list;
+																			report = Report_GET_Max(report);
+
+																			for (let i = 0; i < res2.length; i++)
+																				if (res2[i].Cwa_id == NewReportTag) {
+																					report.trem = res2[i].ID;
+																					report.trem_list = res2[i].List;
+																					Report_GET_cwa(report);
+																					TREM.set_report_overview = 1;
+																					TREM.Report.report_trem = setting["report.trem"];
+																					TREM.Report.report_tremeew = setting["report.tremeew"];
+																					TREM.Report.setView("eq-report-overview", report);
+																					changeView("report", "#reportView_btn");
+																				}
+																		});
+																	} else {
+																		console.error(res0);
+
+																		switch (res0.status) {
+																			case 429: {
+																				log(res0.status, 3, "report_list_info", "ReportGET");
+																				dump({ level: 2, message: res0.status });
+																				break;
+																			}
+
+																			case 404: {
+																				log(res0.status, 3, "report_list_info", "ReportGET");
+																				dump({ level: 2, message: res0.status });
+																				break;
+																			}
+
+																			case 500: {
+																				log(res0.status, 3, "report_list_info", "ReportGET");
+																				dump({ level: 2, message: res0.status });
+																				break;
+																			}
+
+																			default: break;
+																		}
+																	}
+																}).catch(err => {
+																	console.log(err.message);
+																	log(err, 3, "report_list_info", "ReportGET");
+																	dump({ level: 2, message: err });
+																});
+													});
+												} else {
+													console.error(res);
+
+													switch (res.status) {
+														case 429: {
+															log(res.status, 3, "report_list_info", "ReportGET");
+															dump({ level: 2, message: res.status });
+															break;
+														}
+
+														case 404: {
+															log(res.status, 3, "report_list_info", "ReportGET");
+															dump({ level: 2, message: res.status });
+															break;
+														}
+
+														case 500: {
+															log(res.status, 3, "report_list_info", "ReportGET");
+															dump({ level: 2, message: res.status });
+															break;
+														}
+
+														default: break;
+													}
+												}
+											}).catch(err => {
+												console.log(err.message);
+												log(err, 3, "report_list", "ReportGET");
+												dump({ level: 2, message: err });
+												return "err";
+											});
+									else
+										if (!report.trem)
+											fetch("https://api-1.exptech.dev/api/v1/trem/list")
+												.then((res0) => {
+													if (res0.ok) {
+														// console.debug(res);
+														res0.json().then(res2 => {
+															// console.debug(res2);
+															report.list = res1.list;
+															report = Report_GET_Max(report);
+
+															for (let i = 0; i < res2.length; i++)
+																if (res2[i].Cwa_id == NewReportTag) {
+																	report.trem = res2[i].ID;
+																	report.trem_list = res2[i].List;
+																	Report_GET_cwa(report);
+																	TREM.set_report_overview = 1;
+																	TREM.Report.report_trem = setting["report.trem"];
+																	TREM.Report.report_tremeew = setting["report.tremeew"];
+																	TREM.Report.setView("eq-report-overview", report);
+																	changeView("report", "#reportView_btn");
+																}
+														});
+													} else {
+														console.error(res0);
+
+														switch (res0.status) {
+															case 429: {
+																log(res0.status, 3, "report_list_info", "ReportGET");
+																dump({ level: 2, message: res0.status });
+																break;
+															}
+
+															case 404: {
+																log(res0.status, 3, "report_list_info", "ReportGET");
+																dump({ level: 2, message: res0.status });
+																break;
+															}
+
+															case 500: {
+																log(res0.status, 3, "report_list_info", "ReportGET");
+																dump({ level: 2, message: res0.status });
+																break;
+															}
+
+															default: break;
+														}
+													}
+												}).catch(err => {
+													console.log(err.message);
+													log(err, 3, "report_list_info", "ReportGET");
+													dump({ level: 2, message: err });
+												});
+
 									_report_data[0].show = true;
 								}
 
@@ -3530,9 +3684,9 @@ function ReportGET(badcatch = false) {
 			fetch(route.earthquakeReportList(setting["cache.report"]), { signal: controller.signal })
 				.then((ans0) => {
 					if (ans0.ok) {
-						console.debug(ans0);
+						// console.debug(ans0);
 						ans0.json().then((ans) => {
-							console.debug(ans);
+							// console.debug(ans);
 
 							if (ans.length != 0) {
 								for (let i = 0; i < ans.length; i++) {
@@ -3560,6 +3714,11 @@ function ReportGET(badcatch = false) {
 														ans[i].Max_Level = _report_data[_i].Max_Level;
 														ans[i].Max_Level_areaName = _report_data[_i].Max_Level_areaName;
 														ans[i].Max_Level_stationName = _report_data[_i].Max_Level_stationName;
+													}
+
+													if (_report_data[_i].trem) {
+														ans[i].trem = _report_data[_i].trem;
+														ans[i].trem_list = _report_data[_i].trem_list;
 													}
 
 													_report_data.splice(_i, 1);
@@ -3595,14 +3754,168 @@ function ReportGET(badcatch = false) {
 
 								const OriginTime = _report_data[0].originTime ? new Date(_report_data[0].originTime).getTime() : _report_data[0].time;
 
-								if ((NOW().getTime() - OriginTime) > 0 && !_report_data[0].show) {
+								// if (_report_data[0].show) {
+								// 	_report_data[0].show = false;
+								// 	delete _report_data[0].list;
+								// }
+
+								if ((NOW().getTime() - OriginTime) > 0 && NewReportTag != _report_data[0].id) {
 									if (replay != 0) return;
-									TREM.set_report_overview = 1;
-									TREM.Report.setView("eq-report-overview", _report_data[0]);
-									changeView("report", "#reportView_btn");
-									// ReportTag = NOW().getTime();
-									// console.debug("ReportTag: ", ReportTag);
+
+									if (!setting["report.changeView"]) return;
+									let report = _report_data[0];
+									NewReportTag = report.id;
+
+									if (!report.list)
+										fetch(route.earthquakeReport(report.id))
+											.then((res) => {
+												if (res.ok) {
+													// console.debug(res);
+
+													res.json().then(res1 => {
+														// console.debug(res1);
+
+														if (!report.trem)
+															fetch("https://api-1.exptech.dev/api/v1/trem/list")
+																.then((res0) => {
+																	if (res0.ok) {
+																	// console.debug(res);
+																		res0.json().then(res2 => {
+																			// console.debug(res2);
+																			report.list = res1.list;
+																			report = Report_GET_Max(report);
+
+																			for (let i = 0; i < res2.length; i++)
+																				if (res2[i].Cwa_id == NewReportTag) {
+																					report.trem = res2[i].ID;
+																					report.trem_list = res2[i].List;
+																					Report_GET_cwa(report);
+																					TREM.set_report_overview = 1;
+																					TREM.Report.report_trem = setting["report.trem"];
+																					TREM.Report.report_tremeew = setting["report.tremeew"];
+																					TREM.Report.setView("eq-report-overview", report);
+																					changeView("report", "#reportView_btn");
+																				}
+																		});
+																	} else {
+																		console.error(res0);
+
+																		switch (res0.status) {
+																			case 429: {
+																				log(res0.status, 3, "report_list_info", "ReportGET");
+																				dump({ level: 2, message: res0.status });
+																				break;
+																			}
+
+																			case 404: {
+																				log(res0.status, 3, "report_list_info", "ReportGET");
+																				dump({ level: 2, message: res0.status });
+																				break;
+																			}
+
+																			case 500: {
+																				log(res0.status, 3, "report_list_info", "ReportGET");
+																				dump({ level: 2, message: res0.status });
+																				break;
+																			}
+
+																			default: break;
+																		}
+																	}
+																}).catch(err => {
+																	console.log(err.message);
+																	log(err, 3, "report_list_info", "ReportGET");
+																	dump({ level: 2, message: err });
+																});
+													});
+												} else {
+													console.error(res);
+
+													switch (res.status) {
+														case 429: {
+															log(res.status, 3, "report_list_info", "ReportGET");
+															dump({ level: 2, message: res.status });
+															break;
+														}
+
+														case 404: {
+															log(res.status, 3, "report_list_info", "ReportGET");
+															dump({ level: 2, message: res.status });
+															break;
+														}
+
+														case 500: {
+															log(res.status, 3, "report_list_info", "ReportGET");
+															dump({ level: 2, message: res.status });
+															break;
+														}
+
+														default: break;
+													}
+												}
+											}).catch(err => {
+												console.log(err.message);
+												log(err, 3, "report_list", "ReportGET");
+												dump({ level: 2, message: err });
+												return "err";
+											});
+									 else
+										if (!report.trem)
+											fetch("https://api-1.exptech.dev/api/v1/trem/list")
+												.then((res0) => {
+													if (res0.ok) {
+													// console.debug(res);
+														res0.json().then(res2 => {
+															// console.debug(res2);
+															report.list = res1.list;
+															report = Report_GET_Max(report);
+
+															for (let i = 0; i < res2.length; i++)
+																if (res2[i].Cwa_id == NewReportTag) {
+																	report.trem = res2[i].ID;
+																	report.trem_list = res2[i].List;
+																	Report_GET_cwa(report);
+																	TREM.set_report_overview = 1;
+																	TREM.Report.report_trem = setting["report.trem"];
+																	TREM.Report.report_tremeew = setting["report.tremeew"];
+																	TREM.Report.setView("eq-report-overview", report);
+																	changeView("report", "#reportView_btn");
+																}
+														});
+													} else {
+														console.error(res0);
+
+														switch (res0.status) {
+															case 429: {
+																log(res0.status, 3, "report_list_info", "ReportGET");
+																dump({ level: 2, message: res0.status });
+																break;
+															}
+
+															case 404: {
+																log(res0.status, 3, "report_list_info", "ReportGET");
+																dump({ level: 2, message: res0.status });
+																break;
+															}
+
+															case 500: {
+																log(res0.status, 3, "report_list_info", "ReportGET");
+																dump({ level: 2, message: res0.status });
+																break;
+															}
+
+															default: break;
+														}
+													}
+												}).catch(err => {
+													console.log(err.message);
+													log(err, 3, "report_list_info", "ReportGET");
+													dump({ level: 2, message: err });
+												});
+
+
 									_report_data[0].show = true;
+									// console.debug(report);
 								}
 
 								storage.setItem("report_data", _report_data);
@@ -3612,20 +3925,21 @@ function ReportGET(badcatch = false) {
 							let k = 0;
 
 							for (let i = 0; i < _report_data.length; i++)
-								if (_report_data[i].identifier) {
-									if (_report_data[i].identifier.startsWith("CWB")) {
-										_report_data_POST_temp[k] = _report_data[i];
-										k += 1;
-									} else if (_report_data[i].identifier.startsWith("CWA")) {
-										_report_data_POST_temp[k] = _report_data[i];
-										k += 1;
+								if (_report_data[i])
+									if (_report_data[i].identifier) {
+										if (_report_data[i].identifier.startsWith("CWB")) {
+											_report_data_POST_temp[k] = _report_data[i];
+											k += 1;
+										} else if (_report_data[i].identifier.startsWith("CWA")) {
+											_report_data_POST_temp[k] = _report_data[i];
+											k += 1;
+										}
+									} else if (_report_data[i].id) {
+										if (_report_data[i].id.match(/-/g).length === 3) {
+											_report_data_POST_temp[k] = _report_data[i];
+											k += 1;
+										}
 									}
-								} else if (_report_data[i].id) {
-									if (_report_data[i].id.match(/-/g).length === 3) {
-										_report_data_POST_temp[k] = _report_data[i];
-										k += 1;
-									}
-								}
 
 							log("Reports fetched", 1, "EQReportFetcher", "ReportGET");
 							dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
@@ -3784,6 +4098,91 @@ function ReportGET(badcatch = false) {
 	}
 }
 
+function Report_GET_Max(report) {
+	let Max_Level = 0;
+	let Max_Level_areaName = "";
+	let Max_Level_stationName = "";
+	let Max_Level_distance = Number.POSITIVE_INFINITY;
+
+	if (report.list) {
+		for (let index = 0, keys = Object.keys(report.list), n = keys.length; index < n; index++) {
+			const areaName = keys[index];
+
+			if (Max_Level < report.list[areaName].int) {
+				Max_Level = report.list[areaName].int;
+				Max_Level_areaName = areaName;
+				Max_Level_distance = Number.POSITIVE_INFINITY;
+			}
+
+			for (let station_index = 0, station_keys = Object.keys(report.list[areaName].town), o = station_keys.length; station_index < o; station_index++) {
+				const station_name = station_keys[station_index];
+				const station_temp = report.list[areaName].town[station_name];
+				const distance = TREM.Utils.twoPointDistance(
+					{ lat: report.lat, lon: report.lon },
+					{ lat: station_temp.lat, lon: station_temp.lon },
+				).toFixed(2);
+				report.list[areaName].town[station_name].distance = distance;
+
+				if (Max_Level_distance > parseFloat(distance))
+					if (Max_Level_areaName === areaName) {
+						if (Max_Level === station_temp.int) {
+							Max_Level_stationName = station_name;
+							Max_Level_distance = parseFloat(distance);
+						}
+					} else if (Max_Level === station_temp.int) {
+						Max_Level_areaName = areaName;
+						Max_Level_stationName = station_name;
+						Max_Level_distance = parseFloat(distance);
+					}
+
+			}
+		}
+
+		report.Max_Level = Max_Level;
+		report.Max_Level_areaName = Max_Level_areaName;
+		report.Max_Level_stationName = Max_Level_stationName;
+	}
+
+	return report;
+}
+
+function Report_GET_cwa(report) {
+	const location = report.loc.match(/(?<=位於).+(?=\))/);
+	new Notification("地震報告",
+		{
+			body   : `${location}發生規模 ${report.mag.toFixed(1)} 有感地震，最大震度${report.Max_Level_areaName}${report.Max_Level_stationName}${TREM.Constants.intensities[report.list[report.Max_Level_areaName].town[report.Max_Level_stationName].int].text}。`,
+			icon   : "../TREM.ico",
+			silent : win.isFocused(),
+		});
+
+	setTimeout(() => {
+		ipcRenderer.send("screenshotEEW", {
+			Function : "report",
+			ID       : report.id,
+			Version  : 1,
+			Time     : NOW().getTime(),
+			Shot     : 1,
+		});
+	}, 5000);
+
+	if (TREM.MapIntensity.isTriggered)
+		TREM.MapIntensity.clear();
+
+	if (TREM.MapArea2.isTriggered)
+		TREM.MapArea2.clear();
+
+	if (setting["audio.report"]) audioPlay("../audio/Report.wav");
+
+	if (setting["report.show"]) win.showInactive();
+
+	if (setting["report.cover"])
+		if (!win.isFullScreen()) {
+			win.setAlwaysOnTop(true);
+			win.focus();
+			win.setAlwaysOnTop(false);
+		}
+}
+
 ipcRenderer.on("ReportGET", () => {
 	Report_GET();
 });
@@ -3844,6 +4243,7 @@ function Report_GET() {
 
 ipcRenderer.on("ReportTREM", () => {
 	TREM.Report.report_trem = setting["report.trem"];
+	TREM.Report.report_tremeew = setting["report.tremeew"];
 
 	if (TREM.Report.view == "report-overview" || TREM.Report.view == "eq-report-overview")
 		if (TREM.Report.report_trem && TREM.Report._markersGroup) {
@@ -4847,7 +5247,7 @@ ipcRenderer.on("apikey", (event, data) => {
 
 ipcRenderer.on("report-Notification", (event, report) => {
 	if (setting["webhook.url"] != "" && setting["report.Notification"]) {
-		console.debug(report);
+		// console.debug(report);
 		log("Posting Notification report Webhook", 1, "Webhook", "report-Notification");
 		dump({ level: 0, message: "Posting Notification report Webhook", origin: "Webhook" });
 		let msg = {};
@@ -5518,7 +5918,7 @@ function FCMdata(json, Unit) {
 			setTimeout(() => {
 				ipcRenderer.send("screenshotEEW", {
 					Function : "report",
-					ID       : json.earthquakeNo ?? report.id,
+					ID       : report.id,
 					Version  : 1,
 					Time     : NOW().getTime(),
 					Shot     : 1,
@@ -5555,7 +5955,7 @@ function FCMdata(json, Unit) {
 					setTimeout(() => {
 						ipcRenderer.send("screenshotEEW", {
 							Function : "report",
-							ID       : json.earthquakeNo,
+							ID       : report.id,
 							Version  : 1,
 							Time     : NOW().getTime(),
 							Shot     : 1,
@@ -5593,7 +5993,7 @@ function FCMdata(json, Unit) {
 				setTimeout(() => {
 					ipcRenderer.send("screenshotEEW", {
 						Function : "report",
-						ID       : json.earthquakeNo,
+						ID       : report.id,
 						Version  : 1,
 						Time     : NOW().getTime(),
 						Shot     : 1,
@@ -7145,6 +7545,7 @@ const changeView = (args, el, event) => {
 	if (changeel.attr("id") == "report") {
 		TREM.Report.api_key_verify = api_key_verify;
 		TREM.Report.report_trem = setting["report.trem"];
+		TREM.Report.report_tremeew = setting["report.tremeew"];
 		TREM.Report.station = station;
 		toggleNav(false);
 	}

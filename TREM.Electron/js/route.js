@@ -236,6 +236,26 @@ class Route {
 	ntp() {
 		return `https://lb-${ this.random_ws_num }.exptech.${this.random_global_url}/ntp`;
 	}
+
+	ApiBaseUrl(address = 1, version) {
+		return `https://api-${address}.exptech.${this.random_global_url}/api/v${ version }`;
+	}
+
+	tremList(address = 1, version) {
+		return this.ApiBaseUrl(address, version) + "/trem/list";
+	}
+
+	tremReport(address = 1, version, trem) {
+		return this.ApiBaseUrl(address, version) + "/trem/report/" + trem;
+	}
+
+	tremInfo(address = 1, version) {
+		return this.ApiBaseUrl(address, version) + "/trem/info";
+	}
+
+	tremMonth(address = 1, version, month) {
+		return this.ApiBaseUrl(address, version) + "/trem/month/" + month;
+	}
 }
 
 module.exports = Route;
