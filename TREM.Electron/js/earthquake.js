@@ -4198,17 +4198,18 @@ function Report_GET() {
 
 	if (_report_data_GET.length != 0 && !setting["report.getInfo"]) {
 		for (let i = 0; i < _report_data_GET.length; i++)
-			if (_report_data_GET[i].identifier) {
-				if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
-					_report_data_GET_temp[j] = _report_data_GET[i];
-					j += 1;
+			if (_report_data_GET[i])
+				if (_report_data_GET[i].identifier) {
+					if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
+						_report_data_GET_temp[j] = _report_data_GET[i];
+						j += 1;
+					}
+				} else if (_report_data_GET[i].id) {
+					if (_report_data_GET[i].id.match(/-/g).length === 3) {
+						_report_data_GET_temp[j] = _report_data_GET[i];
+						j += 1;
+					}
 				}
-			} else if (_report_data_GET[i].id) {
-				if (_report_data_GET[i].id.match(/-/g).length === 3) {
-					_report_data_GET_temp[j] = _report_data_GET[i];
-					j += 1;
-				}
-			}
 
 		cacheReport(_report_data_GET_temp);
 	} else if (_report_data_GET.length != 0 && setting["report.getInfo"]) {
@@ -4222,17 +4223,18 @@ function Report_GET() {
 			cacheReport(_report_data_GET);
 		} else {
 			for (let i = 0; i < _report_data_GET.length; i++)
-				if (_report_data_GET[i].identifier) {
-					if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
-						_report_data_GET_temp[j] = _report_data_GET[i];
-						j += 1;
+				if (_report_data_GET[i])
+					if (_report_data_GET[i].identifier) {
+						if (_report_data_GET[i].identifier.startsWith("CWB") || _report_data_GET[i].identifier.startsWith("CWA")) {
+							_report_data_GET_temp[j] = _report_data_GET[i];
+							j += 1;
+						}
+					} else if (_report_data_GET[i].id) {
+						if (_report_data_GET[i].id.match(/-/g).length === 3) {
+							_report_data_GET_temp[j] = _report_data_GET[i];
+							j += 1;
+						}
 					}
-				} else if (_report_data_GET[i].id) {
-					if (_report_data_GET[i].id.match(/-/g).length === 3) {
-						_report_data_GET_temp[j] = _report_data_GET[i];
-						j += 1;
-					}
-				}
 
 			// if (setting["exptech.key"] != "") ReportGET();
 			// else cacheReport(_report_data_GET_temp);
