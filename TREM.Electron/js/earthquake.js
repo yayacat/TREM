@@ -3283,22 +3283,23 @@ function ReportGET(badcatch = false) {
 
 		if (_report_data.length != 0 && !setting["report.getInfo"]) {
 			for (let i = 0; i < _report_data.length; i++)
-				if (_report_data[i].identifier) {
-					if (_report_data[i].identifier.startsWith("CWB")) {
-						_report_data_temp[j] = _report_data[i];
-						j += 1;
-					} else if (_report_data[i].identifier.startsWith("CWA")) {
-						_report_data_temp[j] = _report_data[i];
-						j += 1;
+				if (_report_data[i])
+					if (_report_data[i].identifier) {
+						if (_report_data[i].identifier.startsWith("CWB")) {
+							_report_data_temp[j] = _report_data[i];
+							j += 1;
+						} else if (_report_data[i].identifier.startsWith("CWA")) {
+							_report_data_temp[j] = _report_data[i];
+							j += 1;
+						}
+					} else if (_report_data[i].id) {
+						if (_report_data[i].id.match(/-/g).length === 3) {
+							_report_data_temp[j] = _report_data[i];
+							j += 1;
+						}
+					} else if (_report_data[i].identifier === "") {
+						_report_data.splice(_i, 1);
 					}
-				} else if (_report_data[i].id) {
-					if (_report_data[i].id.match(/-/g).length === 3) {
-						_report_data_temp[j] = _report_data[i];
-						j += 1;
-					}
-				} else if (_report_data[i].identifier === "") {
-					_report_data.splice(_i, 1);
-				}
 
 			_report_data = _report_data_temp;
 		}
@@ -3582,7 +3583,8 @@ function ReportGET(badcatch = false) {
 							if (_report_data.length > setting["cache.report"]) {
 								_report_data_temp = [];
 								for (let i = 0; i < setting["cache.report"]; i++)
-									_report_data_temp[i] = _report_data[i];
+									if (_report_data[i])
+										_report_data_temp[i] = _report_data[i];
 								TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 								ReportList(_report_data_temp);
 							} else {
@@ -3603,7 +3605,8 @@ function ReportGET(badcatch = false) {
 								if (_report_data.length > setting["cache.report"]) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
-										_report_data_temp[i] = _report_data[i];
+										if (_report_data[i])
+											_report_data_temp[i] = _report_data[i];
 									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
@@ -3626,7 +3629,8 @@ function ReportGET(badcatch = false) {
 								if (_report_data.length > setting["cache.report"]) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
-										_report_data_temp[i] = _report_data[i];
+										if (_report_data[i])
+											_report_data_temp[i] = _report_data[i];
 									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
@@ -3649,7 +3653,8 @@ function ReportGET(badcatch = false) {
 								if (_report_data.length > setting["cache.report"]) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
-										_report_data_temp[i] = _report_data[i];
+										if (_report_data[i])
+											_report_data_temp[i] = _report_data[i];
 									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
@@ -3973,7 +3978,8 @@ function ReportGET(badcatch = false) {
 							if (_report_data.length > setting["cache.report"]) {
 								_report_data_temp = [];
 								for (let i = 0; i < setting["cache.report"]; i++)
-									_report_data_temp[i] = _report_data[i];
+									if (_report_data[i])
+										_report_data_temp[i] = _report_data[i];
 								TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 								ReportList(_report_data_temp);
 							} else {
@@ -3994,7 +4000,8 @@ function ReportGET(badcatch = false) {
 								if (_report_data.length > setting["cache.report"]) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
-										_report_data_temp[i] = _report_data[i];
+										if (_report_data[i])
+											_report_data_temp[i] = _report_data[i];
 									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
@@ -4014,7 +4021,8 @@ function ReportGET(badcatch = false) {
 								if (_report_data.length > setting["cache.report"]) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
-										_report_data_temp[i] = _report_data[i];
+										if (_report_data[i])
+											_report_data_temp[i] = _report_data[i];
 									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
@@ -4034,7 +4042,8 @@ function ReportGET(badcatch = false) {
 								if (_report_data.length > setting["cache.report"]) {
 									_report_data_temp = [];
 									for (let i = 0; i < setting["cache.report"]; i++)
-										_report_data_temp[i] = _report_data[i];
+										if (_report_data[i])
+											_report_data_temp[i] = _report_data[i];
 									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 									ReportList(_report_data_temp);
 								} else {
@@ -4057,7 +4066,8 @@ function ReportGET(badcatch = false) {
 					if (_report_data.length > setting["cache.report"]) {
 						_report_data_temp = [];
 						for (let i = 0; i < setting["cache.report"]; i++)
-							_report_data_temp[i] = _report_data[i];
+							if (_report_data[i])
+								_report_data_temp[i] = _report_data[i];
 						TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 						ReportList(_report_data_temp);
 					} else {
@@ -4084,7 +4094,8 @@ function ReportGET(badcatch = false) {
 		if (_report_data.length > setting["cache.report"]) {
 			_report_data_temp = [];
 			for (let i = 0; i < setting["cache.report"]; i++)
-				_report_data_temp[i] = _report_data[i];
+				if (_report_data[i])
+					_report_data_temp[i] = _report_data[i];
 			TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
 			ReportList(_report_data_temp);
 		} else {
@@ -4566,9 +4577,10 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 			_report_data = storage.getItem("report_data");
 
 			for (let _i = 0; _i < _report_data.length; _i++)
-				if (_report_data[_i].id)
-					if (_report_data[_i].id === report.id)
-						_report_data.splice(_i, 1);
+				if (_report_data[_i])
+					if (_report_data[_i].id)
+						if (_report_data[_i].id === report.id)
+							_report_data.splice(_i, 1);
 
 			_report_data.push(report);
 
