@@ -5920,6 +5920,7 @@ function FCMdata(json, Unit) {
 		const MaxstationName = Object.keys(report.list[MaxareaName].town)[0];
 		report.int = report.list[MaxareaName].int;
 		report.no = report.id.split("-")[0];
+		NewReportTag = report.id;
 
 		if (report.id.match(/-/g).length === 3 && setting["report.onlycwachangeView"]) {
 			if (!win.isFocused())
