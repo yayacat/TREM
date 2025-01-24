@@ -4585,16 +4585,19 @@ function addReport(report, prepend = false, index = 0, palert = false) {
 			_report_data.push(report);
 
 			for (let i = 0; i < _report_data.length - 1; i++)
-				for (let _i = 0; _i < _report_data.length - 1; _i++) {
-					const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
-					const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
+				if (_report_data[i])
+					for (let _i = 0; _i < _report_data.length - 1; _i++)
+						if (_report_data[_i] && _report_data[_i + 1]) {
+							const time_temp = _report_data[_i].originTime ? new Date(_report_data[_i].originTime).getTime() : _report_data[_i].time;
+							const time_1_temp = _report_data[_i + 1].originTime ? new Date(_report_data[_i + 1].originTime).getTime() : _report_data[_i + 1].time;
 
-					if (time_temp < time_1_temp) {
-						const temp = _report_data[_i + 1];
-						_report_data[_i + 1] = _report_data[_i];
-						_report_data[_i] = temp;
-					}
-				}
+							if (time_temp < time_1_temp) {
+								const temp = _report_data[_i + 1];
+								_report_data[_i + 1] = _report_data[_i];
+								_report_data[_i] = temp;
+							}
+						}
+
 
 			storage.setItem("report_data", _report_data);
 
