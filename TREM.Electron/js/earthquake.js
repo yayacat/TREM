@@ -3585,10 +3585,10 @@ function ReportGET(badcatch = false) {
 								for (let i = 0; i < setting["cache.report"]; i++)
 									if (_report_data[i])
 										_report_data_temp[i] = _report_data[i];
-								TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+								TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 								ReportList(_report_data_temp);
 							} else {
-								TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+								TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 								ReportList(_report_data);
 							}
 						});
@@ -3607,10 +3607,10 @@ function ReportGET(badcatch = false) {
 									for (let i = 0; i < setting["cache.report"]; i++)
 										if (_report_data[i])
 											_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -3631,10 +3631,10 @@ function ReportGET(badcatch = false) {
 									for (let i = 0; i < setting["cache.report"]; i++)
 										if (_report_data[i])
 											_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -3655,10 +3655,10 @@ function ReportGET(badcatch = false) {
 									for (let i = 0; i < setting["cache.report"]; i++)
 										if (_report_data[i])
 											_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -3980,10 +3980,10 @@ function ReportGET(badcatch = false) {
 								for (let i = 0; i < setting["cache.report"]; i++)
 									if (_report_data[i])
 										_report_data_temp[i] = _report_data[i];
-								TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+								TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 								ReportList(_report_data_temp);
 							} else {
-								TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+								TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 								ReportList(_report_data);
 							}
 						});
@@ -4002,10 +4002,10 @@ function ReportGET(badcatch = false) {
 									for (let i = 0; i < setting["cache.report"]; i++)
 										if (_report_data[i])
 											_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -4023,10 +4023,10 @@ function ReportGET(badcatch = false) {
 									for (let i = 0; i < setting["cache.report"]; i++)
 										if (_report_data[i])
 											_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -4044,10 +4044,10 @@ function ReportGET(badcatch = false) {
 									for (let i = 0; i < setting["cache.report"]; i++)
 										if (_report_data[i])
 											_report_data_temp[i] = _report_data[i];
-									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data_temp);
 								} else {
-									TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+									TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 									ReportList(_report_data);
 								}
 
@@ -4068,10 +4068,10 @@ function ReportGET(badcatch = false) {
 						for (let i = 0; i < setting["cache.report"]; i++)
 							if (_report_data[i])
 								_report_data_temp[i] = _report_data[i];
-						TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+						TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 						ReportList(_report_data_temp);
 					} else {
-						TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+						TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 						ReportList(_report_data);
 					}
 				});
@@ -4096,10 +4096,10 @@ function ReportGET(badcatch = false) {
 			for (let i = 0; i < setting["cache.report"]; i++)
 				if (_report_data[i])
 					_report_data_temp[i] = _report_data[i];
-			TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+			TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 			ReportList(_report_data_temp);
 		} else {
-			TREM.Report.cache = new Map(_report_data.map(v => [(v.identifier ?? v.id), v]));
+			TREM.Report.cache = new Map(_report_data.map(v => [(v?.identifier ?? v?.id), v]));
 			ReportList(_report_data);
 		}
 
@@ -4294,7 +4294,7 @@ function cacheReport(_report_data_GET) {
 		for (let i = 0; i < setting["cache.report"]; i++)
 			_report_data_temp[i] = _report_data_GET[i];
 
-		TREM.Report.cache = new Map(_report_data_temp.map(v => [(v.identifier ?? v.id), v]));
+		TREM.Report.cache = new Map(_report_data_temp.map(v => [(v?.identifier ?? v?.id), v]));
 
 		if (Report != 0)
 			ReportList(_report_data_temp, {
@@ -4304,7 +4304,7 @@ function cacheReport(_report_data_GET) {
 		else
 			ReportList(_report_data_temp);
 	} else {
-		TREM.Report.cache = new Map(_report_data_GET.map(v => [(v.identifier ?? v.id), v]));
+		TREM.Report.cache = new Map(_report_data_GET.map(v => [(v?.identifier ?? v?.id), v]));
 
 		if (Report != 0)
 			ReportList(_report_data_GET, {
@@ -6313,6 +6313,57 @@ TREM.Earthquake.on("eew", (data) => {
 		dev_s = get_speed.Stime;
 		dev_p *= 1000;
 		dev_s *= 1000;
+
+		let kmP = 0;
+		let km = 0;
+
+		const km_time = (NOW().getTime() - data.time) / 1000;
+
+		const _time_table = TREM.Resources.time[findClosest(TREM.Resources.time_list, data.depth)];
+		let prev_table = null;
+
+		for (const table of _time_table) {
+			if (!kmP && table.P > km_time)
+				if (prev_table) {
+					const t_diff = table.P - prev_table.P;
+					const r_diff = table.R - prev_table.R;
+					const t_offset = km_time - prev_table.P;
+					const r_offset = (t_offset / t_diff) * r_diff;
+					kmP = prev_table.R + r_offset;
+				} else {
+					kmP = table.R;
+				}
+
+			if (!km && table.S > km_time)
+				if (prev_table) {
+					const t_diff = table.S - prev_table.S;
+					const r_diff = table.R - prev_table.R;
+					const t_offset = km_time - prev_table.S;
+					const r_offset = (t_offset / t_diff) * r_diff;
+					km = prev_table.R + r_offset;
+				} else {
+					km = table.R;
+				}
+
+			if (kmP && km) break;
+
+			prev_table = table;
+		}
+
+		let temp_p = km / 2;
+		let temp_s = kmP / 2;
+		temp_p *= 1000;
+		temp_s *= 1000;
+
+		if (temp_p < dev_p) {
+			dev_p = km / 2;
+			dev_p *= 1000;
+		}
+
+		if (temp_s < dev_s) {
+			dev_s = kmP / 2;
+			dev_s *= 1000;
+		}
 	}
 
 	if (setting["dev.mode"])
@@ -7245,7 +7296,7 @@ function main(data) {
 					}
 
 					TREM.Earthquake.emit("eewEnd", data.id);
-					TREM.EEW.get(INFO[TINFO].ID).Cancel = true;
+					TREM.EEW.get(INFO[index].ID).Cancel = true;
 
 					if (Object.keys(EarthquakeList).length == 1) {
 						clearInterval(eew[data.id].t);
@@ -7387,7 +7438,7 @@ function main(data) {
 	if (data.cancel) {
 		if (Canceltime == 0) Canceltime = NOW().getTime();
 
-		if (NOW().getTime() - Canceltime > 5_000) Cancel = true;
+		if (NOW().getTime() - Canceltime > 300_000) Cancel = true;
 	}
 
 	if (NOW().getTime() - data.timestamp > 300_000 || Cancel) {
