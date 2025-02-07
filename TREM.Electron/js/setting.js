@@ -1012,24 +1012,24 @@ function tsunamiopen(checked, name) {
 
 function send() {
 	let data = {};
-	let Unit_type = "eew-test";
-	const testtext_value = document.getElementById("testtext").value;
+	let Unit_type = "test";
+	// const testtext_value = document.getElementById("testtext").value;
 
-	if (testtext_value == "中央氣象局") Unit_type = "eew-cwb";
+	// if (testtext_value == "中央氣象局") Unit_type = "eew-cwb";
 
-	if (testtext_value == "中央氣象署") Unit_type = "eew-cwb";
+	// if (testtext_value == "中央氣象署") Unit_type = "eew-cwb";
 
-	if (testtext_value == "防災科学技術研究所") Unit_type = "eew-nied";
+	// if (testtext_value == "防災科学技術研究所") Unit_type = "eew-nied";
 
-	if (testtext_value == "日本氣象廳") Unit_type = "eew-jma";
+	// if (testtext_value == "日本氣象廳") Unit_type = "eew-jma";
 
-	if (testtext_value == "韓國氣象廳") Unit_type = "eew-kma";
+	// if (testtext_value == "韓國氣象廳") Unit_type = "eew-kma";
 
-	if (testtext_value == "福建省地震局") Unit_type = "eew-fjdzj";
+	// if (testtext_value == "福建省地震局") Unit_type = "eew-fjdzj";
 
-	if (testtext_value == "四川省地震局") Unit_type = "eew-scdzj";
+	// if (testtext_value == "四川省地震局") Unit_type = "eew-scdzj";
 
-	if (testtext_value == "NSSPE") Unit_type = "trem-eew";
+	// if (testtext_value == "NSSPE") Unit_type = "trem-eew";
 
 	let unit_name = "";
 	let raw = {};
@@ -1215,6 +1215,72 @@ function send() {
 				},
 			};
 	}
+
+	const testtext_value = document.getElementById("testtext").value;
+
+	if (testtext_value == "中央氣象局") Unit_type = "cwa";
+
+	if (testtext_value == "中央氣象署") Unit_type = "cwa";
+
+	if (testtext_value == "防災科学技術研究所") Unit_type = "nied";
+
+	if (testtext_value == "日本氣象廳") Unit_type = "jma";
+
+	if (testtext_value == "韓國氣象廳") Unit_type = "kma";
+
+	if (testtext_value == "福建省地震局") Unit_type = "fjdzj";
+
+	if (testtext_value == "四川省地震局") Unit_type = "scdzj";
+
+	if (testtext_value == "NSSPE") Unit_type = "trem-eew";
+
+	data = {
+		type   : "eew",
+		author : Unit_type,
+		id     : document.getElementById("ID").value,
+		serial : parseInt(document.getElementById("Version").value),
+		status : document.getElementById("cancelbtn").checked ? 3 : document.getElementById("testbtn").checked ? 2 : document.getElementById("alertbtn").checked ? 1 : 0,
+		final  : document.getElementById("finalbtn").checked ? 1 : 0,
+		eq     : {
+			time  : new Date(document.getElementById("Time").value).getTime(),
+			lon   : document.getElementById("EastLongitude").value,
+			lat   : document.getElementById("NorthLatitude").value,
+			depth : document.getElementById("Depth").value,
+			mag   : parseFloat(document.getElementById("Scale").value),
+			loc   : document.getElementById("Location").value,
+			// lon   : 142.8,
+			// lat   : 43.2,
+			// depth : 180,
+			// mag   : 4.7,
+			// loc   : "十勝地方北部",
+			max   : 0,
+		},
+		time      : new Date(document.getElementById("TimeStamp").value).getTime(),
+		timestamp : new Date(document.getElementById("TimeStamp").value).getTime(),
+		Unit      : document.getElementById("testtext").value,
+	};
+
+	ipcRenderer.send("test_eew", data);
+	document.getElementById("sendState").innerHTML = "發送成功，第" + data.serial + "報";
+	document.getElementById("Version").value = Number(document.getElementById("Version").value) + 1;
+	const utc = new Date();
+	const NOW = new Date(utc.getTime() + utc.getTimezoneOffset() * 60 * 1000 + 60 * 60 * 8 * 1000);
+	const now = new Date(NOW.getTime() - 20000);
+	const Now1 = now.getFullYear()
+	+ "-" + (now.getMonth() + 1)
+	+ "-" + now.getDate()
+	+ " " + now.getHours()
+	+ ":" + now.getMinutes()
+	+ ":" + now.getSeconds();
+	document.getElementById("Time").value = Now1;
+	const now1 = new Date(NOW.getTime());
+	const Now2 = now1.getFullYear()
+	+ "-" + (now1.getMonth() + 1)
+	+ "-" + now1.getDate()
+	+ " " + now1.getHours()
+	+ ":" + now1.getMinutes()
+	+ ":" + now1.getSeconds();
+	document.getElementById("TimeStamp").value = Now2;
 
 	// axios.post("https://exptech.com.tw/api/v1/et", data)
 	// 	.then((response) => {

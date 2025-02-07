@@ -6139,17 +6139,17 @@ ipcRenderer.on("Olddatabase_eew", (event, json) => {
 });
 
 ipcRenderer.on("test_eew", (event, json) => {
-	json.time = NOW().getTime();
-	json.timestamp = NOW().getTime();
+	// json.time = NOW().getTime();
+	// json.timestamp = NOW().getTime();
 	json.Unit = (json.scale == 1) ? "PLUM(局部無阻尼運動傳播法)"
-		: (json.type == "eew-scdzj") ? "四川省地震局 (SCDZJ)"
-			: (json.type == "eew-nied") ? "防災科学技術研究所 (NIED)"
-				: (json.type == "eew-kma") ? "기상청(KMA)"
-					: (json.type == "eew-jma") ? "気象庁(JMA)"
-						: (json.type == "eew-cwb") ? "中央氣象署 (CWA)"
-							: (json.type == "eew-fjdzj") ? "福建省地震局 (FJDZJ)"
-								: (json.type == "trem-eew" && json.number > 3) ? "TREM(實驗功能僅供參考)"
-									: (json.type == "trem-eew" && json.number <= 3) ? "NSSPE(無震源參數推算)"
+		: (json.author == "scdzj") ? "四川省地震局 (SCDZJ)"
+			: (json.author == "nied") ? "防災科学技術研究所 (NIED)"
+				: (json.author == "kma") ? "기상청(KMA)"
+					: (json.author == "jma") ? "気象庁(JMA)"
+						: (json.author == "cwa") ? "中央氣象署 (CWA)"
+							: (json.author == "fjdzj") ? "福建省地震局 (FJDZJ)"
+								: (json.author == "trem" && json.serial > 3) ? "TREM(實驗功能僅供參考)"
+									: (json.author == "trem" && json.serial <= 3) ? "NSSPE(無震源參數推算)"
 										: (json.Unit) ? json.Unit : "";
 
 	stopReplaybtn();
@@ -6352,15 +6352,20 @@ TREM.Earthquake.on("eew", (data) => {
 
 		let temp_p = km / 2;
 		let temp_s = kmP / 2;
+
+		if (distance / temp_p > 7) temp_p = distance / 7;
+
+		if (distance / temp_s > 4) temp_s = distance / 4;
+
 		temp_p *= 1000;
 		temp_s *= 1000;
 
-		if (temp_p < dev_p) {
+		if (temp_p < dev_p && temp_p > 0) {
 			dev_p = km / 2;
 			dev_p *= 1000;
 		}
 
-		if (temp_s < dev_s) {
+		if (temp_s < dev_s && temp_s > 0) {
 			dev_s = kmP / 2;
 			dev_s *= 1000;
 		}
