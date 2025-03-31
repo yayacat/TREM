@@ -83,7 +83,7 @@
   "license": "AGPL-3.0",
   "devDependencies": {
     "electron": "^35.0.2",
-    "electron-builder": "^25.1.8",
+    "electron-builder": "^26.0.12",
     "eslint": "^8.57.0"
   },
   "dependencies": {
