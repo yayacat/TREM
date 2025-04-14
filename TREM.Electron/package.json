@@ -84,7 +84,7 @@
   "devDependencies": {
     "electron": "^35.0.2",
     "electron-builder": "^25.1.8",
-    "eslint": "^8.57.0"
+    "eslint": "^9.24.0"
   },
   "dependencies": {
     "@electron/remote": "^2.0.12",
