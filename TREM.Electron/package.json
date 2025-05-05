@@ -109,7 +109,7 @@
     "tinycolor2": "1.6.0",
     "tough-cookie": "^5.1.2",
     "undici": "7.5.0",
-    "ws": "^8.18.0"
+    "ws": "^8.18.2"
   },
   "dependenciesoff": {
     "@electron/remote": "^2.0.12",
