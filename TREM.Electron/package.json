@@ -102,7 +102,7 @@
     "jquery": "3.7.1",
     "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
-    "leaflet-edgebuffer": "^1.0.6",
+    "leaflet-edgebuffer": "^1.0.7",
     "leaflet-geojson-vt": "github:ExpTechTW/leaflet-geojson-vt",
     "protobufjs": "^7.3.2",
     "speak-tts": "^2.0.8",
