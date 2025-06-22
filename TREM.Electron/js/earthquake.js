@@ -5841,8 +5841,21 @@ function FCMdata(json, Unit) {
 	server_timestamp.push(json.timestamp);
 
 	if (server_timestamp.length > 30) server_timestamp.splice(0, 1);
-	// eslint-disable-next-line no-empty-function
-	fs.writeFile(path.join(app.getPath("userData"), "server.json"), JSON.stringify(server_timestamp), () => {});
+
+	// Debounce writing server.json
+	if (TREM.serverJsonWriteTimeout) {
+		clearTimeout(TREM.serverJsonWriteTimeout);
+	}
+	TREM.serverJsonWriteTimeout = setTimeout(() => {
+		fs.writeFile(path.join(app.getPath("userData"), "server.json"), JSON.stringify(server_timestamp), (err) => {
+			if (err) {
+				log(`Error writing server.json: ${err}`, 2, "FCMdata", "earthquake");
+				dump({ level: 1, message: `Error writing server.json: ${err}`, origin: "FCMdata" });
+			}
+		});
+		TREM.serverJsonWriteTimeout = null;
+	}, 5000); // Write at most every 5 seconds
+
 	// GetData = true;
 	const filename = NOW().getTime();
 
@@ -6226,6 +6239,9 @@ TREM.Earthquake.on("eew", (data) => {
 	EarthquakeList[data.id].ID = data.id;
 
 	if (data.eq) EarthquakeList[data.id].eq = data.eq;
+	// Store initial depth for caching _time_table in main()
+	EarthquakeList[data.id].eq_depth_for_cache = data.depth;
+
 
 	let value = 0;
 	let distance = 0;
@@ -7119,7 +7135,20 @@ function main(data) {
 
 			const km_time = (NOW().getTime() - data.time) / 1000;
 
-			const _time_table = TREM.Resources.time[findClosest(TREM.Resources.time_list, data.depth)];
+			let _time_table;
+			const eewListItem = EarthquakeList[data.id];
+
+			// Cache _time_table if depth hasn't changed for this EEW
+			if (eewListItem && eewListItem._cached_time_table && eewListItem.eq_depth_for_cache === data.depth) {
+				_time_table = eewListItem._cached_time_table;
+			} else {
+				_time_table = TREM.Resources.time[findClosest(TREM.Resources.time_list, data.depth)];
+				if (eewListItem) {
+					eewListItem._cached_time_table = _time_table;
+					// eq_depth_for_cache is updated when new EEW data comes in the main handler
+				}
+			}
+
 			let prev_table = null;
 
 			for (const table of _time_table) {
@@ -7577,26 +7606,44 @@ function updateText() {
 	// if (EarthquakeList[INFO[TINFO].ID].CircleS) EarthquakeList[INFO[TINFO].ID].CircleS.bringToFront();
 
 	for (const key in EarthquakeList) {
-		if (!TREM.EEW.get(key)?.epicenterIconTW?.getElement()?.classList?.contains("hide"))
-			TREM.EEW.get(key)?.epicenterIconTW?.getElement()?.classList?.add("hide");
+		const eewEntry = TREM.EEW.get(key);
+		const isCurrentTinfo = key === INFO[TINFO]?.ID;
 
-		if (!TREM.EEW.get(key)?.CirclePTW?.getElement()?.classList?.contains("hide"))
-			TREM.EEW.get(key)?.CirclePTW?.getElement()?.classList?.add("hide");
+		if (eewEntry?.epicenterIconTW?.getElement()) {
+			if (isCurrentTinfo) {
+				eewEntry.epicenterIconTW.getElement().classList.remove("hide");
+			} else {
+				eewEntry.epicenterIconTW.getElement().classList.add("hide");
+			}
+		}
+		if (eewEntry?.CirclePTW?.getElement()) {
+			if (isCurrentTinfo) {
+				eewEntry.CirclePTW.getElement().classList.remove("hide");
+			} else {
+				eewEntry.CirclePTW.getElement().classList.add("hide");
+			}
+		}
+		if (eewEntry?.CircleSTW?.getElement()) {
+			if (isCurrentTinfo) {
+				eewEntry.CircleSTW.getElement().classList.remove("hide");
+			} else {
+				eewEntry.CircleSTW.getElement().classList.add("hide");
+			}
+		}
 
-		if (!TREM.EEW.get(key)?.CircleSTW?.getElement()?.classList?.contains("hide"))
-			TREM.EEW.get(key)?.CircleSTW?.getElement()?.classList?.add("hide");
-
-		if (TREM.EEW.get(key)?.geojson)
-			TREM.EEW.get(key).geojson.remove();
+		if (eewEntry?.geojson) {
+			if (isCurrentTinfo) {
+				if (!Maps.mini.hasLayer(eewEntry.geojson)) {
+					eewEntry.geojson.addTo(Maps.mini);
+				}
+				// eewEntry.geojson.bringToFront(); // Optional: if z-ordering matters
+			} else {
+				if (Maps.mini.hasLayer(eewEntry.geojson)) {
+					eewEntry.geojson.remove();
+				}
+			}
+		}
 	}
-
-	if (TREM.EEW.get(INFO[TINFO].ID).epicenterIconTW) TREM.EEW.get(INFO[TINFO].ID).epicenterIconTW.getElement()?.classList?.remove("hide");
-
-	if (TREM.EEW.get(INFO[TINFO].ID).CirclePTW) TREM.EEW.get(INFO[TINFO].ID).CirclePTW.getElement()?.classList?.remove("hide");
-
-	if (TREM.EEW.get(INFO[TINFO].ID).CircleSTW) TREM.EEW.get(INFO[TINFO].ID).CircleSTW.getElement()?.classList?.remove("hide");
-
-	if (TREM.EEW.get(INFO[TINFO].ID)?.geojson) TREM.EEW.get(INFO[TINFO].ID).geojson.addTo(Maps.mini);
 
 	const Num = Math.round(((NOW().getTime() - INFO[TINFO].Time) * 4 / 10) / INFO[TINFO].Depth);
 	const Catch = document.getElementById("box-10");
