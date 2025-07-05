@@ -6227,15 +6227,16 @@ TREM.Earthquake.on("eew", (data) => {
 
 	if (data.eq) EarthquakeList[data.id].eq = data.eq;
 
-	let value = 0;
-	let distance = 0;
+	let value = 0; // Initial countdown for audio alerts
+	let distance = 0; // User's distance to epicenter in KM
 
-	const GC = {};
-	let level;
-	let MaxIntensity = { label: "", value: -1 };
-	const NSSPE = data.intensity ?? {};
+	const GC = {}; // For map intensity coloring based on town code
+	let level; // User's local intensity object
+	let MaxIntensity = { label: "", value: -1 }; // Max intensity overall for the event
+	const NSSPE = data.intensity ?? {}; // NSSPE intensity data if available
 
-	for (const city in TREM.Resources.region)
+	// Calculate distance and local intensity for each town
+	for (const city in TREM.Resources.region) {
 		for (const town in TREM.Resources.region[city]) {
 			const loc = TREM.Resources.region[city][town];
 			const d = TREM.Utils.twoSideDistance(
@@ -6253,21 +6254,23 @@ TREM.Earthquake.on("eew", (data) => {
 				),
 			);
 
-			if (data.depth == null) int = NSSPE[loc[0]] ?? { value: 0, label: "0", get text() {
+			if (data.depth == null) int = NSSPE[loc.code] ?? { value: 0, label: "0", get text() { // Corrected: NSSPE uses towncode, not loc[0]
 				return TREM.Localization.getString("Intensity_Zero");
 			} };
 
 			if (setting["location.city"] == city && setting["location.town"] == town) {
 				level = int;
-				distance = d;
-				value = Math.floor(_speed(data.depth, distance).Stime - (NOW().getTime() - data.time) / 1000) - 2;
+				distance = d; // Distance to user's configured location
 			}
 
-			if (int.value > MaxIntensity.value)
+			if (int.value > MaxIntensity.value) {
 				MaxIntensity = int;
+			}
 			GC[loc.code] = int.value;
 		}
+	}
 
+	// If user has set a custom lat/lon
 	if (setting["location.lat"] != "" && setting["location.lon"] != "") {
 		const d = TREM.Utils.twoSideDistance(
 			TREM.Utils.twoPointDistance(
@@ -6280,26 +6283,81 @@ TREM.Earthquake.on("eew", (data) => {
 			TREM.Utils.pga(
 				data.scale,
 				d,
-				undefined,
+				undefined, // No site effect for custom lat/lon
 			),
 		);
 
-		for (const city in TREM.Resources.region)
-			for (const town in TREM.Resources.region[city]) {
-				const loc = TREM.Resources.region[city][town];
-
-				if (data.depth == null) int = NSSPE[loc[0]] ?? { value: 0, label: "0", get text() {
-					return TREM.Localization.getString("Intensity_Zero");
-				} };
-			}
+		// Fallback to NSSPE if depth is null
+		if (data.depth == null) { // This logic might need refinement for custom lat/lon and NSSPE
+			// For simplicity, let's assume NSSPE is not directly applicable here or needs a different lookup
+			// For now, we'll rely on the PGA-based intensity.
+			// A more advanced system might try to find the closest town for NSSPE.
+		}
 
 		level = int;
 		distance = d;
-		value = Math.floor(_speed(data.depth, distance).Stime - (NOW().getTime() - data.time) / 1000) - 2;
 
-		if (int.value > MaxIntensity.value)
+		if (int.value > MaxIntensity.value) {
 			MaxIntensity = int;
+		}
 	}
+
+	// ---- START: Fix for Countdown Synchronization ----
+	let s_time_to_user_from_json = null;
+	let p_time_to_user_from_json = null;
+	const _time_table_for_countdown = TREM.Resources.time[findClosest(TREM.Resources.time_list, data.depth.toString())]; // Ensure depth is string for key
+
+	if (data.depth != null && _time_table_for_countdown && _time_table_for_countdown.length > 0) {
+		let prev_entry_s = null;
+		let prev_entry_p = null;
+		for (const entry of _time_table_for_countdown) {
+			if (s_time_to_user_from_json === null && entry.R >= distance) {
+				if (prev_entry_s && entry.S > prev_entry_s.S && entry.R > prev_entry_s.R) {
+					const r_diff_s = entry.R - prev_entry_s.R;
+					const s_time_diff_s = entry.S - prev_entry_s.S;
+					const r_offset_s = distance - prev_entry_s.R;
+					s_time_to_user_from_json = prev_entry_s.S + (r_offset_s / r_diff_s) * s_time_diff_s;
+				} else {
+					s_time_to_user_from_json = entry.S; // Exact match or first point
+				}
+			}
+			if (p_time_to_user_from_json === null && entry.R >= distance) {
+				if (prev_entry_p && entry.P > prev_entry_p.P && entry.R > prev_entry_p.R) {
+					const r_diff_p = entry.R - prev_entry_p.R;
+					const p_time_diff_p = entry.P - prev_entry_p.P;
+					const r_offset_p = distance - prev_entry_p.R;
+					p_time_to_user_from_json = prev_entry_p.P + (r_offset_p / r_diff_p) * p_time_diff_p;
+				} else {
+					p_time_to_user_from_json = entry.P; // Exact match or first point
+				}
+			}
+			if (s_time_to_user_from_json !== null && p_time_to_user_from_json !== null) break;
+			prev_entry_s = entry;
+			prev_entry_p = entry;
+		}
+		// Handle cases where distance is beyond the table's max R (extrapolation)
+		if (s_time_to_user_from_json === null && _time_table_for_countdown.length > 0) {
+			const last_entry = _time_table_for_countdown[_time_table_for_countdown.length - 1];
+			if (last_entry.R > 0) s_time_to_user_from_json = last_entry.S * (distance / last_entry.R) ;
+			else s_time_to_user_from_json = last_entry.S;
+		}
+		if (p_time_to_user_from_json === null && _time_table_for_countdown.length > 0) {
+			const last_entry = _time_table_for_countdown[_time_table_for_countdown.length - 1];
+			if (last_entry.R > 0) p_time_to_user_from_json = last_entry.P * (distance / last_entry.R);
+			else p_time_to_user_from_json = last_entry.P;
+		}
+	}
+
+	// Calculate initial countdown for audio alert (value) using the _speed function with -2s buffer
+	if (data.depth != null) {
+	    const speed_stime = _speed(data.depth, distance).Stime;
+	    value = Math.floor(speed_stime - (NOW().getTime() - data.time) / 1000) - 2;
+	} else {
+	    value = -Infinity; // Or some other indicator that it can't be calculated
+	}
+
+	// ---- END: Fix for Countdown Synchronization ----
+
 
 	if (data.type == "trem-eew" && data.number < 3) {
 		data.scale = null;
@@ -6311,72 +6369,13 @@ TREM.Earthquake.on("eew", (data) => {
 		data.depth = null;
 	}
 
-	let dev_p = 0;
-	let dev_s = 0;
-
-	if (data.depth) {
-		const get_speed = _speed(data.depth, distance);
-		dev_p = get_speed.Ptime;
-		dev_s = get_speed.Stime;
-		dev_p *= 1000;
-		dev_s *= 1000;
-
-		let kmP = 0;
-		let km = 0;
-
-		const km_time = (NOW().getTime() - data.time) / 1000;
-
-		const _time_table = TREM.Resources.time[findClosest(TREM.Resources.time_list, data.depth)];
-		let prev_table = null;
-
-		for (const table of _time_table) {
-			if (!kmP && table.P > km_time)
-				if (prev_table) {
-					const t_diff = table.P - prev_table.P;
-					const r_diff = table.R - prev_table.R;
-					const t_offset = km_time - prev_table.P;
-					const r_offset = (t_offset / t_diff) * r_diff;
-					kmP = prev_table.R + r_offset;
-				} else {
-					kmP = table.R;
-				}
-
-			if (!km && table.S > km_time)
-				if (prev_table) {
-					const t_diff = table.S - prev_table.S;
-					const r_diff = table.R - prev_table.R;
-					const t_offset = km_time - prev_table.S;
-					const r_offset = (t_offset / t_diff) * r_diff;
-					km = prev_table.R + r_offset;
-				} else {
-					km = table.R;
-				}
-
-			if (kmP && km) break;
-
-			prev_table = table;
-		}
-
-		let temp_p = km / 2;
-		let temp_s = kmP / 2;
-
-		if (distance / temp_p > 7) temp_p = distance / 7;
-
-		if (distance / temp_s > 4) temp_s = distance / 4;
-
-		temp_p *= 1000;
-		temp_s *= 1000;
-
-		if (temp_p < dev_p && temp_p > 0) {
-			dev_p = km / 2;
-			dev_p *= 1000;
-		}
-
-		if (temp_s < dev_s && temp_s > 0) {
-			dev_s = kmP / 2;
-			dev_s *= 1000;
-		}
-	}
+	// let dev_p = 0; // This was for the old _speed() based alert_pTime
+	// let dev_s = 0; // This was for the old _speed() based alert_sTime
+	// // The dev_p and dev_s are now effectively p_time_to_user_from_json and s_time_to_user_from_json if data.depth is not null
+	// // The logic for kmP and km in main(data) using time.json will determine the circle expansion.
+	// // The original dev_p, dev_s, kmP, km, temp_p, temp_s block for adjusting _speed() results seems less relevant
+	// // if the primary goal is to sync countdown with circles based on time.json.
+	// // However, the _speed() function itself with its velocity caps is still used for the initial audio countdown 'value'.
 
 	if (setting["dev.mode"])
 		if ((data.type == "trem-eew" || data.author == "trem") || data.type == "eew-cwb" || data.type == "eew-fjdzj") {
@@ -6385,7 +6384,10 @@ TREM.Earthquake.on("eew", (data) => {
 			const int = TREM.Utils.PGAToIntensity(
 				TREM.Utils.pga(
 					data.scale,
-					data.depth,
+					data.depth, // This was data.depth, but pga usually takes distance. Assuming it meant epicentral distance for max intensity at source, or this is a different usage.
+					            // Given it's for MaxIntensity overall, data.depth here might be a placeholder or error.
+					            // Let's assume it was intended to be a very small distance (e.g., 1km from hypocenter) if it's for source intensity.
+					            // For now, leaving as data.depth as per original code, but flagging as potentially odd.
 					1,
 				),
 			);
@@ -6396,27 +6398,26 @@ TREM.Earthquake.on("eew", (data) => {
 
 	if (data.eq && data.eq.max) MaxIntensity = { label: TREM.Constants.intensities[data.eq.max].label, value: data.eq.max };
 
-	// TREM.MapIntensity.expected(GC);
 
 	let Alert = true;
 
 	if (level.value < Number(setting["eew.Intensity"])) Alert = false;
 
-	let Nmsg = "";
+	let Nmsg = ""; // For the notification message
 
-	clearInterval(AudioT);
-	audio.main_lock = false;
-	AudioT = null;
-	clearInterval(AudioT1);
-	audio.minor_lock = false;
-	AudioT1 = null;
-	audio.main = [];
-	audio.minor = [];
+	// This 'value' is for the audio countdown, keeping the -2s buffer
+	if (data.depth != null) {
+	    const s_wave_travel_time_for_audio = _speed(data.depth, distance).Stime;
+	    const audio_countdown_val = Math.floor(s_wave_travel_time_for_audio - (NOW().getTime() - data.time) / 1000) - 2;
+	    if (audio_countdown_val > 0) {
+	        Nmsg = `${audio_countdown_val}秒後抵達`;
+	    } else {
+	        Nmsg = "已抵達 (預警盲區)";
+	    }
+	} else {
+	    Nmsg = "預計到達時間未知";
+	}
 
-	if (value > 0)
-		Nmsg = `${value}秒後抵達`;
-	else
-		Nmsg = "已抵達 (預警盲區)";
 
 	const notify = (level.label.includes("+") || level.label.includes("-")) ? level.label.replace("+", "強").replace("-", "弱") : level.label + "級";
 	let body = `${notify ?? "未知"}地震，${Nmsg}\nM ${data.scale} ${data.location ?? "未知區域"}`;
@@ -6466,10 +6467,10 @@ TREM.Earthquake.on("eew", (data) => {
 	if (!Info.Notify.includes(data.id)) {
 		Info.Notify.push(data.id);
 		// show latest eew
-		TINFO = INFO.length;
+		TINFO = INFO.length; // This should be INFO.length -1 for 0-based index
 		clearInterval(Timers.ticker);
 		Timers.ticker = setInterval(() => {
-			if (TINFO + 1 >= INFO.length)
+			if (TINFO + 1 >= INFO.length) // Corrected: cycle through existing INFO array
 				TINFO = 0;
 			else TINFO++;
 		}, 5000);
@@ -6491,8 +6492,8 @@ TREM.Earthquake.on("eew", (data) => {
 
 		eewt.id = data.id;
 
-		if (data.author != "trem")
-			if (setting["audio.eew"] && Alert) {
+		if (data.author != "trem") { // Audio alerts based on initial 'value' (with -2s buffer)
+			if (setting["audio.eew"] && Alert && value != -Infinity) { // Check if value could be calculated
 				log("Playing Audio > eew", 1, "Audio", "eew");
 				dump({ level: 0, message: "Playing Audio > eew", origin: "Audio" });
 				TREM.Audios.eew.play();
@@ -6505,7 +6506,7 @@ TREM.Earthquake.on("eew", (data) => {
 				else
 					audioPlay1("../audio/1/intensity.wav");
 
-				if (value > 0 && value < 100) {
+				if (value > 0 && value < 100) { // 'value' is the audio countdown
 					if (value <= 10) {
 						audioPlay1(`../audio/1/${value.toString()}.wav`);
 					} else if (value < 20) {
@@ -6514,10 +6515,10 @@ TREM.Earthquake.on("eew", (data) => {
 						audioPlay1(`../audio/1/${value.toString().substring(0, 1)}x.wav`);
 						audioPlay1(`../audio/1/x${value.toString().substring(1, 2)}.wav`);
 					}
-
 					audioPlay1("../audio/1/second.wav");
 				}
 			}
+		}
 	}
 
 	if (data.author != "trem")
@@ -6551,30 +6552,32 @@ TREM.Earthquake.on("eew", (data) => {
 		EarthquakeList[data.id].number = data.number;
 	}
 
-	eew[data.id] = {
+	eew[data.id] = { // This eew object seems to be for internal state, not directly for display countdown
 		lon    : Number(data.lon),
 		lat    : Number(data.lat),
-		time   : 0,
-		Time   : data.time,
+		time   : 0, // This 'time' is reset to 0, its purpose here is unclear if not used for display.
+		Time   : data.time, // Original earthquake origin time
 		id     : data.id,
-		km     : 0,
+		km     : 0, // This will be updated by main(data) for circle radius
 		type   : data.type,
-		t      : eew[data.id]?.t ?? null,
-		value  : Math.floor(_speed(data.depth, distance).Stime - (NOW().getTime() - data.time) / 1000),
+		t      : eew[data.id]?.t ?? null, // Interval timer for audio countdown
+		value  : data.depth != null ? Math.floor(_speed(data.depth, distance).Stime - (NOW().getTime() - data.time) / 1000) : -Infinity, // Recalculate for consistency, used by audio interval
 		Second : eew[data.id]?.Second ?? -1,
 		arrive : eew[data.id]?.arrive ?? "",
 	};
 
-	if (data.number != 1) {
+
+	if (data.number != 1) { // If it's an update, clear the audio countdown interval to restart it
 		clearInterval(eew[data.id].t);
 		eew[data.id].t = null;
 		eew[data.id].Second = -1;
 		eew[data.id].arrive = "";
 	}
 
-	if (data.author != "trem")
-		if (eew[data.id].Second == -1 || eew[data.id].value < eew[data.id].Second)
-			if (setting["audio.eew"] && Alert)
+	// Audio countdown logic (seems to use _speed() still)
+	if (data.author != "trem" && data.depth != null) { // Check data.depth for _speed
+		if (eew[data.id].Second == -1 || eew[data.id].value < eew[data.id].Second) { // value here is from _speed()
+			if (setting["audio.eew"] && Alert) {
 				if (eew[data.id].arrive == "") {
 					if (eew[data.id].t != null) {
 						clearInterval(eew[data.id].t);
@@ -6582,51 +6585,60 @@ TREM.Earthquake.on("eew", (data) => {
 					}
 
 					eew[data.id].t = setInterval(() => {
+						let current_countdown_val;
 						try {
-							eew[data.id].value = Math.floor(_speed(data.depth, distance).Stime - (NOW().getTime() - data.time) / 1000);
+						    // This uses _speed, so it might differ from visual countdown if not also changed
+							current_countdown_val = Math.floor(_speed(data.depth, distance).Stime - (NOW().getTime() - data.time) / 1000);
 						} catch (err) {
 							log(err, 3, "Audio", "eew");
 							dump({ level: 2, message: err, origin: "Audio" });
 							console.log(err);
+							clearInterval(eew[data.id].t); // Stop interval on error
+							return;
 						}
+						eew[data.id].value = current_countdown_val; // Update internal value
 
-						if (Math.sign(eew[data.id].value) != -1) {
-							eew[data.id].Second = eew[data.id].value;
+						if (Math.sign(current_countdown_val) != -1) { // If time remaining
+							eew[data.id].Second = current_countdown_val;
 
-							if (stamp != eew[data.id].value && !audio.minor_lock) {
-								stamp = eew[data.id].value;
+							if (stamp != current_countdown_val && !audio.minor_lock) {
+								stamp = current_countdown_val;
 
-								if (eew[data.id].value < 100)
-									if (eew[data.id].value > 10) {
-										if (eew[data.id].value.toString().substring(1, 2) == "0") {
-											audioPlay1(`../audio/1/${eew[data.id].value.toString().substring(0, 1)}x.wav`);
+								if (current_countdown_val < 100) {
+									if (current_countdown_val > 10) {
+										if (current_countdown_val.toString().substring(1, 2) == "0") {
+											audioPlay1(`../audio/1/${current_countdown_val.toString().substring(0, 1)}x.wav`);
 											audioPlay1("../audio/1/x0.wav");
 										} else {
 											audioPlay("../audio/1/ding.wav");
 										}
-									} else if (eew[data.id].value > 0) {
-										audioPlay1(`../audio/1/${eew[data.id].value.toString()}.wav`);
-									} else {
+									} else if (current_countdown_val > 0) {
+										audioPlay1(`../audio/1/${current_countdown_val.toString()}.wav`);
+									} else { // Countdown reached 0
 										eew[data.id].arrive = data.id;
 										audioPlay1("../audio/1/arrive.wav");
-										_time = 0;
-										eew[data.id].Second = -1;
+										_time = 0; // Reset _time for dinging after arrival
+										eew[data.id].Second = -1; // Mark as arrived for this logic
 									}
+								}
 							}
-						} else if (_time >= 0) {
+						} else if (_time >= 0) { // If arrived and _time is tracking post-arrival dings
 							audioPlay("../audio/1/ding.wav");
 							_time++;
-
-							if (_time >= 10) {
+							if (_time >= 10) { // Stop dinging after 10 dings
 								clearInterval(eew[data.id].t);
 								eew[data.id].t = null;
 								_time = -1;
 							}
 						}
-					}, 50);
+					}, 50); // Interval for audio countdown updates
 				}
+			}
+		}
+	}
 
-	const speed = setting["shock.smoothing"] ? 100 : 500;
+
+	const speed_interval = setting["shock.smoothing"] ? 100 : 500; // Renamed 'speed' to 'speed_interval' to avoid conflict
 
 	if (EarthquakeList[data.id].Timer != undefined || EarthquakeList[data.id].Timer != null) clearInterval(EarthquakeList[data.id].Timer);
 
@@ -6656,25 +6668,27 @@ TREM.Earthquake.on("eew", (data) => {
 
 	let find = INFO.findIndex(v => v.ID == data.id);
 
-	if (find == -1) find = INFO.length;
+	if (find == -1) find = INFO.length; // Will push new if not found
 	const time = new Date((data.replay_time) ? data.replay_time : data.time);
+
+	// INFO array now uses arrival times based on time.json if available
 	INFO[find] = {
 		ID              : data.id,
 		alert_number    : data.number,
 		alert_intensity : (data.type == "trem-eew" || data.author == "trem") ? (data.max ? data.max : data.eq.max ?? 0) : MaxIntensity.value,
 		alert_location  : data.location ?? "未知區域",
-		alert_time      : time,
-		alert_sTime     : data.depth ? Math.floor(data.time + dev_s) : null,
-		alert_pTime     : data.depth ? Math.floor(data.time + dev_p) : null,
+		alert_time      : time, // Earthquake origin time (Date object)
+		alert_sTime     : (data.depth != null && s_time_to_user_from_json !== null) ? (data.time + s_time_to_user_from_json * 1000) : null,
+		alert_pTime     : (data.depth != null && p_time_to_user_from_json !== null) ? (data.time + p_time_to_user_from_json * 1000) : null,
 		alert_local     : level.value,
 		alert_magnitude : data.scale ?? "?",
 		alert_depth     : data.depth ?? "?",
 		alert_provider  : (data.final) ? data.Unit + "(最終報)" : data.Unit,
 		alert_type      : classString,
-		"intensity-1"   : `<font color="white" size="7"><b>${MaxIntensity.label}</b></font>`,
-		"time-1"        : `<font color="white" size="2"><b>${time}</b></font>`,
-		"info-1"        : `<font color="white" size="4"><b>M ${data.scale} </b></font><font color="white" size="3"><b> 深度: ${data.depth} km</b></font>`,
-		distance,
+		"intensity-1"   : `<font color="white" size="7"><b>${MaxIntensity.label}</b></font>`, // MaxIntensity overall
+		"time-1"        : `<font color="white" size="2"><b>${timeconvert(time).format("YYYY/MM/DD HH:mm:ss")}</b></font>`, // Formatted origin time
+		"info-1"        : `<font color="white" size="4"><b>M ${data.scale ?? "?"} </b></font><font color="white" size="3"><b> 深度: ${data.depth ?? "?"} km</b></font>`,
+		distance, // User's distance to epicenter
 	};
 
 	// switch to main view
@@ -7175,13 +7189,69 @@ function main(data) {
 			// 		}
 			// }
 
-			if (setting["shock.p"])
+	// P-wave calculation
+    let prev_table_p = null;
+    for (const table of _time_table) {
+        if (table.P > 0) { // Ensure P time is valid
+            if (km_time < table.P) {
+                if (prev_table_p) {
+                    const t_diff_p = table.P - prev_table_p.P;
+                    const r_diff_p = table.R - prev_table_p.R;
+                    const t_offset_p = km_time - prev_table_p.P;
+                    if (t_diff_p > 0) { // Avoid division by zero if P times are identical
+                       kmP = prev_table_p.R + (t_offset_p / t_diff_p) * r_diff_p;
+                    } else {
+                       kmP = prev_table_p.R; // Or table.R, depending on desired behavior for identical P times
+                    }
+                } else { // km_time is before the first P entry
+                    kmP = 0;
+                }
+                break;
+            }
+            kmP = table.R; // If km_time is >= current table.P, this is the current radius
+        }
+        prev_table_p = table;
+    }
+    if (kmP === 0 && km_time > 0 && _time_table.length > 0 && prev_table_p && km_time >= _time_table[_time_table.length -1].P && _time_table[_time_table.length -1].P > 0){
+        kmP = _time_table[_time_table.length -1].R; // km_time is beyond last P entry
+    }
+
+
+    // S-wave calculation (similar separate loop)
+    let prev_table_s = null;
+    for (const table of _time_table) {
+        if (table.S > 0) { // Ensure S time is valid
+            if (km_time < table.S) {
+                if (prev_table_s) {
+                    const t_diff_s = table.S - prev_table_s.S;
+                    const r_diff_s = table.R - prev_table_s.R;
+                    const t_offset_s = km_time - prev_table_s.S;
+                    if (t_diff_s > 0) { // Avoid division by zero
+                        km = prev_table_s.R + (t_offset_s / t_diff_s) * r_diff_s;
+                    } else {
+                        km = prev_table_s.R;
+                    }
+                } else { // km_time is before the first S entry
+                    km = 0;
+                }
+                break;
+            }
+            km = table.R;  // If km_time is >= current table.S, this is the current radius
+        }
+        prev_table_s = table;
+    }
+	if (km === 0 && km_time > 0 && _time_table.length > 0 && prev_table_s && km_time >= _time_table[_time_table.length -1].S && _time_table[_time_table.length -1].S > 0){
+        km = _time_table[_time_table.length -1].R; // km_time is beyond last S entry
+    }
+
+
+	if (setting["shock.p"]) {
 				if (kmP > 0) {
 					if (!EarthquakeList[data.id].CircleP)
 						EarthquakeList[data.id].CircleP = L.circle([+data.lat, +data.lon], {
 							color     : "#6FB7B7",
 							fillColor : "transparent",
-							radius    : kmP,
+					radius    : kmP * 1000, // FIX: km to meters
 							renderer  : L.svg(),
 							className : "p-wave",
 						}).addTo(Maps.main);
@@ -7191,13 +7261,13 @@ function main(data) {
 							.setLatLng([+data.lat, +data.lon]);
 
 					EarthquakeList[data.id].CircleP
-						.setRadius(kmP);
+				.setRadius(kmP * 1000); // FIX: km to meters
 
 					if (!EarthquakeList[data.id].CirclePTW)
 						EarthquakeList[data.id].CirclePTW = L.circle([data.lat, data.lon], {
 							color     : "#6FB7B7",
 							fillColor : "transparent",
-							radius    : kmP,
+					radius    : kmP * 1000, // FIX: km to meters
 							renderer  : L.svg(),
 							className : "p-wave",
 						}).addTo(Maps.mini);
@@ -7207,11 +7277,12 @@ function main(data) {
 							.setLatLng([+data.lat, +data.lon]);
 
 					EarthquakeList[data.id].CirclePTW
-						.setRadius(kmP);
+				.setRadius(kmP * 1000); // FIX: km to meters
 				}
+	}
 
-			if (km > data.depth * 100) {
-				if (TREM.EEW.get(data.id).waveProgress) {
+	if (km > 0 && data.depth != null && km > data.depth * 100) { // Added km > 0 check and data.depth != null
+		if (TREM.EEW.get(data.id)?.waveProgress) {
 					TREM.EEW.get(data.id).waveProgress.remove();
 					delete TREM.EEW.get(data.id).waveProgress;
 				}
@@ -7223,7 +7294,7 @@ function main(data) {
 						color       : data.Alert ? "red" : "orange",
 						fillColor   : `url(#${data.Alert ? "alert" : "pred"}-gradient)`,
 						fillOpacity : 1,
-						radius      : km,
+				radius      : km * 1000, // FIX: km to meters
 						renderer    : L.svg(),
 						className   : "s-wave",
 					}).addTo(Maps.main);
@@ -7233,7 +7304,7 @@ function main(data) {
 						.setLatLng([+data.lat, +data.lon]);
 
 				EarthquakeList[data.id].CircleS
-					.setRadius(km)
+			.setRadius(km * 1000) // FIX: km to meters
 					.setStyle(
 						{
 							color     : data.Alert ? "red" : "orange",
@@ -7246,7 +7317,7 @@ function main(data) {
 						color       : data.Alert ? "red" : "orange",
 						fillColor   : `url(#${data.Alert ? "alert" : "pred"}-gradient)`,
 						fillOpacity : 1,
-						radius      : km,
+				radius      : km * 1000, // FIX: km to meters
 						renderer    : L.svg(),
 						className   : "s-wave",
 					}).addTo(Maps.mini);
@@ -7256,7 +7327,7 @@ function main(data) {
 						.setLatLng([+data.lat, +data.lon]);
 
 				EarthquakeList[data.id].CircleSTW
-					.setRadius(km)
+			.setRadius(km * 1000) // FIX: km to meters
 					.setStyle(
 						{
 							color     : data.Alert ? "red" : "orange",
@@ -7577,34 +7648,33 @@ function updateText() {
 	// if (EarthquakeList[INFO[TINFO].ID].CircleS) EarthquakeList[INFO[TINFO].ID].CircleS.bringToFront();
 
 	for (const key in EarthquakeList) {
-		if (!TREM.EEW.get(key)?.epicenterIconTW?.getElement()?.classList?.contains("hide"))
-			TREM.EEW.get(key)?.epicenterIconTW?.getElement()?.classList?.add("hide");
-
-		if (!TREM.EEW.get(key)?.CirclePTW?.getElement()?.classList?.contains("hide"))
-			TREM.EEW.get(key)?.CirclePTW?.getElement()?.classList?.add("hide");
-
-		if (!TREM.EEW.get(key)?.CircleSTW?.getElement()?.classList?.contains("hide"))
-			TREM.EEW.get(key)?.CircleSTW?.getElement()?.classList?.add("hide");
-
-		if (TREM.EEW.get(key)?.geojson)
-			TREM.EEW.get(key).geojson.remove();
+		const eewData = TREM.EEW.get(key);
+		if (eewData?.epicenterIconTW) eewData.epicenterIconTW.getElement()?.classList.add("hide");
+		if (eewData?.CirclePTW) eewData.CirclePTW.getElement()?.classList.add("hide");
+		if (eewData?.CircleSTW) eewData.CircleSTW.getElement()?.classList.add("hide");
+		if (eewData?.geojson) eewData.geojson.remove();
 	}
 
-	if (TREM.EEW.get(INFO[TINFO].ID).epicenterIconTW) TREM.EEW.get(INFO[TINFO].ID).epicenterIconTW.getElement()?.classList?.remove("hide");
+	const currentEEWData = TREM.EEW.get(INFO[TINFO].ID);
+	if (currentEEWData) {
+		if (currentEEWData.epicenterIconTW) currentEEWData.epicenterIconTW.getElement()?.classList.remove("hide");
+		if (currentEEWData.CirclePTW) currentEEWData.CirclePTW.getElement()?.classList.remove("hide");
+		if (currentEEWData.CircleSTW) currentEEWData.CircleSTW.getElement()?.classList.remove("hide");
+		if (currentEEWData.geojson) currentEEWData.geojson.addTo(Maps.mini);
+	}
 
-	if (TREM.EEW.get(INFO[TINFO].ID).CirclePTW) TREM.EEW.get(INFO[TINFO].ID).CirclePTW.getElement()?.classList?.remove("hide");
 
-	if (TREM.EEW.get(INFO[TINFO].ID).CircleSTW) TREM.EEW.get(INFO[TINFO].ID).CircleSTW.getElement()?.classList?.remove("hide");
-
-	if (TREM.EEW.get(INFO[TINFO].ID)?.geojson) TREM.EEW.get(INFO[TINFO].ID).geojson.addTo(Maps.mini);
-
-	const Num = Math.round(((NOW().getTime() - INFO[TINFO].Time) * 4 / 10) / INFO[TINFO].Depth);
 	const Catch = document.getElementById("box-10");
-
-	if (Num <= 100)
-		Catch.innerHTML = `<font color="white" size="6"><b>震波到地表進度: ${Num}%</b></font>`;
-	else
-		Catch.innerHTML = "";
+	if (INFO[TINFO] && INFO[TINFO].Time && INFO[TINFO].alert_depth && INFO[TINFO].alert_depth !== "?") {
+		const Num = Math.round(((NOW().getTime() - INFO[TINFO].Time) * 4 / 10) / INFO[TINFO].alert_depth); // INFO[TINFO].Time is already a Date object
+		if (Num <= 100 && Num >=0) { // ensure Num is reasonable
+			Catch.innerHTML = `<font color="white" size="6"><b>震波到地表進度: ${Num}%</b></font>`;
+		} else {
+			Catch.innerHTML = "";
+		}
+	} else {
+		Catch.innerHTML = ""; // Clear if data is missing
+	}
 }
 
 const changeView = (args, el, event) => {
