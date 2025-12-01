@@ -91,7 +91,7 @@
     "@material/material-color-utilities": "0.2.0",
     "@turf/circle": "^7.2.0",
     "bytenode": "1.5.7",
-    "chokidar": "^4.0.3",
+    "chokidar": "^5.0.0",
     "discord.js": "14.21.0",
     "echarts": "^5.6.0",
     "electron-common-ipc": "^16.0.4",
