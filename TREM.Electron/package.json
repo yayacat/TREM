@@ -82,8 +82,8 @@
   "keywords": [],
   "license": "AGPL-3.0",
   "devDependencies": {
-    "electron": "37.2.4",
-    "electron-builder": "^26.0.12",
+    "electron": "37.10.3",
+    "electron-builder": "^26.6.0",
     "eslint": "^8.57.0"
   },
   "dependencies": {
@@ -108,7 +108,7 @@
     "speak-tts": "^2.0.8",
     "tinycolor2": "1.6.0",
     "tough-cookie": "^5.1.2",
-    "undici": "7.12.0",
+    "undici": "7.18.2",
     "ws": "^8.18.3"
   },
   "dependenciesoff": {
